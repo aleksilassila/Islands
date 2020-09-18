@@ -1,0 +1,22 @@
+name: Islands
+version: 0.0.1
+author: Aleksi Lassila
+main: me.aleksilassila.islands.Islands
+api-version: 1.16
+commands:
+  goislands:
+    description: Your description
+    usage: /<command>
+    permission: yourplugin.yourcommandpermission
+  goback:
+    description: Your description
+    usage: /<command>
+    permission: yourplugin.yourcommandpermi
+  findisland:
+    description: Your description
+    usage: /<command>
+    permission: yourplugin.yourcommandpermi
+  getbiome:
+    description: Your description
+    usage: /<command>
+    permission: yourplugin.yourcommandpermi
