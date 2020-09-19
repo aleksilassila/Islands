@@ -14,9 +14,9 @@ commands:
     permission: yourplugin.yourcommandpermi
   findisland:
     description: Your description
-    usage: /<command>
+    usage: /<command> biome
     permission: yourplugin.yourcommandpermi
-  getbiome:
+  createisland:
     description: Your description
     usage: /<command>
     permission: yourplugin.yourcommandpermi

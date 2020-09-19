@@ -8,6 +8,8 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+import java.util.List;
+
 public class IslandCommands implements CommandExecutor {
     private Islands plugin;
 
@@ -17,7 +19,7 @@ public class IslandCommands implements CommandExecutor {
         plugin.getCommand("goislands").setExecutor(this);
         plugin.getCommand("goback").setExecutor(this);
         plugin.getCommand("findisland").setExecutor(this);
-        plugin.getCommand("getbiome").setExecutor(this);
+        plugin.getCommand("createisland").setExecutor(this);
 
     }
 
@@ -31,10 +33,64 @@ public class IslandCommands implements CommandExecutor {
             } else if (label.equalsIgnoreCase("goback")) {
                 player.teleport(new Location(plugin.getServer().getWorlds().get(0), player.getLocation().getBlockX(), 140, player.getLocation().getBlockZ()));
             } else if (label.equalsIgnoreCase("findisland")) {
-                int[] position = plugin.islandGen.getIslandSourceLocation(Biome.BAMBOO_JUNGLE, 100);
-                player.sendMessage("Found suitable BAMBOOJUNGLE island. x:" + position[0] + ", y: " + position[1]);
-            } else if (label.equalsIgnoreCase("getbiome")) {
-                player.sendMessage("Your biome in islands: " + plugin.islandsWorld.getBiome(player.getLocation().getBlockX(), 180, player.getLocation().getBlockZ()));
+                if (args.length < 1) {
+                    player.sendMessage("Provide biome.");
+                    return true;
+                }
+
+                Biome targetBiome = null;
+
+                for (Biome biome : Biome.values()) {
+                    if (biome.name().equalsIgnoreCase(args[0])) {
+                        targetBiome = biome;
+                    }
+                }
+
+                if (targetBiome == null) {
+                    player.sendMessage("Biome not found.");
+                    return true;
+                }
+
+                List<Location> locations = plugin.islandGen.getAllIslandLocations(32, targetBiome);
+                player.sendMessage("Found " + locations.size() + " suitable " + targetBiome + ".");
+                for (Location location : locations) {
+                    player.sendMessage("Location: " + location.getBlockX() + ", " + location.getBlockZ());
+                }
+            } else if (label.equalsIgnoreCase("createisland")) {
+                if (args.length < 1) {
+                    player.sendMessage("Provide biome.");
+                    return true;
+                }
+
+                Biome targetBiome = null;
+
+                for (Biome biome : Biome.values()) {
+                    if (biome.name().equalsIgnoreCase(args[0])) {
+                        targetBiome = biome;
+                    }
+                }
+
+                if (targetBiome == null) {
+                    player.sendMessage("Biome not found.");
+                    return true;
+                }
+
+                boolean success = plugin.islandGen.generateIsland(targetBiome, 32);
+
+//                List<Location> locations = plugin.islandGen.getAllIslandLocations(32, targetBiome);
+//                Location location = locations.get(0);
+//                Location location = new Location(plugin.islandsSourceWorld, 0,0,0);
+//                plugin.islandGen.copyRegion(
+//                        location,
+//                        new Location(plugin.islandsSourceWorld, location.getBlockX() + 32, location.getBlockY() - 100, location.getBlockZ() + 32),
+//                        location
+//                );
+                if (success) {
+                    player.sendMessage("Done");
+                } else {
+                    player.sendMessage("Error occured");
+                }
+
             }
 
             return true;
