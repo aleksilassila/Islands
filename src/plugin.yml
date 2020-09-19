@@ -4,14 +4,10 @@ author: Aleksi Lassila
 main: me.aleksilassila.islands.Islands
 api-version: 1.16
 commands:
-  goislands:
+  go:
     description: Your description
     usage: /<command>
     permission: yourplugin.yourcommandpermission
-  goback:
-    description: Your description
-    usage: /<command>
-    permission: yourplugin.yourcommandpermi
   findisland:
     description: Your description
     usage: /<command> biome

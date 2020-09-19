@@ -1,7 +1,9 @@
 package me.aleksilassila.islands.commands;
 
 import me.aleksilassila.islands.Islands;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.block.Biome;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -16,8 +18,7 @@ public class IslandCommands implements CommandExecutor {
     public IslandCommands(Islands plugin) {
         this.plugin = plugin;
 
-        plugin.getCommand("goislands").setExecutor(this);
-        plugin.getCommand("goback").setExecutor(this);
+        plugin.getCommand("go").setExecutor(this);
         plugin.getCommand("findisland").setExecutor(this);
         plugin.getCommand("createisland").setExecutor(this);
 
@@ -28,10 +29,25 @@ public class IslandCommands implements CommandExecutor {
         if (sender instanceof Player) {
             Player player = (Player) sender;
 
-            if (label.equalsIgnoreCase("goislands")) {
-                player.teleport(new Location(plugin.islandsWorld, player.getLocation().getBlockX(), 140, player.getLocation().getBlockZ()));
-            } else if (label.equalsIgnoreCase("goback")) {
-                player.teleport(new Location(plugin.getServer().getWorlds().get(0), player.getLocation().getBlockX(), 140, player.getLocation().getBlockZ()));
+            if (label.equalsIgnoreCase("go")) {
+                if (args.length != 1) {
+                    player.sendMessage("Provide world.");
+                    return true;
+                }
+
+                World world;
+
+                if (args[0].equalsIgnoreCase("source")) {
+                    world = plugin.islandsSourceWorld;
+                } else if (args[0].equalsIgnoreCase("islands")) {
+                    world = plugin.islandsWorld;
+                } else {
+                    world = Bukkit.getWorlds().get(0);
+                }
+
+                player.sendMessage("Length of worlds: " + Bukkit.getWorlds().size());
+
+                player.teleport(new Location(world, player.getLocation().getBlockX(), 120, player.getLocation().getBlockZ()));
             } else if (label.equalsIgnoreCase("findisland")) {
                 if (args.length < 1) {
                     player.sendMessage("Provide biome.");
