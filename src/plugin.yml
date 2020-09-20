@@ -15,6 +15,14 @@ commands:
     aliases: [is]
   visit:
     description: Your description
-    usage: /<command> biome
+    usage: /<command> name
     permission: yourplugin.yourcommandpermi
     aliases: [vi]
+  home:
+    description: Teleport to your home island
+    usage: /<command> [home id]
+    permission: yourplugin.yourcommandpermi
+  homes:
+    description: List homes
+    usage: /<command>
+    permission: yourplugin.yourcommandpermi

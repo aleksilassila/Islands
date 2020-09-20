@@ -114,6 +114,8 @@ public class IslandGrid {
         int realY = getIslandY(xIndex, zIndex);
         int realZ = zIndex * islandSpacing;
 
+        String home = String.valueOf(getNumberOfIslands(uuid) + 1);
+
         String islandId = String.valueOf((int) Math.floor(Math.random() * 10000000));
 
         getIslandsConfig().set("islands."+islandId+".xIndex", xIndex);
@@ -128,7 +130,7 @@ public class IslandGrid {
 
         getIslandsConfig().set("islands."+islandId+".UUID", uuid.toString());
         getIslandsConfig().set("islands."+islandId+".name", name);
-        getIslandsConfig().set("islands."+islandId+".home", String.valueOf(getNumberOfIslands(uuid) + 1));
+        getIslandsConfig().set("islands."+islandId+".home", home);
         getIslandsConfig().set("islands."+islandId+".size", islandSize);
 
         islands.plugin.saveIslandsConfig();
