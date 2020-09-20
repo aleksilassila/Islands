@@ -64,7 +64,7 @@ public class IslandCommands implements CommandExecutor {
         }
 
         try {
-            String islandId = plugin.islands.grid.getIslandId(player.getUniqueId(), args[0]);
+            String islandId = plugin.islands.grid.getPrivateIsland(player.getUniqueId(), args[0]);
 
             player.teleport(plugin.islands.grid.getIslandSpawn(islandId));
         } catch (IslandGrid.IslandGridException e) {
@@ -129,7 +129,7 @@ public class IslandCommands implements CommandExecutor {
         if (success) {
             player.sendMessage(ChatColor.GREEN + "Island regenerated successfully.");
             try {
-                player.teleport(plugin.islands.grid.getIslandSpawn(plugin.islands.grid.getIslandId(player.getUniqueId(), args[1])));
+                player.teleport(plugin.islands.grid.getIslandSpawn(plugin.islands.grid.getPrivateIsland(player.getUniqueId(), args[1])));
             } catch (IslandGrid.IslandGridException e) {
                 player.sendMessage(ChatColor.RED + "Could not teleport to island.");
             }

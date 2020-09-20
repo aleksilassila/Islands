@@ -83,7 +83,7 @@ public class Islands {
 
     public boolean regenerateIsland(Biome biome, UUID uuid, String name) {
         try {
-            String islandId = grid.getIslandId(uuid, name);
+            String islandId = grid.getPrivateIsland(uuid, name);
 
             boolean success = islandGeneration.copyIsland(
                     biome,

@@ -98,16 +98,7 @@ public class IslandGeneration {
     }
 
     public boolean isBlockInShape(int x, int y, int z, int islandSize) {
-        if (y > islandSize / 2) {
-            if ((Math.pow(x - islandSize / 2, 2) + 0.8 * Math.pow(y - islandSize / 2, 2) + Math.pow(z - islandSize / 2, 2)) <= Math.pow(islandSize / 2, 2)) {
-                return true;
-            }
-        } else {
-            if ((Math.pow(x - islandSize / 2, 2) + ((islandSize * 2)/(Math.pow(y, 2) * 0.2 + islandSize / 8.0) + 1) * Math.pow(y - islandSize / 1.7, 2) + Math.pow(z - islandSize / 2, 2)) <= Math.pow(islandSize / 2, 2)) {
-                return true;
-            }
-        }
-
-        return false;
+        return (Math.pow(x - islandSize / 2.0, 2) + (islandSize / Math.pow(y, 2) + 1.3) * Math.pow(y - islandSize / 2.0, 2) + Math.pow(z - islandSize / 2.0, 2))
+                <= Math.pow(islandSize / 2.0, 2);
     }
 }
