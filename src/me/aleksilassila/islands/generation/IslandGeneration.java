@@ -22,6 +22,13 @@ public class IslandGeneration {
         this.biomes = new Biomes(islands.sourceWorld, 32);
     }
 
+    public boolean isBlockInShape(int x, int y, int z, int islandSize) {
+        if ((Math.pow(x - islandSize / 2, 2) + Math.pow(1.2 * y - islandSize / 2, 2) + Math.pow(z - islandSize / 2, 2)) <= Math.pow(islandSize / 2, 2)) {
+            return true;
+        }
+
+        return false;
+    }
 
     public boolean copyIsland(Biome biome, int islandSize, int targetX, int targetY, int targetZ) {
         List<Location> locations = biomes.availableLocations.get(biome);

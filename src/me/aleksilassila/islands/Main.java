@@ -3,6 +3,7 @@ package me.aleksilassila.islands;
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import me.aleksilassila.islands.commands.IslandCommands;
 import me.aleksilassila.islands.generation.EmptyWorldGenerator;
+import me.aleksilassila.islands.listeners.IslandsListener;
 import org.bukkit.*;
 
 import org.bukkit.plugin.java.JavaPlugin;
@@ -25,6 +26,7 @@ public class Main extends JavaPlugin {
         islands = new Islands(islandsWorld, islandsSourceWorld, this);
 
         new IslandCommands(this);
+        new IslandsListener(this);
 
         getLogger().info("Islands enabled!");
     }

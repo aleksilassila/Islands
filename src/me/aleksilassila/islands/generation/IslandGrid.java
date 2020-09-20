@@ -14,7 +14,7 @@ public class IslandGrid {
     private Islands islands;
 
     private int islandsInARow = 3;
-    private int islandSpacing = 80+20;
+    private int islandSpacing = 80 + 20;
 
     public IslandGrid(Islands instance) {
         this.islands = instance;
@@ -178,6 +178,24 @@ public class IslandGrid {
         }
 
         return true;
+    }
+
+    public boolean isBlockInNormalIsland(int x, int y, int z) {
+        int xIndex = x / islandSpacing;
+        int zIndex = z / islandSpacing;
+        int islandLowY = 50 + ((xIndex * islandsInARow + zIndex) % 3) * 50;
+
+        int relativeX = x - xIndex * islandSpacing;
+        int relativeZ = z - zIndex * islandSpacing;
+        int relativeY = y - islandLowY;
+
+        //if (relativeX <= 64 && relativeZ <= 64 && relativeY > 0 && relativeY < 64) {
+        if (islands.islandGeneration.isBlockInShape(relativeX, relativeY, relativeZ, 64)) {
+            return true;
+        }
+        //}
+
+        return false;
     }
 
     // deleteIsland
