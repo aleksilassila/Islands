@@ -17,7 +17,7 @@ public class IslandsListener implements Listener {
 
     @EventHandler
     public void onBlockFromTo(BlockFromToEvent event) {
-        boolean canFlow = plugin.islands.grid.isBlockInNormalIsland(event.getBlock().getX(), event.getBlock().getY(), event.getBlock().getZ());
+        boolean canFlow = plugin.islands.grid.isBlockInIsland(event.getBlock().getX(), event.getBlock().getY(), event.getBlock().getZ());
 
         if(!canFlow) {
             event.setCancelled(true);

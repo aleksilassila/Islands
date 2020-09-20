@@ -1,5 +1,6 @@
 package me.aleksilassila.islands.biomes;
 
+import me.aleksilassila.islands.Main;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -12,13 +13,16 @@ public class Biomes {
     public HashMap<Biome, List<Location>> availableLocations;
     private int biggestIslandSize = 80;
 
-    int biomeSearchJumpBlocks = 8;
+    int biomeSearchJumpBlocks;
     //int biomeSearchSize = 5000;
-    int biomeSearchSize = 1000;
+    int biomeSearchSize;
 
-    public Biomes(World world, int biggestIslandSize) {
+    public Biomes(World world, Main plugin) {
         this.world = world;
-        this.biggestIslandSize = biggestIslandSize;
+        this.biggestIslandSize = plugin.getConfig().getInt("island.BIG");
+
+        this.biomeSearchJumpBlocks = plugin.getConfig().getInt("generation.searchJump");
+        this.biomeSearchSize = plugin.getConfig().getInt("generation.searchArea");
 
         this.availableLocations = getAllAvailableIslandLocations();
     }

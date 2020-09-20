@@ -1,6 +1,7 @@
 package me.aleksilassila.islands.generation;
 
 import me.aleksilassila.islands.Islands;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -13,11 +14,16 @@ import java.util.UUID;
 public class IslandGrid {
     private Islands islands;
 
-    private int islandsInARow = 3;
-    private int islandSpacing = 80 + 20;
+    private int islandsInARow;
+    private int islandSpacing;
 
     public IslandGrid(Islands instance) {
         this.islands = instance;
+
+        this.islandsInARow = instance.plugin.getConfig().getInt("generation.islandsInARow");
+        this.islandSpacing = instance.plugin.getConfig().getInt("generation.islandSpacing");
+
+        Bukkit.broadcastMessage("INT IS " + islandSpacing);
     }
 
     public static class IslandGridException extends java.lang.Exception {
@@ -27,7 +33,7 @@ public class IslandGrid {
     }
 
     private FileConfiguration getConfig() {
-        return islands.plugin.getConfig();
+        return islands.plugin.getIslandsConfig();
     }
 
     public String getFirstIslandId(UUID uuid) throws IslandGridException {
@@ -90,7 +96,7 @@ public class IslandGrid {
             return new Location(
                     islands.plugin.islandsWorld,
                     getConfig().getInt("islands." + islandId + ".spawnPoint.x"),
-                    180,
+                    getConfig().getInt("islands." + islandId + ".y") + 100,
                     getConfig().getInt("islands." + islandId + ".spawnPoint.z")
             );
         } else {
@@ -98,9 +104,14 @@ public class IslandGrid {
         }
     }
 
+    private int getIslandY(int xIndex, int zIndex) {
+        int islandIndex = (xIndex * islandsInARow + zIndex);
+        return 20 + ((islandIndex + xIndex) % 3) * 70;
+    }
+
     private String addIslandToConfig(int xIndex, int zIndex, int islandSize, UUID uuid, String name){
         int realX = xIndex * islandSpacing;
-        int realY = 50 + ((xIndex * islandsInARow + zIndex) % 3) * 50;
+        int realY = getIslandY(xIndex, zIndex);
         int realZ = zIndex * islandSpacing;
 
         String islandId = String.valueOf((int) Math.floor(Math.random() * 10000000));
@@ -119,7 +130,7 @@ public class IslandGrid {
         getConfig().set("islands."+islandId+".name", name);
         getConfig().set("islands."+islandId+".size", islandSize);
 
-        islands.plugin.saveConfig();
+        islands.plugin.saveIslandsConfig();
 
         return islandId;
     }
@@ -171,7 +182,7 @@ public class IslandGrid {
         }
         try {
             getConfig().set("islands."+ getFirstIslandId(uuid)+".name", name);
-            islands.plugin.saveConfig();
+            islands.plugin.saveIslandsConfig();
 
         } catch (IslandGridException e) {
             return false;
@@ -180,22 +191,18 @@ public class IslandGrid {
         return true;
     }
 
-    public boolean isBlockInNormalIsland(int x, int y, int z) {
+    public boolean isBlockInIsland(int x, int y, int z) {
         int xIndex = x / islandSpacing;
         int zIndex = z / islandSpacing;
-        int islandLowY = 50 + ((xIndex * islandsInARow + zIndex) % 3) * 50;
+        int islandLowY = getIslandY(xIndex, zIndex);
 
         int relativeX = x - xIndex * islandSpacing;
         int relativeZ = z - zIndex * islandSpacing;
         int relativeY = y - islandLowY;
 
-        //if (relativeX <= 64 && relativeZ <= 64 && relativeY > 0 && relativeY < 64) {
-        if (islands.islandGeneration.isBlockInShape(relativeX, relativeY, relativeZ, 64)) {
-            return true;
-        }
-        //}
+        int islandSize = 64; // CHANGE THIS
 
-        return false;
+        return islands.islandGeneration.isBlockInShape(relativeX, relativeY, relativeZ, islandSize);
     }
 
     // deleteIsland

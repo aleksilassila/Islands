@@ -19,15 +19,7 @@ public class IslandGeneration {
 
     public IslandGeneration(Islands islands) {
         this.islands = islands;
-        this.biomes = new Biomes(islands.sourceWorld, 32);
-    }
-
-    public boolean isBlockInShape(int x, int y, int z, int islandSize) {
-        if ((Math.pow(x - islandSize / 2, 2) + Math.pow(1.2 * y - islandSize / 2, 2) + Math.pow(z - islandSize / 2, 2)) <= Math.pow(islandSize / 2, 2)) {
-            return true;
-        }
-
-        return false;
+        this.biomes = new Biomes(islands.sourceWorld, islands.plugin);
     }
 
     public boolean copyIsland(Biome biome, int islandSize, int targetX, int targetY, int targetZ) {
@@ -49,7 +41,7 @@ public class IslandGeneration {
             int centerZ = (int) (sourceLocation.getBlockZ() + ((double) islandSize) / 2.0);
 
             Material material = islands.sourceWorld.getBlockAt(centerX, centerY, centerZ).getBlockData().getMaterial();
-            if (material == Material.GRASS_BLOCK || material == Material.STONE || material == Material.DIRT || material == Material.SAND || material == Material.SANDSTONE ) {
+            if (material == Material.STONE || material == Material.SANDSTONE || material == Material.WATER) {
                 break;
             }
             centerY--;
@@ -83,18 +75,39 @@ public class IslandGeneration {
             int relativeY = point.getBlockY() - startY;
             int relativeZ = point.getBlockZ() - startZ;
 
-            if ((Math.pow(relativeX - islandSize / 2, 2) + Math.pow(1.2 * relativeY - islandSize / 2, 2) + Math.pow(relativeZ - islandSize / 2, 2)) <= Math.pow(islandSize / 2, 2)){
+            if (isBlockInShape(relativeX, relativeY, relativeZ, islandSize)){
                 islands.world.getBlockAt(targetX + relativeX, targetY + relativeY, targetZ + relativeZ).setBlockData(sourceData);
             } else {
                 islands.world.getBlockAt(targetX + relativeX, targetY + relativeY, targetZ + relativeZ).setType(Material.AIR);
             }
+        }
 
-            islands.world.getBlockAt(targetX + relativeX, targetY + relativeY, targetZ + relativeZ).setBiome(biome);
+        Bukkit.getLogger().info("Updating biomes...");
+        for (int x = targetX - 10; x < targetX + islandSize + 10; x++) {
+            for (int z = targetZ - 10; z < targetZ + islandSize + 10; z++) {
+                for (int y = 0; y < islands.world.getMaxHeight(); y++) {
+                    islands.world.getBlockAt(x, y, z).setBiome(biome);
+                }
+            }
         }
 
         // Update lighting
         islands.world.getChunkAt(targetX + islandSize / 2, targetZ + islandSize / 2);
 
         return true;
+    }
+
+    public boolean isBlockInShape(int x, int y, int z, int islandSize) {
+        if (y > islandSize / 2) {
+            if ((Math.pow(x - islandSize / 2, 2) + 0.8 * Math.pow(y - islandSize / 2, 2) + Math.pow(z - islandSize / 2, 2)) <= Math.pow(islandSize / 2, 2)) {
+                return true;
+            }
+        } else {
+            if ((Math.pow(x - islandSize / 2, 2) + ((islandSize * 2)/(Math.pow(y, 2) * 0.2 + islandSize / 8.0) + 1) * Math.pow(y - islandSize / 1.7, 2) + Math.pow(z - islandSize / 2, 2)) <= Math.pow(islandSize / 2, 2)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

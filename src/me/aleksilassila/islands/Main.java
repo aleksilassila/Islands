@@ -6,12 +6,21 @@ import me.aleksilassila.islands.generation.EmptyWorldGenerator;
 import me.aleksilassila.islands.listeners.IslandsListener;
 import org.bukkit.*;
 
+import org.bukkit.configuration.InvalidConfigurationException;
+import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
+
+import java.io.File;
+import java.io.IOException;
 
 public class Main extends JavaPlugin {
 
     public World islandsWorld;
     public World islandsSourceWorld;
+
+    private FileConfiguration islandsConfig;
+    private File islandsConfigFile;
 
     public Islands islands;
 
@@ -19,6 +28,8 @@ public class Main extends JavaPlugin {
     public void onEnable() {
         getConfig().options().copyDefaults(true);
         saveConfig();
+
+        initIslandsConfig();
 
         islandsWorld = createIslandsWorldIfNecessary();
         islandsSourceWorld = createIslandsSourceWorldIfNecessary();
@@ -40,6 +51,33 @@ public class Main extends JavaPlugin {
         super.onDisable();
     }
 
+    public FileConfiguration getIslandsConfig() {
+        return this.islandsConfig;
+    }
+
+    public void saveIslandsConfig() {
+        try {
+            islandsConfig.save(islandsConfigFile);
+        } catch (IOException e) {
+            getLogger().warning("Unable to save islandsConfig");
+        }
+    }
+
+    private void initIslandsConfig() {
+        islandsConfigFile = new File(getDataFolder(), "islands.yml");
+        if (!islandsConfigFile.exists()) {
+            islandsConfigFile.getParentFile().mkdirs();
+            saveResource("islands.yml", false);
+         }
+
+        islandsConfig = new YamlConfiguration();
+        try {
+            islandsConfig.load(islandsConfigFile);
+        } catch (IOException | InvalidConfigurationException e) {
+            e.printStackTrace();
+        }
+    }
+
     World createIslandsSourceWorldIfNecessary() {
         Bukkit.getServer().getLogger().info("Creating islands source world...");
 
@@ -47,6 +85,7 @@ public class Main extends JavaPlugin {
 
         wc.environment(World.Environment.NORMAL);
         wc.type(WorldType.NORMAL);
+        wc.generateStructures(false);
 
         World world = wc.createWorld();
 

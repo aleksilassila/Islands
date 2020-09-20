@@ -1,0 +1,9 @@
+island:
+  BIG: 80
+  NORMAL: 64
+  SMALL: 32
+generation:
+  searchJump: 8
+  searchArea: 2000
+  islandsInARow: 3
+  islandSpacing: 100

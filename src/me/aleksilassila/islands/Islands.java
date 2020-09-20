@@ -13,7 +13,6 @@ public class Islands {
     public Main plugin;
     public World world;
     public World sourceWorld;
-    // Island positions
 
     public IslandGeneration islandGeneration;
     public IslandGrid grid;
@@ -47,12 +46,13 @@ public class Islands {
     private int getIslandSize(IslandSize size) {
         switch (size) {
             case SMALL:
-                return 32;
+                return plugin.getConfig().getInt("island.SMALL");
             case BIG:
-                return 80;
+                return plugin.getConfig().getInt("island.BIG");
             case NORMAL:
             default:
-                return 64;
+                return plugin.getConfig().getInt("island.NORMAL");
+
         }
     }
 
@@ -65,9 +65,9 @@ public class Islands {
             boolean success = islandGeneration.copyIsland(
                     biome,
                     islandSize,
-                    plugin.getConfig().getInt("islands."+islandId+".x"),
-                    plugin.getConfig().getInt("islands."+islandId+".y"),
-                    plugin.getConfig().getInt("islands."+islandId+".z")
+                    plugin.getIslandsConfig().getInt("islands."+islandId+".x"),
+                    plugin.getIslandsConfig().getInt("islands."+islandId+".y"),
+                    plugin.getIslandsConfig().getInt("islands."+islandId+".z")
             );
 
             if (!success) {
@@ -87,10 +87,10 @@ public class Islands {
 
             boolean success = islandGeneration.copyIsland(
                     biome,
-                    plugin.getConfig().getInt("islands." + islandId + ".size"),
-                    plugin.getConfig().getInt("islands."+islandId+".x"),
-                    plugin.getConfig().getInt("islands."+islandId+".y"),
-                    plugin.getConfig().getInt("islands."+islandId+".z")
+                    plugin.getIslandsConfig().getInt("islands." + islandId + ".size"),
+                    plugin.getIslandsConfig().getInt("islands." + islandId + ".x"),
+                    plugin.getIslandsConfig().getInt("islands." + islandId + ".y"),
+                    plugin.getIslandsConfig().getInt("islands." + islandId + ".z")
             );
 
             return success;
