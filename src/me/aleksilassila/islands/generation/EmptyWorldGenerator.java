@@ -1,4 +1,4 @@
-package me.aleksilassila.islands;
+package me.aleksilassila.islands.generation;
 
 import org.bukkit.World;
 import org.bukkit.generator.ChunkGenerator;

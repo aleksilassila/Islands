@@ -1,18 +1,20 @@
 name: Islands
 version: 0.0.1
 author: Aleksi Lassila
-main: me.aleksilassila.islands.Islands
+main: me.aleksilassila.islands.Main
 api-version: 1.16
 commands:
   go:
     description: Your description
     usage: /<command>
     permission: yourplugin.yourcommandpermission
-  findisland:
+  island:
     description: Your description
     usage: /<command> biome
     permission: yourplugin.yourcommandpermi
-  createisland:
+    aliases: [is]
+  visit:
     description: Your description
-    usage: /<command>
+    usage: /<command> biome
     permission: yourplugin.yourcommandpermi
+    aliases: [vi]
