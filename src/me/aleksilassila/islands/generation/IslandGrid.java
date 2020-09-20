@@ -88,7 +88,7 @@ public class IslandGrid {
             }
         }
 
-        throw new IslandGridException("No island matched given name,");
+        throw new IslandGridException("No island matched given name.");
     }
 
     public Location getIslandSpawn(String islandId) throws IslandGridException {
@@ -128,11 +128,24 @@ public class IslandGrid {
 
         getIslandsConfig().set("islands."+islandId+".UUID", uuid.toString());
         getIslandsConfig().set("islands."+islandId+".name", name);
+        getIslandsConfig().set("islands."+islandId+".home", String.valueOf(getNumberOfIslands(uuid) + 1));
         getIslandsConfig().set("islands."+islandId+".size", islandSize);
 
         islands.plugin.saveIslandsConfig();
 
         return islandId;
+    }
+
+    private int getNumberOfIslands(UUID uuid) {
+        int numberOfPreviousIslands;
+
+        try {
+            numberOfPreviousIslands = getAllIslandIds(uuid).size();
+        } catch (IslandGridException e) {
+            numberOfPreviousIslands = 0;
+        }
+
+        return numberOfPreviousIslands;
     }
 
     public String createIsland(UUID uuid, int islandSize) throws IslandGridException {
@@ -153,15 +166,7 @@ public class IslandGrid {
                     }
                 }
 
-                int numberOfPreviousIslands;
-
-                try {
-                    numberOfPreviousIslands = getAllIslandIds(uuid).size();
-                } catch (IslandGridException e) {
-                    numberOfPreviousIslands = 0;
-                }
-
-                return addIslandToConfig(x, z, islandSize, uuid, String.valueOf(numberOfPreviousIslands + 1));
+                return addIslandToConfig(x, z, islandSize, uuid, String.valueOf(getNumberOfIslands(uuid) + 1));
             }
         }
 
@@ -201,7 +206,23 @@ public class IslandGrid {
         getIslandsConfig().set("islands." + islandId + ".UUID", newUuid.toString());
     }
 
-    public boolean isBlockInIsland(int x, int y, int z) {
+    public String getHomeIsland(UUID uuid, String home) throws IslandGridException {
+        List<String> allIslands = getAllIslandIds(uuid);
+
+        if (allIslands == null) {
+            throw new IslandGridException("No islands found.");
+        }
+
+        for (String islandId : allIslands) {
+            if (getIslandsConfig().getString("islands." + islandId + ".home").equals(home)) {
+                return islandId;
+            }
+        }
+
+        throw new IslandGridException("No island matched given name.");
+    }
+
+    public boolean isBlockInIslandSphere(int x, int y, int z) {
         int xIndex = x / islandSpacing;
         int zIndex = z / islandSpacing;
         int islandLowY = getIslandY(xIndex, zIndex);
@@ -212,7 +233,7 @@ public class IslandGrid {
 
         int islandSize = 64; // CHANGE THIS
 
-        return islands.islandGeneration.isBlockInShape(relativeX, relativeY, relativeZ, islandSize);
+        return islands.islandGeneration.isBlockInIslandSphere(relativeX, relativeY, relativeZ, islandSize);
     }
 
     // deleteIsland

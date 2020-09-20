@@ -75,7 +75,7 @@ public class IslandGeneration {
             int relativeY = point.getBlockY() - startY;
             int relativeZ = point.getBlockZ() - startZ;
 
-            if (isBlockInShape(relativeX, relativeY, relativeZ, islandSize)){
+            if (isBlockInIslandShape(relativeX, relativeY, relativeZ, islandSize)){
                 islands.world.getBlockAt(targetX + relativeX, targetY + relativeY, targetZ + relativeZ).setBlockData(sourceData);
             } else {
                 islands.world.getBlockAt(targetX + relativeX, targetY + relativeY, targetZ + relativeZ).setType(Material.AIR);
@@ -97,8 +97,13 @@ public class IslandGeneration {
         return true;
     }
 
-    public boolean isBlockInShape(int x, int y, int z, int islandSize) {
+    public boolean isBlockInIslandShape(int x, int y, int z, int islandSize) {
         return (Math.pow(x - islandSize / 2.0, 2) + (islandSize / Math.pow(y, 2) + 1.3) * Math.pow(y - islandSize / 2.0, 2) + Math.pow(z - islandSize / 2.0, 2))
+                <= Math.pow(islandSize / 2.0, 2);
+    }
+
+    public boolean isBlockInIslandSphere(int x, int y, int z, int islandSize) {
+        return (Math.pow(x - islandSize / 2.0, 2) + Math.pow(y - islandSize / 2.0, 2) + Math.pow(z - islandSize / 2.0, 2))
                 <= Math.pow(islandSize / 2.0, 2);
     }
 }
