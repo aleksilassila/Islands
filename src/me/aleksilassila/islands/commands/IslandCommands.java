@@ -4,6 +4,8 @@ import me.aleksilassila.islands.Main;
 import me.aleksilassila.islands.generation.IslandGrid;
 import me.aleksilassila.islands.utils.ChatUtils;
 import org.bukkit.ChatColor;
+import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -39,7 +41,7 @@ public class IslandCommands {
                 String islandId = plugin.islands.grid.getPrivateIsland(player.getUniqueId(), args[0]);
 
                 player.teleport(plugin.islands.grid.getIslandSpawn(islandId));
-            } catch (IslandGrid.IslandGridException e) {
+            } catch (IslandGrid.IslandNotFound e) {
                 player.sendMessage(error("404 - Island not found."));
             }
 
@@ -67,6 +69,7 @@ public class IslandCommands {
             }
 
             Player player = (Player) sender;
+
             if (args.length == 1 && args[0].equalsIgnoreCase("list") || label.equalsIgnoreCase("homes")) {
                 try {
                     List<String> ids = plugin.islands.grid.getAllIslandIds(player.getUniqueId());
@@ -76,7 +79,7 @@ public class IslandCommands {
                         String name = plugin.getIslandsConfig().getString("islands." + islandId + ".name");
                         player.sendMessage(ChatColor.AQUA + " - " + name);
                     }
-                } catch (IslandGrid.IslandGridException ignored) { }
+                } catch (IslandGrid.IslandNotFound ignored) { }
 
                 return true;
             } else {
@@ -90,11 +93,29 @@ public class IslandCommands {
                 }
             }
 
+            if (player.getWorld().getName().equals("world_nether")) {
+                player.sendMessage(info("You can only use this command in overworld."));
+                return true;
+            }
+
+            if (player.getWorld().getName().equals("world")) {
+                // Check if is on surface
+                Location playerLocation = player.getLocation();
+
+                for (int y = playerLocation.getBlockY(); y < player.getWorld().getHighestBlockYAt(playerLocation); y++) {
+                    playerLocation.setY(y);
+                    if (player.getWorld().getBlockAt(playerLocation).getBlockData().getMaterial().equals(Material.STONE)) {
+                        player.sendMessage(info("You can only use this command on surface."));
+                        return true;
+                    }
+                }
+            }
+
             String homeId = args.length == 0 ? "1" : args[0];
 
             try {
                 player.teleport(grid.getIslandSpawn(grid.getHomeIsland(player.getUniqueId(), homeId)));
-            } catch (IslandGrid.IslandGridException e) {
+            } catch (IslandGrid.IslandNotFound e) {
                 player.sendMessage(error("404 - Home not found."));
             }
 

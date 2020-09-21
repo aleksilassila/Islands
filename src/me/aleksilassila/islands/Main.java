@@ -2,7 +2,7 @@ package me.aleksilassila.islands;
 
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import me.aleksilassila.islands.commands.GoCommand;
-import me.aleksilassila.islands.commands.GenerationCommand;
+import me.aleksilassila.islands.commands.IslandManagmentCommands;
 import me.aleksilassila.islands.commands.IslandCommands;
 import me.aleksilassila.islands.generation.EmptyWorldGenerator;
 import me.aleksilassila.islands.listeners.IslandsListener;
@@ -38,7 +38,7 @@ public class Main extends JavaPlugin {
 
         islands = new Islands(islandsWorld, islandsSourceWorld, this);
 
-        new GenerationCommand(this);
+        new IslandManagmentCommands(this);
         new IslandCommands.HomeCommand(this);
         new IslandCommands.VisitCommand(this);
         new GoCommand(this);

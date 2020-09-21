@@ -81,7 +81,7 @@ public class Islands {
 
             return islandId;
 
-        } catch (IslandGrid.IslandGridException e) {
+        } catch (IslandGrid.IslandNotFound e) {
             throw new IslandsException(e.getMessage());
         }
     }
@@ -100,7 +100,7 @@ public class Islands {
 
             return success;
 
-        } catch (IslandGrid.IslandGridException e) {
+        } catch (IslandGrid.IslandNotFound e) {
             return false;
         }
     };
