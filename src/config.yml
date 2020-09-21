@@ -4,6 +4,6 @@ island:
   SMALL: 32
 generation:
   searchJump: 8
-  searchArea: 2000
+  searchArea: 1000
   islandsInARow: 3
   islandSpacing: 100
