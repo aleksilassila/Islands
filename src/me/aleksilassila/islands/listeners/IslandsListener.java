@@ -2,6 +2,7 @@ package me.aleksilassila.islands.listeners;
 
 import me.aleksilassila.islands.Main;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
@@ -46,6 +47,8 @@ public class IslandsListener implements Listener {
                 location.setY(targetWorld.getHighestBlockYAt(location) + 40);
 
                 player.teleport(location);
+
+                player.sendTitle("", ChatColor.GOLD + "Type /home to get back to your island.", (int)(20 * 0.5), 20 * 5, (int)(20 * 0.5));
 
                 plugin.islands.playersWithNoFall.add(player);
 

@@ -81,7 +81,9 @@ public class IslandCommands {
                 return true;
             } else {
                 try {
-                    Integer.parseInt(args[0]);
+                    if (args.length != 0) {
+                        Integer.parseInt(args[0]);
+                    }
                 } catch (NumberFormatException e) {
                     player.sendMessage(error("Usage: /home <id>"));
                     return true;
