@@ -18,8 +18,8 @@ import java.util.HashMap;
 import java.util.List;
 
 public class IslandManagmentCommands extends ChatUtils implements CommandExecutor {
-    private Main plugin;
-    private IslandGrid grid;
+    private final Main plugin;
+    private final IslandGrid grid;
 
     public IslandManagmentCommands(Main plugin) {
         this.plugin = plugin;
@@ -110,16 +110,19 @@ public class IslandManagmentCommands extends ChatUtils implements CommandExecuto
             return;
         }
 
-        if (Bukkit.getPlayer(args[1]) == null) {
-            player.sendMessage(Messages.Error.NO_PLAYER);
+        Player targetPlayer = Bukkit.getPlayer(args[1]);
+
+        if (targetPlayer == null) {
+            player.sendMessage(Messages.Error.NO_PLAYER_FOUND);
             return;
         }
 
         if (plugin.getIslandsConfig().getString("islands." + islandId + ".UUID").equals(player.getUniqueId().toString())) {
             if (plugin.getIslandsConfig().getInt("islands." + islandId + ".public") == 1) {
-                grid.giveIsland(islandId, Bukkit.getPlayer(args[1]));
+                grid.giveIsland(islandId, targetPlayer);
 
                 player.sendMessage(Messages.Success.OWNER_CHANGED(args[1]));
+                targetPlayer.sendMessage(Messages.Success.ISLAND_RECEIVED(targetPlayer.getName(), args[1]));
             } else {
                 player.sendMessage(Messages.Error.NOT_PUBLIC);
             }
@@ -203,7 +206,7 @@ public class IslandManagmentCommands extends ChatUtils implements CommandExecuto
         Biome targetBiome = getTargetBiome(args[1]);
 
         if (targetBiome == null) {
-            player.sendMessage(Messages.Error.NO_BIOME);
+            player.sendMessage(Messages.Error.NO_BIOME_FOUND);
             return;
         }
 
@@ -222,7 +225,7 @@ public class IslandManagmentCommands extends ChatUtils implements CommandExecuto
             if (location != null) {
                 player.teleport(location);
             } else {
-                player.sendMessage(Messages.Error.ISLAND_GEN);
+                player.sendMessage(Messages.Error.ISLAND_GEN_FAILED);
             }
 
         } catch (Islands.IslandsException e) {
@@ -239,7 +242,7 @@ public class IslandManagmentCommands extends ChatUtils implements CommandExecuto
         Biome targetBiome = getTargetBiome(args[2]);
 
         if (targetBiome == null) {
-            player.sendMessage(Messages.Error.NO_BIOME);
+            player.sendMessage(Messages.Error.NO_BIOME_FOUND);
             return;
         }
 
@@ -258,10 +261,10 @@ public class IslandManagmentCommands extends ChatUtils implements CommandExecuto
             if (location != null) {
                 player.teleport(location);
             } else {
-                player.sendMessage(Messages.Error.TELEPORT);
+                player.sendMessage(Messages.Error.TELEPORT_FAILED);
             }
         } else {
-            player.sendMessage(Messages.Error.ISLAND_GEN);
+            player.sendMessage(Messages.Error.ISLAND_GEN_FAILED);
         }
     }
 
@@ -269,10 +272,10 @@ public class IslandManagmentCommands extends ChatUtils implements CommandExecuto
         public static class Error {
             public static final String UNAUTHORIZED = error("You don't own this island.");
             public static final String NOT_PUBLIC = error("The island must be public");
-            public static final String NO_PLAYER = error("No given player found.");
-            public static String ISLAND_GEN = error("Island regeneration failed.");
-            public static String TELEPORT = error("Could not teleport.");
-            public static String NO_BIOME = error("Biome not found.");
+            public static final String NO_PLAYER_FOUND = error("No given player found.");
+            public static String ISLAND_GEN_FAILED = error("Island regeneration failed.");
+            public static String TELEPORT_FAILED = error("Could not teleport.");
+            public static String NO_BIOME_FOUND = error("Biome not found.");
             public static String NO_LOCATIONS_FOR_BIOME = error("No available locations for specified biome.");
         }
 
@@ -287,6 +290,10 @@ public class IslandManagmentCommands extends ChatUtils implements CommandExecuto
 
             public static String NAME_CHANGED(String name) {
                 return success("Island name changed to " + name + ". Anyone with your island name can now visit it.");
+            }
+
+            public static String ISLAND_RECEIVED(String playerName, String islandName) {
+                return success("You are now the owner of " + playerName + "'s island " + islandName + ".");
             }
         }
 
