@@ -62,6 +62,16 @@ public class IslandManagmentCommands extends ChatUtils implements CommandExecuto
         return true;
     }
 
+    private void sendHelp(Player player) {
+        player.sendMessage(success("Available /island subcommands:"));
+
+        player.sendMessage(Messages.Help.CREATE);
+        player.sendMessage(Messages.Help.REGENERATE);
+        player.sendMessage(Messages.Help.NAME);
+        player.sendMessage(Messages.Help.UNNAME);
+        player.sendMessage(Messages.Help.GIVE);
+    }
+
     private void giveIsland(Player player, String[] args) {
         if (args.length != 2) {
             player.sendMessage(Messages.Help.GIVE);
@@ -77,29 +87,23 @@ public class IslandManagmentCommands extends ChatUtils implements CommandExecuto
             return;
         }
 
-        if (plugin.getIslandsConfig().getString("islands." + islandId + ".UUID").equals(player.getUniqueId().toString()) && plugin.getIslandsConfig().getInt("islands." + islandId + ".public") == 1) {
-            plugin.getIslandsConfig().set("islands." + islandId + ".UUID", Bukkit.getPlayer(args[1]).getUniqueId().toString());
-            plugin.saveIslandsConfig();
-
-            plugin.getIslandsConfig().set("islands." + islandId + ".home", String.valueOf(plugin.islands.grid.getNumberOfIslands(Bukkit.getPlayer(args[1]).getUniqueId())));
-            plugin.saveIslandsConfig();
-
-            player.sendMessage(success("Island owner switched to " + args[1] + "."));
+        if (Bukkit.getPlayer(args[1]) == null) {
+            player.sendMessage(Messages.Error.NO_PLAYER);
             return;
+        }
+
+        if (plugin.getIslandsConfig().getString("islands." + islandId + ".UUID").equals(player.getUniqueId().toString())) {
+            if (plugin.getIslandsConfig().getInt("islands." + islandId + ".public") == 1) {
+                plugin.islands.grid.giveIsland(islandId, Bukkit.getPlayer(args[1]));
+
+                player.sendMessage(success("Island owner switched to " + args[1] + "."));
+            } else {
+                player.sendMessage(Messages.Error.NOT_PUBLIC);
+            }
         } else {
             player.sendMessage(Messages.Error.UNAUTHORIZED);
         }
 
-    }
-
-    private void sendHelp(Player player) {
-        player.sendMessage(success("Available /island subcommands:"));
-
-        player.sendMessage(Messages.Help.CREATE);
-        player.sendMessage(Messages.Help.REGENERATE);
-        player.sendMessage(Messages.Help.NAME);
-        player.sendMessage(Messages.Help.UNNAME);
-        player.sendMessage(Messages.Help.GIVE);
     }
 
     private void unnameIsland(Player player, String[] args) {
@@ -118,12 +122,9 @@ public class IslandManagmentCommands extends ChatUtils implements CommandExecuto
         }
 
         if (plugin.getIslandsConfig().getString("islands." + islandId + ".UUID").equals(player.getUniqueId().toString())) {
-            plugin.getIslandsConfig().set("islands." + islandId + ".name", plugin.getIslandsConfig().getString("islands." + islandId + ".home"));
-            plugin.getIslandsConfig().set("islands." + islandId + ".public", 0);
-            plugin.saveIslandsConfig();
+            plugin.islands.grid.unnameIsland(islandId);
 
             player.sendMessage(success("Island unnamed and made private."));
-            return;
         } else {
             player.sendMessage(Messages.Error.UNAUTHORIZED);
         }
@@ -145,12 +146,9 @@ public class IslandManagmentCommands extends ChatUtils implements CommandExecuto
         }
 
         if (plugin.getIslandsConfig().getString("islands." + islandId + ".UUID").equals(player.getUniqueId().toString())) {
-            plugin.getIslandsConfig().set("islands." + islandId + ".name", args[1]);
-            plugin.getIslandsConfig().set("islands." + islandId + ".public", 1);
-            plugin.saveIslandsConfig();
+            plugin.islands.grid.nameIsland(islandId, args[1]);
 
             player.sendMessage(success("Island name changed to " + args[1] + ". Anyone with your island name can now visit it."));
-            return;
         } else {
             player.sendMessage(Messages.Error.UNAUTHORIZED);
         }
@@ -244,7 +242,9 @@ public class IslandManagmentCommands extends ChatUtils implements CommandExecuto
 
     private static class Messages {
         public static class Error {
-            public static final String UNAUTHORIZED = error("The island must be public and yours.");
+            public static final String UNAUTHORIZED = error("You don't own this island.");
+            public static final String NOT_PUBLIC = error("The island must be public");
+            public static final String NO_PLAYER = error("No given player found.");
             public static String ISLAND_GEN = error("Island regeneration failed.");
             public static String TELEPORT = error("Could not teleport.");
             public static String NO_BIOME = error("Biome not found.");

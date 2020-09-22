@@ -5,6 +5,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,6 +23,21 @@ public class IslandGrid {
 
         this.islandsInARow = instance.plugin.getConfig().getInt("generation.islandsInARow");
         this.islandSpacing = instance.plugin.getConfig().getInt("generation.islandSpacing");
+    }
+
+    public void unnameIsland(String islandId) {
+        String homeId = islands.plugin.getIslandsConfig().getString("islands." + islandId + ".home");
+
+        getIslandsConfig().set("islands." + islandId + ".name", homeId);
+        getIslandsConfig().set("islands." + islandId + ".public", 0);
+
+        islands.plugin.saveIslandsConfig();
+    }
+
+    public void giveIsland(String islandId, Player player) {
+        getIslandsConfig().set("islands." + islandId + ".UUID", player.getUniqueId().toString());
+        getIslandsConfig().set("islands." + islandId + ".home", String.valueOf(getNumberOfIslands(player.getUniqueId()) + 1));
+        islands.plugin.saveIslandsConfig();
     }
 
     public static class IslandNotFound extends java.lang.Exception {
@@ -204,19 +220,11 @@ public class IslandGrid {
         throw new IslandNotFound();
     }
 
-    public void nameIsland(UUID uuid, String name) throws IslandNotFound {
-        if (getIslandsConfig().getConfigurationSection("islands." + name) != null) {
-            return;
-        }
-        try {
-            getIslandsConfig().set("islands."+ getPrivateIsland(uuid, name) + ".name", name);
+    public void nameIsland(String islandId, String name){
+            getIslandsConfig().set("islands." + islandId + ".name", name);
+            getIslandsConfig().set("islands." + islandId + ".public", 1);
+
             islands.plugin.saveIslandsConfig();
-
-        } catch (IslandNotFound e) {
-            throw new IslandNotFound();
-        }
-
-        return;
     }
 
     public void setIslandOwner(UUID newUuid, String islandId) throws IslandNotFound {
