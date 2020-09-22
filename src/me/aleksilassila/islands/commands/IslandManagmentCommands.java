@@ -19,9 +19,11 @@ import java.util.List;
 
 public class IslandManagmentCommands extends ChatUtils implements CommandExecutor {
     private Main plugin;
+    private IslandGrid grid;
 
     public IslandManagmentCommands(Main plugin) {
         this.plugin = plugin;
+        this.grid = plugin.islands.grid;
 
         plugin.getCommand("go").setExecutor(this);
         plugin.getCommand("island").setExecutor(this);
@@ -79,7 +81,7 @@ public class IslandManagmentCommands extends ChatUtils implements CommandExecuto
             return;
         }
 
-        String islandId = plugin.islands.grid.getIslandId(player.getLocation());
+        String islandId = grid.getIslandId(player.getLocation());
 
         if (islandId == null) {
             player.sendMessage(Messages.Error.UNAUTHORIZED);
@@ -93,7 +95,7 @@ public class IslandManagmentCommands extends ChatUtils implements CommandExecuto
 
         if (plugin.getIslandsConfig().getString("islands." + islandId + ".UUID").equals(player.getUniqueId().toString())) {
             if (plugin.getIslandsConfig().getInt("islands." + islandId + ".public") == 1) {
-                plugin.islands.grid.giveIsland(islandId, Bukkit.getPlayer(args[1]));
+                grid.giveIsland(islandId, Bukkit.getPlayer(args[1]));
 
                 player.sendMessage(success("Island owner switched to " + args[1] + "."));
             } else {
@@ -111,7 +113,7 @@ public class IslandManagmentCommands extends ChatUtils implements CommandExecuto
             return;
         }
 
-        String islandId = plugin.islands.grid.getIslandId(player.getLocation());
+        String islandId = grid.getIslandId(player.getLocation());
 
         if (islandId == null) {
             player.sendMessage(Messages.Error.UNAUTHORIZED);
@@ -119,7 +121,7 @@ public class IslandManagmentCommands extends ChatUtils implements CommandExecuto
         }
 
         if (plugin.getIslandsConfig().getString("islands." + islandId + ".UUID").equals(player.getUniqueId().toString())) {
-            plugin.islands.grid.unnameIsland(islandId);
+            grid.unnameIsland(islandId);
 
             player.sendMessage(success("Island unnamed and made private."));
         } else {
@@ -133,7 +135,7 @@ public class IslandManagmentCommands extends ChatUtils implements CommandExecuto
             return;
         }
 
-        String islandId = plugin.islands.grid.getIslandId(player.getLocation());
+        String islandId = grid.getIslandId(player.getLocation());
 
         if (islandId == null) {
             player.sendMessage(Messages.Error.UNAUTHORIZED);
@@ -141,7 +143,7 @@ public class IslandManagmentCommands extends ChatUtils implements CommandExecuto
         }
 
         if (plugin.getIslandsConfig().getString("islands." + islandId + ".UUID").equals(player.getUniqueId().toString())) {
-            plugin.islands.grid.nameIsland(islandId, args[1]);
+            grid.nameIsland(islandId, args[1]);
 
             player.sendMessage(success("Island name changed to " + args[1] + ". Anyone with your island name can now visit it."));
         } else {
@@ -194,7 +196,7 @@ public class IslandManagmentCommands extends ChatUtils implements CommandExecuto
 
             player.sendMessage(Messages.Success.ISLAND_GEN);
 
-            Location location = plugin.islands.grid.getIslandSpawn(islandId);
+            Location location = grid.getIslandSpawn(islandId);
 
             if (location != null) {
                 player.teleport(location);
@@ -230,7 +232,7 @@ public class IslandManagmentCommands extends ChatUtils implements CommandExecuto
         if (success) {
             player.sendMessage(Messages.Success.ISLAND_GEN);
 
-            Location location = plugin.islands.grid.getIslandSpawn(plugin.islands.grid.getPrivateIsland(player.getUniqueId(), args[1]));
+            Location location = grid.getIslandSpawn(grid.getPrivateIsland(player.getUniqueId(), args[1]));
 
             if (location != null) {
                 player.teleport(location);
