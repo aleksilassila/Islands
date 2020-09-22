@@ -1,18 +1,17 @@
 package me.aleksilassila.islands.listeners;
 
 import me.aleksilassila.islands.Main;
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.Location;
-import org.bukkit.World;
+import me.aleksilassila.islands.utils.ChatUtils;
+import org.bukkit.*;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockFromToEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.player.PlayerInteractEvent;
 
-public class IslandsListener implements Listener {
+public class IslandsListener extends ChatUtils implements Listener {
     private Main plugin;
 
     public IslandsListener(Main plugin) {
@@ -31,12 +30,12 @@ public class IslandsListener implements Listener {
         }
     }
 
-    @EventHandler
-    public void onDamageEvent(EntityDamageEvent e) {
+    @EventHandler // Player teleportation in void, damage restrictions
+    public void onDamageEvent(EntityDamageByEntityEvent e) {
         if (e.getEntity() instanceof Player) {
             Player player = (Player) e.getEntity();
 
-            if (e.getCause().equals(EntityDamageEvent.DamageCause.VOID) && player.getWorld().getName().equals("islands")) {
+            if (e.getCause().equals(EntityDamageEvent.DamageCause.VOID) && player.getWorld().equals(plugin.islandsWorld)) {
                 World targetWorld = Bukkit.getWorld("world");
 
                 Location location = player.getLocation();
@@ -60,6 +59,28 @@ public class IslandsListener implements Listener {
                 } else if (player.getWorld().getName().equals("islands")) {
                     e.setCancelled(true);
                 }
+            }
+        } else if (e.getEntity().getWorld().equals(plugin.islandsWorld)) {
+            String ownerUUID = plugin.islands.grid.getBlockOwnerUUID(e.getEntity().getLocation().getBlockX(), e.getEntity().getLocation().getBlockZ());
+
+            if (ownerUUID != null && e.getDamager() instanceof Player && !ownerUUID.equals(e.getDamager().getUniqueId().toString())) {
+                e.setCancelled(true);
+
+                e.getDamager().sendMessage(error("You cannot intract here."));
+            }
+        }
+    }
+
+    @EventHandler // Player interact restriction
+    public void onPlayerInteract(PlayerInteractEvent e) {
+        if (e.getClickedBlock() == null) return;
+        if (e.getPlayer().getWorld().equals(plugin.islandsWorld)) {
+            String ownerUUID = plugin.islands.grid.getBlockOwnerUUID(e.getClickedBlock().getX(), e.getClickedBlock().getZ());
+
+            if (ownerUUID == null || !ownerUUID.equals(e.getPlayer().getUniqueId().toString())) {
+                e.setCancelled(true);
+
+                e.getPlayer().sendMessage(error("You cannot intract here."));
             }
         }
     }

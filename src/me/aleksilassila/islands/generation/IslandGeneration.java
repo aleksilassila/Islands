@@ -65,8 +65,6 @@ public class IslandGeneration {
         int startY = centerY - islandSize / 2;
         int startZ = sourceLocation.getBlockZ();
 
-
-        Bukkit.getLogger().info("Started copying to (" + targetX + ", " + targetY + ", " + targetZ + ")");
         for (BlockVector3 point : sourceRegion) {
             BlockData sourceData = islands.sourceWorld.getBlockAt(point.getBlockX(), point.getBlockY(), point.getBlockZ()).getBlockData();
 
@@ -104,6 +102,11 @@ public class IslandGeneration {
 
     public boolean isBlockInIslandSphere(int x, int y, int z, int islandSize) {
         return (Math.pow(x - islandSize / 2.0, 2) + Math.pow(y - islandSize / 2.0, 2) + Math.pow(z - islandSize / 2.0, 2))
+                <= Math.pow(islandSize / 2.0, 2);
+    }
+
+    public boolean isBlockInIslandCircle(int relativeX, int relativeZ, int islandSize) {
+        return (Math.pow(relativeX - islandSize / 2.0, 2) + Math.pow(relativeZ - islandSize / 2.0, 2))
                 <= Math.pow(islandSize / 2.0, 2);
     }
 }

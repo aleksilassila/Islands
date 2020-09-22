@@ -130,13 +130,13 @@ public class IslandGrid {
 
     @NotNull
     private String addIslandToConfig(int xIndex, int zIndex, int islandSize, UUID uuid, String name) {
-        int realX = xIndex * islandSpacing;
+        int realX = xIndex * islandSpacing + islandSpacing / 2 - islandSize / 2;
         int realY = getIslandY(xIndex, zIndex);
-        int realZ = zIndex * islandSpacing;
+        int realZ = zIndex * islandSpacing + islandSpacing / 2 - islandSize / 2;
 
         String home = String.valueOf(getNumberOfIslands(uuid) + 1);
 
-        String islandId = String.valueOf((int) Math.floor(Math.random() * 10000000));
+        String islandId = xIndex + "x" + zIndex;
 
         getIslandsConfig().set("islands."+islandId+".xIndex", xIndex);
         getIslandsConfig().set("islands."+islandId+".zIndex", zIndex);
@@ -213,13 +213,31 @@ public class IslandGrid {
         int zIndex = z / islandSpacing;
         int islandLowY = getIslandY(xIndex, zIndex);
 
-        int relativeX = x - xIndex * islandSpacing;
-        int relativeZ = z - zIndex * islandSpacing;
+        int islandSize = getIslandsConfig().getInt("islands." + xIndex + "x" + zIndex  + ".size");
+
+
+        int relativeX = x - (xIndex * islandSpacing + islandSpacing / 2 - islandSize / 2);
+        int relativeZ = z - (zIndex * islandSpacing + islandSpacing / 2 - islandSize / 2);
         int relativeY = y - islandLowY;
 
-        int islandSize = 64; // CHANGE THIS
-
         return islands.islandGeneration.isBlockInIslandSphere(relativeX, relativeY, relativeZ, islandSize);
+    }
+
+    @Nullable
+    public String getBlockOwnerUUID(int x, int z) {
+        int xIndex = x / islandSpacing;
+        int zIndex = z / islandSpacing;
+
+        int islandSize = getIslandsConfig().getInt("islands." + xIndex + "x" + zIndex  + ".size");
+
+        int relativeX = x - (xIndex * islandSpacing + islandSpacing / 2 - islandSize / 2);
+        int relativeZ = z - (zIndex * islandSpacing + islandSpacing / 2 - islandSize / 2);
+
+        boolean isInside = islands.islandGeneration.isBlockInIslandCircle(relativeX, relativeZ, islandSize);
+
+        if (!isInside) return null;
+
+        return getIslandsConfig().getString("islands." + xIndex + "x" + zIndex + ".UUID");
     }
 
     // deleteIsland

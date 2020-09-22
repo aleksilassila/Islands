@@ -1,5 +1,7 @@
 package me.aleksilassila.islands.commands;
 
+import com.sun.istack.internal.NotNull;
+import com.sun.istack.internal.Nullable;
 import me.aleksilassila.islands.Islands;
 import me.aleksilassila.islands.Main;
 import me.aleksilassila.islands.generation.IslandGrid;
@@ -11,7 +13,6 @@ import org.bukkit.block.Biome;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
-import org.bukkit.craftbukkit.libs.jline.internal.Nullable;
 import org.bukkit.entity.Player;
 
 import java.util.HashMap;
@@ -167,6 +168,11 @@ public class IslandManagmentCommands extends ChatUtils implements CommandExecuto
         }
 
         if (plugin.getIslandsConfig().getString("islands." + islandId + ".UUID").equals(player.getUniqueId().toString())) {
+            if (grid.getPublicIsland(args[1]) != null) {
+                player.sendMessage(Messages.Error.NAME_TAKEN);
+                return;
+            }
+
             grid.nameIsland(islandId, args[1]);
 
             player.sendMessage(Messages.Success.NAME_CHANGED(args[1]));
@@ -191,7 +197,7 @@ public class IslandManagmentCommands extends ChatUtils implements CommandExecuto
     private void createIsland(Player player, String[] args) {
         HashMap<Biome, List<Location>> availableLocations = plugin.islands.islandGeneration.biomes.availableLocations;
 
-        if (args.length != 2) {
+        if (args.length < 2) {
             player.sendMessage(Messages.Help.CREATE);
 
             for (Biome biome : availableLocations.keySet()) {
@@ -202,6 +208,8 @@ public class IslandManagmentCommands extends ChatUtils implements CommandExecuto
 
             return;
         }
+
+        Islands.IslandSize islandSize = args.length == 3 ? parseIslandSize(args[2]) : Islands.IslandSize.NORMAL;
 
         Biome targetBiome = getTargetBiome(args[1]);
 
@@ -216,7 +224,7 @@ public class IslandManagmentCommands extends ChatUtils implements CommandExecuto
         }
 
         try {
-            String islandId = plugin.islands.createNewIsland(targetBiome, Islands.IslandSize.NORMAL, player.getUniqueId());
+            String islandId = plugin.islands.createNewIsland(targetBiome, islandSize, player.getUniqueId());
 
             player.sendMessage(Messages.Success.ISLAND_GEN);
 
@@ -233,6 +241,18 @@ public class IslandManagmentCommands extends ChatUtils implements CommandExecuto
         }
 
     }
+
+    @NotNull
+    private Islands.IslandSize parseIslandSize(String size) {
+        for (Islands.IslandSize targetSize : Islands.IslandSize.values()) {
+            if (targetSize.name().equalsIgnoreCase(size)) {
+                return targetSize;
+            }
+        }
+
+        return Islands.IslandSize.NORMAL;
+    }
+
     private void regenerateIsland(Player player, String[] args) {
         if (args.length != 3) {
             player.sendMessage(Messages.Help.REGENERATE);
@@ -273,6 +293,7 @@ public class IslandManagmentCommands extends ChatUtils implements CommandExecuto
             public static final String UNAUTHORIZED = error("You don't own this island.");
             public static final String NOT_PUBLIC = error("The island must be public");
             public static final String NO_PLAYER_FOUND = error("No given player found.");
+            public static final String NAME_TAKEN = error("That name is already taken.");
             public static String ISLAND_GEN_FAILED = error("Island regeneration failed.");
             public static String TELEPORT_FAILED = error("Could not teleport.");
             public static String NO_BIOME_FOUND = error("Biome not found.");
@@ -298,7 +319,7 @@ public class IslandManagmentCommands extends ChatUtils implements CommandExecuto
         }
 
         public static class Help {
-            public static String CREATE = ChatColor.GRAY + "/island create <biome>";
+            public static String CREATE = ChatColor.GRAY + "/island create <biome> (BIG/NORMAL/SMALL)";
             public static String REGENERATE = ChatColor.GRAY + "/island regenerate <id/name> <biome>";
             public static String NAME = ChatColor.GRAY + "/island name <name> (You have to be on target island)";
             public static String UNNAME = ChatColor.GRAY + "/island unname (You have to be on target island)";
