@@ -41,10 +41,9 @@ public class IslandGrid {
         islands.plugin.saveIslandsConfig();
     }
 
-    public static class IslandGridException extends java.lang.Exception {
-        public IslandGridException() {
-            super();
-        }
+    public void deleteIsland(String islandId) {
+        getIslandsConfig().set("islands." + islandId, null);
+        islands.plugin.saveIslandsConfig();
     }
 
     @Nullable

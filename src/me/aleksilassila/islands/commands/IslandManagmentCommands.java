@@ -44,6 +44,10 @@ public class IslandManagmentCommands extends ChatUtils implements CommandExecuto
                     regenerateIsland(player, args);
 
                     return true;
+                } else if (args[0].equalsIgnoreCase("delete")) {
+                    deleteIsland(player, args);
+
+                    return true;
                 } else if (args[0].equalsIgnoreCase("give")) {
                     giveIsland(player, args);
 
@@ -65,11 +69,29 @@ public class IslandManagmentCommands extends ChatUtils implements CommandExecuto
         return true;
     }
 
+    private void deleteIsland(Player player, String[] args) {
+        String islandId = grid.getIslandId(player.getLocation());
+
+        if (islandId == null) {
+            player.sendMessage(Messages.Error.UNAUTHORIZED);
+            return;
+        }
+
+        if (plugin.getIslandsConfig().getString("islands." + islandId + ".UUID").equals(player.getUniqueId().toString())) {
+            grid.deleteIsland(islandId);
+
+            player.sendMessage(Messages.Success.DELETED);
+        } else {
+            player.sendMessage(Messages.Error.UNAUTHORIZED);
+        }
+    }
+
     private void sendHelp(Player player) {
         player.sendMessage(success("Available /island subcommands:"));
 
         player.sendMessage(Messages.Help.CREATE);
         player.sendMessage(Messages.Help.REGENERATE);
+        player.sendMessage(Messages.Help.DELETE);
         player.sendMessage(Messages.Help.NAME);
         player.sendMessage(Messages.Help.UNNAME);
         player.sendMessage(Messages.Help.GIVE);
@@ -97,14 +119,13 @@ public class IslandManagmentCommands extends ChatUtils implements CommandExecuto
             if (plugin.getIslandsConfig().getInt("islands." + islandId + ".public") == 1) {
                 grid.giveIsland(islandId, Bukkit.getPlayer(args[1]));
 
-                player.sendMessage(success("Island owner switched to " + args[1] + "."));
+                player.sendMessage(Messages.Success.OWNER_CHANGED(args[1]));
             } else {
                 player.sendMessage(Messages.Error.NOT_PUBLIC);
             }
         } else {
             player.sendMessage(Messages.Error.UNAUTHORIZED);
         }
-
     }
 
     private void unnameIsland(Player player, String[] args) {
@@ -123,7 +144,7 @@ public class IslandManagmentCommands extends ChatUtils implements CommandExecuto
         if (plugin.getIslandsConfig().getString("islands." + islandId + ".UUID").equals(player.getUniqueId().toString())) {
             grid.unnameIsland(islandId);
 
-            player.sendMessage(success("Island unnamed and made private."));
+            player.sendMessage(Messages.Success.UNNAMED);
         } else {
             player.sendMessage(Messages.Error.UNAUTHORIZED);
         }
@@ -145,7 +166,7 @@ public class IslandManagmentCommands extends ChatUtils implements CommandExecuto
         if (plugin.getIslandsConfig().getString("islands." + islandId + ".UUID").equals(player.getUniqueId().toString())) {
             grid.nameIsland(islandId, args[1]);
 
-            player.sendMessage(success("Island name changed to " + args[1] + ". Anyone with your island name can now visit it."));
+            player.sendMessage(Messages.Success.NAME_CHANGED(args[1]));
         } else {
             player.sendMessage(Messages.Error.UNAUTHORIZED);
         }
@@ -256,7 +277,17 @@ public class IslandManagmentCommands extends ChatUtils implements CommandExecuto
         }
 
         public static class Success {
+            public static final String DELETED = success("Island deleted successfully. It will be overwritten when someone creates a new island.");
+            public static final String UNNAMED = success("Island unnamed and made private.");
             public static String ISLAND_GEN = success("Island regenerated successfully.");
+
+            public static String OWNER_CHANGED(String name) {
+                return success("Island owner switched to " + name + ".");
+            }
+
+            public static String NAME_CHANGED(String name) {
+                return success("Island name changed to " + name + ". Anyone with your island name can now visit it.");
+            }
         }
 
         public static class Help {
@@ -265,6 +296,7 @@ public class IslandManagmentCommands extends ChatUtils implements CommandExecuto
             public static String NAME = ChatColor.GRAY + "/island name <name> (You have to be on target island)";
             public static String UNNAME = ChatColor.GRAY + "/island unname (You have to be on target island)";
             public static String GIVE = ChatColor.GRAY + "/island give <name> (You have to be on target island)";
+            public static String DELETE = ChatColor.GRAY + "/island delete (You have to be on target island)";
         }
     }
 }
