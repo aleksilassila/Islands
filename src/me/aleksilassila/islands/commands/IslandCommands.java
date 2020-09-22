@@ -37,11 +37,12 @@ public class IslandCommands {
                 return true;
             }
 
-            try {
-                String islandId = plugin.islands.grid.getPublicIsland(args[0]);
 
+            String islandId = plugin.islands.grid.getPublicIsland(args[0]);
+
+            if (islandId != null) {
                 player.teleport(plugin.islands.grid.getIslandSpawn(islandId));
-            } catch (IslandGrid.IslandNotFound e) {
+            } else {
                 player.sendMessage(error("404 - Island not found."));
             }
 
@@ -71,16 +72,14 @@ public class IslandCommands {
             Player player = (Player) sender;
 
             if (args.length == 1 && args[0].equalsIgnoreCase("list") || label.equalsIgnoreCase("homes")) {
-                try {
-                    List<String> ids = plugin.islands.grid.getAllIslandIds(player.getUniqueId());
+                List<String> ids = plugin.islands.grid.getAllIslandIds(player.getUniqueId());
 
-                    player.sendMessage(success("Found " + ids.size() + " home(s)."));
-                    for (String islandId : ids) {
-                        String name = plugin.getIslandsConfig().getString("islands." + islandId + ".name");
-                        String homeNumber = plugin.getIslandsConfig().getString("islands." + islandId + ".home");
-                        player.sendMessage(ChatColor.AQUA + " - " + name + " (" + homeNumber + ")");
-                    }
-                } catch (IslandGrid.IslandNotFound ignored) { }
+                player.sendMessage(success("Found " + ids.size() + " home(s)."));
+                for (String islandId : ids) {
+                    String name = plugin.getIslandsConfig().getString("islands." + islandId + ".name");
+                    String homeNumber = plugin.getIslandsConfig().getString("islands." + islandId + ".home");
+                    player.sendMessage(ChatColor.AQUA + " - " + name + " (" + homeNumber + ")");
+                }
 
                 return true;
             } else {
@@ -114,9 +113,11 @@ public class IslandCommands {
 
             String homeId = args.length == 0 ? "1" : args[0];
 
-            try {
-                player.teleport(grid.getIslandSpawn(grid.getHomeIsland(player.getUniqueId(), homeId)));
-            } catch (IslandGrid.IslandNotFound e) {
+            Location location = grid.getIslandSpawn(grid.getHomeIsland(player.getUniqueId(), homeId));
+
+            if (location != null) {
+                player.teleport(location);
+            } else {
                 player.sendMessage(error("404 - Home not found."));
             }
 

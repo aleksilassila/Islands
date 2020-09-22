@@ -11,6 +11,7 @@ import org.bukkit.block.Biome;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.craftbukkit.libs.jline.internal.Nullable;
 import org.bukkit.entity.Player;
 
 import java.util.HashMap;
@@ -78,11 +79,9 @@ public class IslandManagmentCommands extends ChatUtils implements CommandExecuto
             return;
         }
 
-        String islandId = null;
+        String islandId = plugin.islands.grid.getIslandId(player.getLocation());
 
-        try {
-            islandId = plugin.islands.grid.getIslandId(player.getLocation());
-        } catch (IslandGrid.IslandNotFound e) {
+        if (islandId == null) {
             player.sendMessage(Messages.Error.UNAUTHORIZED);
             return;
         }
@@ -112,11 +111,9 @@ public class IslandManagmentCommands extends ChatUtils implements CommandExecuto
             return;
         }
 
-        String islandId = null;
+        String islandId = plugin.islands.grid.getIslandId(player.getLocation());
 
-        try {
-            islandId = plugin.islands.grid.getIslandId(player.getLocation());
-        } catch (IslandGrid.IslandNotFound e) {
+        if (islandId == null) {
             player.sendMessage(Messages.Error.UNAUTHORIZED);
             return;
         }
@@ -136,11 +133,9 @@ public class IslandManagmentCommands extends ChatUtils implements CommandExecuto
             return;
         }
 
-        String islandId = null;
+        String islandId = plugin.islands.grid.getIslandId(player.getLocation());
 
-        try {
-            islandId = plugin.islands.grid.getIslandId(player.getLocation());
-        } catch (IslandGrid.IslandNotFound e) {
+        if (islandId == null) {
             player.sendMessage(Messages.Error.UNAUTHORIZED);
             return;
         }
@@ -154,6 +149,7 @@ public class IslandManagmentCommands extends ChatUtils implements CommandExecuto
         }
     }
 
+    @Nullable
     private Biome getTargetBiome(String biome) {
          Biome targetBiome = null;
 
@@ -197,12 +193,15 @@ public class IslandManagmentCommands extends ChatUtils implements CommandExecuto
             String islandId = plugin.islands.createNewIsland(targetBiome, Islands.IslandSize.NORMAL, player.getUniqueId());
 
             player.sendMessage(Messages.Success.ISLAND_GEN);
-            try {
-                player.teleport(plugin.islands.grid.getIslandSpawn(islandId));
 
-            } catch (IslandGrid.IslandNotFound e) {
+            Location location = plugin.islands.grid.getIslandSpawn(islandId);
+
+            if (location != null) {
+                player.teleport(location);
+            } else {
                 player.sendMessage(Messages.Error.ISLAND_GEN);
             }
+
         } catch (Islands.IslandsException e) {
             player.sendMessage(error(e.getMessage()));
         }
@@ -230,9 +229,12 @@ public class IslandManagmentCommands extends ChatUtils implements CommandExecuto
 
         if (success) {
             player.sendMessage(Messages.Success.ISLAND_GEN);
-            try {
-                player.teleport(plugin.islands.grid.getIslandSpawn(plugin.islands.grid.getPrivateIsland(player.getUniqueId(), args[1])));
-            } catch (IslandGrid.IslandNotFound e) {
+
+            Location location = plugin.islands.grid.getIslandSpawn(plugin.islands.grid.getPrivateIsland(player.getUniqueId(), args[1]));
+
+            if (location != null) {
+                player.teleport(location);
+            } else {
                 player.sendMessage(Messages.Error.TELEPORT);
             }
         } else {

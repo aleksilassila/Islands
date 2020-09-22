@@ -48,7 +48,7 @@ public class Islands {
         }
     }
 
-    private int getIslandSize(IslandSize size) {
+    public int getIslandSize(IslandSize size) {
         switch (size) {
             case SMALL:
                 return plugin.getConfig().getInt("island.SMALL");
@@ -64,44 +64,37 @@ public class Islands {
     public String createNewIsland(Biome biome, IslandSize size, UUID uuid) throws IslandsException {
         int islandSize = getIslandSize(size);
 
-        try {
-            String islandId = grid.createIsland(uuid, islandSize);
+        String islandId = grid.createIsland(uuid, islandSize);
 
-            boolean success = islandGeneration.copyIsland(
-                    biome,
-                    islandSize,
-                    plugin.getIslandsConfig().getInt("islands."+islandId+".x"),
-                    plugin.getIslandsConfig().getInt("islands."+islandId+".y"),
-                    plugin.getIslandsConfig().getInt("islands."+islandId+".z")
-            );
+        boolean success = islandGeneration.copyIsland(
+                biome,
+                islandSize,
+                plugin.getIslandsConfig().getInt("islands."+islandId+".x"),
+                plugin.getIslandsConfig().getInt("islands."+islandId+".y"),
+                plugin.getIslandsConfig().getInt("islands."+islandId+".z")
+        );
 
-            if (!success) {
-                throw new IslandsException("Could not copy island");
-            }
-
-            return islandId;
-
-        } catch (IslandGrid.IslandNotFound e) {
-            throw new IslandsException(e.getMessage());
+        if (!success) {
+            throw new IslandsException("Could not copy island");
         }
+
+        return islandId;
+
     }
 
     public boolean regenerateIsland(Biome biome, UUID uuid, String name) {
-        try {
-            String islandId = grid.getPrivateIsland(uuid, name);
+        String islandId = grid.getPrivateIsland(uuid, name);
 
-            boolean success = islandGeneration.copyIsland(
-                    biome,
-                    plugin.getIslandsConfig().getInt("islands." + islandId + ".size"),
-                    plugin.getIslandsConfig().getInt("islands." + islandId + ".x"),
-                    plugin.getIslandsConfig().getInt("islands." + islandId + ".y"),
-                    plugin.getIslandsConfig().getInt("islands." + islandId + ".z")
-            );
+        if (islandId == null) { return false; }
 
-            return success;
+        boolean success = islandGeneration.copyIsland(
+                biome,
+                plugin.getIslandsConfig().getInt("islands." + islandId + ".size"),
+                plugin.getIslandsConfig().getInt("islands." + islandId + ".x"),
+                plugin.getIslandsConfig().getInt("islands." + islandId + ".y"),
+                plugin.getIslandsConfig().getInt("islands." + islandId + ".z")
+        );
 
-        } catch (IslandGrid.IslandNotFound e) {
-            return false;
-        }
+        return success;
     };
 }

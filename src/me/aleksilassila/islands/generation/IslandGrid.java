@@ -1,7 +1,8 @@
 package me.aleksilassila.islands.generation;
 
+import com.sun.istack.internal.NotNull;
+import com.sun.istack.internal.Nullable;
 import me.aleksilassila.islands.Islands;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -35,18 +36,19 @@ public class IslandGrid {
     }
 
     public void giveIsland(String islandId, Player player) {
-        getIslandsConfig().set("islands." + islandId + ".UUID", player.getUniqueId().toString());
         getIslandsConfig().set("islands." + islandId + ".home", String.valueOf(getNumberOfIslands(player.getUniqueId()) + 1));
+        getIslandsConfig().set("islands." + islandId + ".UUID", player.getUniqueId().toString());
         islands.plugin.saveIslandsConfig();
     }
 
-    public static class IslandNotFound extends java.lang.Exception {
-        public IslandNotFound() {
+    public static class IslandGridException extends java.lang.Exception {
+        public IslandGridException() {
             super();
         }
     }
 
-    public String getIslandId(Location location) throws IslandNotFound {
+    @Nullable
+    public String getIslandId(Location location) {
         for (String islandId : getIslandsConfig().getConfigurationSection("islands").getKeys(false)) {
             if (location.getBlockX() / islandSpacing == getIslandsConfig().getInt("islands." + islandId + ".xIndex")) {
                 if (location.getBlockZ() / islandSpacing == getIslandsConfig().getInt("islands." + islandId + ".zIndex")) {
@@ -55,39 +57,19 @@ public class IslandGrid {
             }
         }
 
-        throw new IslandNotFound();
+        return null;
     }
 
     private FileConfiguration getIslandsConfig() {
         return islands.plugin.getIslandsConfig();
     }
 
-    public String getFirstIslandId(UUID uuid) throws IslandNotFound {
-        ConfigurationSection section = getIslandsConfig().getConfigurationSection("islands");
-
-        if (section == null) {
-            throw new IslandNotFound();
-        }
-
-        Set<String> islands = section.getKeys(false);
-
-        for (String islandId : islands) {
-            if (getIslandsConfig().getString("islands." + islandId + ".UUID").equals(uuid.toString())) {
-                return islandId;
-            }
-        }
-
-        throw new IslandNotFound();
-    }
-
-    public List<String> getAllIslandIds(UUID uuid) throws IslandNotFound {
+    @NotNull
+    public List<String> getAllIslandIds(UUID uuid) {
         List<String> islands = new ArrayList<>();
 
         ConfigurationSection section = getIslandsConfig().getConfigurationSection("islands");
-
-        if (section == null) {
-            throw new IslandNotFound();
-        }
+        if (section == null) { return islands; }
 
         Set<String> allIslands = section.getKeys(false);
 
@@ -101,12 +83,9 @@ public class IslandGrid {
         return islands;
     }
 
-    public String getPrivateIsland(UUID uuid, String name) throws IslandNotFound {
+    @Nullable
+    public String getPrivateIsland(UUID uuid, String name) {
         List<String> allIslands = getAllIslandIds(uuid);
-
-        if (allIslands == null) {
-            throw new IslandNotFound();
-        }
 
         for (String islandId : allIslands) {
             if (getIslandsConfig().getString("islands." + islandId + ".name").equals(name)) {
@@ -114,20 +93,25 @@ public class IslandGrid {
             }
         }
 
-        throw new IslandNotFound();
+        return null;
     }
 
-    public String getPublicIsland(String name) throws IslandNotFound {
-        for (String islandId : getIslandsConfig().getConfigurationSection("islands").getKeys(false)) {
+    @Nullable
+    public String getPublicIsland(String name) {
+        ConfigurationSection section = getIslandsConfig().getConfigurationSection("islands");
+        if (section == null) { return null; }
+
+        for (String islandId : section.getKeys(false)) {
             if (getIslandsConfig().getString("islands." + islandId + ".name").equalsIgnoreCase(name) && getIslandsConfig().getInt("islands." + islandId + ".public") == 1) {
                 return islandId;
             }
         }
 
-        throw new IslandNotFound();
+        return null;
     }
 
-    public Location getIslandSpawn(String islandId) throws IslandNotFound {
+    @Nullable
+    public Location getIslandSpawn(String islandId) {
         if (getIslandsConfig().getConfigurationSection("islands."+islandId) != null) {
             return new Location(
                     islands.plugin.islandsWorld,
@@ -136,7 +120,7 @@ public class IslandGrid {
                     getIslandsConfig().getInt("islands." + islandId + ".spawnPoint.z")
             );
         } else {
-            throw new IslandNotFound();
+            return null;
         }
     }
 
@@ -145,7 +129,8 @@ public class IslandGrid {
         return 20 + ((islandIndex + xIndex) % 3) * 70;
     }
 
-    private String addIslandToConfig(int xIndex, int zIndex, int islandSize, UUID uuid, String name){
+    @NotNull
+    private String addIslandToConfig(int xIndex, int zIndex, int islandSize, UUID uuid, String name) {
         int realX = xIndex * islandSpacing;
         int realY = getIslandY(xIndex, zIndex);
         int realZ = zIndex * islandSpacing;
@@ -176,18 +161,10 @@ public class IslandGrid {
     }
 
     public int getNumberOfIslands(UUID uuid) {
-        int numberOfPreviousIslands;
-
-        try {
-            numberOfPreviousIslands = getAllIslandIds(uuid).size();
-        } catch (IslandNotFound e) {
-            numberOfPreviousIslands = 0;
-        }
-
-        return numberOfPreviousIslands;
+        return getAllIslandIds(uuid).size();
     }
 
-    public String createIsland(UUID uuid, int islandSize) throws IslandNotFound {
+    public String createIsland(UUID uuid, int islandSize) {
         ConfigurationSection section = getIslandsConfig().getConfigurationSection("islands");
 
         if (section == null) {
@@ -209,15 +186,7 @@ public class IslandGrid {
             }
         }
 
-
-        // Nothing fancy so far
-//        for (int layer = 1; layer == -1; layer++) {
-//            for (int index = 0; index == -1; index++) {
-//                int nOfPositions = (layer - 1) * 2 + 1;
-//            }
-//        }
-
-        throw new IslandNotFound();
+        return null;
     }
 
     public void nameIsland(String islandId, String name){
@@ -227,22 +196,9 @@ public class IslandGrid {
             islands.plugin.saveIslandsConfig();
     }
 
-    public void setIslandOwner(UUID newUuid, String islandId) throws IslandNotFound {
-        ConfigurationSection section = getIslandsConfig().getConfigurationSection("islands." + islandId);
-
-        if (section == null) {
-            throw new IslandNotFound();
-        }
-
-        getIslandsConfig().set("islands." + islandId + ".UUID", newUuid.toString());
-    }
-
-    public String getHomeIsland(UUID uuid, String home) throws IslandNotFound {
+    @Nullable
+    public String getHomeIsland(UUID uuid, String home) {
         List<String> allIslands = getAllIslandIds(uuid);
-
-        if (allIslands == null) {
-            throw new IslandNotFound();
-        }
 
         for (String islandId : allIslands) {
             if (getIslandsConfig().getString("islands." + islandId + ".home").equals(home)) {
@@ -250,7 +206,7 @@ public class IslandGrid {
             }
         }
 
-        throw new IslandNotFound();
+        return null;
     }
 
     public boolean isBlockInIslandSphere(int x, int y, int z) {
