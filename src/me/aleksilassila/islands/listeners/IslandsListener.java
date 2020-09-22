@@ -32,7 +32,7 @@ public class IslandsListener extends ChatUtils implements Listener {
     }
 
     @EventHandler // Player teleportation in void, damage restrictions
-    public void onDamageEvent(EntityDamageByEntityEvent e) {
+    public void onDamageEvent(EntityDamageEvent e) {
         if (e.getEntity() instanceof Player) {
             Player player = (Player) e.getEntity();
 
@@ -61,13 +61,17 @@ public class IslandsListener extends ChatUtils implements Listener {
                     e.setCancelled(true);
                 }
             }
-        } else if (e.getEntity().getWorld().equals(plugin.islandsWorld)) {
+        }
+    }
+
+    public void onEntityDamageEvent(EntityDamageByEntityEvent e) {
+         if (e.getEntity().getWorld().equals(plugin.islandsWorld)) {
             String ownerUUID = plugin.islands.grid.getBlockOwnerUUID(e.getEntity().getLocation().getBlockX(), e.getEntity().getLocation().getBlockZ());
 
             if (ownerUUID != null && e.getDamager() instanceof Player && !ownerUUID.equals(e.getDamager().getUniqueId().toString())) {
                 e.setCancelled(true);
 
-                e.getDamager().sendMessage(error("You cannot intract here."));
+                e.getDamager().sendMessage(error("You cannot interact here."));
             }
         }
     }
@@ -81,7 +85,7 @@ public class IslandsListener extends ChatUtils implements Listener {
             if (ownerUUID == null || !ownerUUID.equals(e.getPlayer().getUniqueId().toString())) {
                 e.setCancelled(true);
 
-                e.getPlayer().sendMessage(error("You cannot intract here."));
+                e.getPlayer().sendMessage(error("You cannot interact here."));
             }
         }
     }
@@ -94,7 +98,7 @@ public class IslandsListener extends ChatUtils implements Listener {
             if (ownerUUID == null || !ownerUUID.equals(e.getPlayer().getUniqueId().toString())) {
                 e.setCancelled(true);
 
-                e.getPlayer().sendMessage(error("You cannot intract here."));
+                e.getPlayer().sendMessage(error("You cannot interact here."));
             }
         }
     }
