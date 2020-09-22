@@ -254,12 +254,28 @@ public class IslandManagmentCommands extends ChatUtils implements CommandExecuto
     }
 
     private void regenerateIsland(Player player, String[] args) {
-        if (args.length != 3) {
+        HashMap<Biome, List<Location>> availableLocations = plugin.islands.islandGeneration.biomes.availableLocations;
+
+        if (args.length < 2) {
             player.sendMessage(Messages.Help.REGENERATE);
+
+            for (Biome biome : availableLocations.keySet()) {
+                if (availableLocations.get(biome).size() > 0) {
+                    player.sendMessage(ChatColor.GOLD + biome.toString() + ChatColor.GREEN +  " has " + ChatColor.GOLD +  availableLocations.get(biome).size() + ChatColor.GREEN +  " island variations available.");
+                }
+            }
+
             return;
         }
 
-        Biome targetBiome = getTargetBiome(args[2]);
+        String islandId = grid.getIslandId(player.getLocation());
+
+        if (islandId == null || !plugin.getIslandsConfig().getString("islands." + islandId + ".UUID").equals(player.getUniqueId().toString())) {
+            player.sendMessage(Messages.Error.UNAUTHORIZED);
+            return;
+        }
+
+        Biome targetBiome = getTargetBiome(args[1]);
 
         if (targetBiome == null) {
             player.sendMessage(Messages.Error.NO_BIOME_FOUND);
@@ -271,7 +287,9 @@ public class IslandManagmentCommands extends ChatUtils implements CommandExecuto
             return;
         }
 
-        boolean success = plugin.islands.regenerateIsland(targetBiome, player.getUniqueId(), args[1]);
+        Islands.IslandSize islandSize = args.length == 3 ? parseIslandSize(args[2]) : Islands.IslandSize.NORMAL;
+
+        boolean success = plugin.islands.regenerateIsland(islandId, targetBiome, islandSize);
 
         if (success) {
             player.sendMessage(Messages.Success.ISLAND_GEN);
@@ -319,8 +337,8 @@ public class IslandManagmentCommands extends ChatUtils implements CommandExecuto
         }
 
         public static class Help {
-            public static String CREATE = ChatColor.GRAY + "/island create <biome> (BIG/NORMAL/SMALL)";
-            public static String REGENERATE = ChatColor.GRAY + "/island regenerate <id/name> <biome>";
+            public static String CREATE = ChatColor.GRAY + "/island create <biome> (<BIG/NORMAL/SMALL>)";
+            public static String REGENERATE = ChatColor.GRAY + "/island regenerate <biome> (<BIG/NORMAL/SMALL>) (You have to be on target island)";
             public static String NAME = ChatColor.GRAY + "/island name <name> (You have to be on target island)";
             public static String UNNAME = ChatColor.GRAY + "/island unname (You have to be on target island)";
             public static String GIVE = ChatColor.GRAY + "/island give <name> (You have to be on target island)";

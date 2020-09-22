@@ -138,21 +138,21 @@ public class IslandGrid {
 
         String islandId = xIndex + "x" + zIndex;
 
-        getIslandsConfig().set("islands."+islandId+".xIndex", xIndex);
-        getIslandsConfig().set("islands."+islandId+".zIndex", zIndex);
+        getIslandsConfig().set("islands." + islandId + ".xIndex", xIndex);
+        getIslandsConfig().set("islands." + islandId + ".zIndex", zIndex);
 
-        getIslandsConfig().set("islands."+islandId+".x", realX);
-        getIslandsConfig().set("islands."+islandId+".y", realY);
-        getIslandsConfig().set("islands."+islandId+".z", realZ);
+        getIslandsConfig().set("islands." + islandId + ".x", realX);
+        getIslandsConfig().set("islands." + islandId + ".y", realY);
+        getIslandsConfig().set("islands." + islandId + ".z", realZ);
 
-        getIslandsConfig().set("islands."+islandId+".spawnPoint.x", realX + islandSize / 2);
-        getIslandsConfig().set("islands."+islandId+".spawnPoint.z", realZ + islandSize / 2);
+        getIslandsConfig().set("islands." + islandId + ".spawnPoint.x", realX + islandSize / 2);
+        getIslandsConfig().set("islands." + islandId + ".spawnPoint.z", realZ + islandSize / 2);
 
-        getIslandsConfig().set("islands."+islandId+".UUID", uuid.toString());
-        getIslandsConfig().set("islands."+islandId+".name", name);
-        getIslandsConfig().set("islands."+islandId+".home", home);
-        getIslandsConfig().set("islands."+islandId+".size", islandSize);
-        getIslandsConfig().set("islands."+islandId+".public", 0);
+        getIslandsConfig().set("islands." + islandId + ".UUID", uuid.toString());
+        getIslandsConfig().set("islands." + islandId + ".name", name);
+        getIslandsConfig().set("islands." + islandId + ".home", home);
+        getIslandsConfig().set("islands." + islandId + ".size", islandSize);
+        getIslandsConfig().set("islands." + islandId + ".public", 0);
 
         islands.plugin.saveIslandsConfig();
 
@@ -238,6 +238,21 @@ public class IslandGrid {
         if (!isInside) return null;
 
         return getIslandsConfig().getString("islands." + xIndex + "x" + zIndex + ".UUID");
+    }
+
+    public void updateIslandSize(String islandId, int islandSize) {
+        int xIndex = getIslandsConfig().getInt("islands." + islandId + ".xIndex");
+        int zIndex = getIslandsConfig().getInt("islands." + islandId + ".zIndex");
+
+        int realX = xIndex * islandSpacing + islandSpacing / 2 - islandSize / 2;
+        int realZ = zIndex * islandSpacing + islandSpacing / 2 - islandSize / 2;
+
+        getIslandsConfig().set("islands." + islandId + ".x", realX);
+        getIslandsConfig().set("islands." + islandId + ".z", realZ);
+
+        getIslandsConfig().set("islands." + islandId + ".size", islandSize);
+
+        islands.plugin.saveIslandsConfig();
     }
 
     // deleteIsland

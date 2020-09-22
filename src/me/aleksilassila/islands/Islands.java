@@ -48,7 +48,7 @@ public class Islands {
         }
     }
 
-    public int getIslandSize(IslandSize size) {
+    public int parseIslandSize(IslandSize size) {
         switch (size) {
             case SMALL:
                 return plugin.getConfig().getInt("island.SMALL");
@@ -62,7 +62,7 @@ public class Islands {
     }
 
     public String createNewIsland(Biome biome, IslandSize size, UUID uuid) throws IslandsException {
-        int islandSize = getIslandSize(size);
+        int islandSize = parseIslandSize(size);
 
         String islandId = grid.createIsland(uuid, islandSize);
 
@@ -82,14 +82,12 @@ public class Islands {
 
     }
 
-    public boolean regenerateIsland(Biome biome, UUID uuid, String name) {
-        String islandId = grid.getPrivateIsland(uuid, name);
-
-        if (islandId == null) { return false; }
+    public boolean regenerateIsland(String islandId, Biome biome, IslandSize islandSize) {
+        grid.updateIslandSize(islandId, parseIslandSize(islandSize));
 
         boolean success = islandGeneration.copyIsland(
                 biome,
-                plugin.getIslandsConfig().getInt("islands." + islandId + ".size"),
+                parseIslandSize(islandSize),
                 plugin.getIslandsConfig().getInt("islands." + islandId + ".x"),
                 plugin.getIslandsConfig().getInt("islands." + islandId + ".y"),
                 plugin.getIslandsConfig().getInt("islands." + islandId + ".z")

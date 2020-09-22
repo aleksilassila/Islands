@@ -7,6 +7,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockFromToEvent;
+import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
@@ -56,7 +57,7 @@ public class IslandsListener extends ChatUtils implements Listener {
                 if (plugin.islands.playersWithNoFall.contains(player)) {
                     plugin.islands.playersWithNoFall.remove(player);
                     e.setCancelled(true);
-                } else if (player.getWorld().getName().equals("islands")) {
+                } else if (player.getWorld().equals(plugin.islandsWorld)) {
                     e.setCancelled(true);
                 }
             }
@@ -77,6 +78,19 @@ public class IslandsListener extends ChatUtils implements Listener {
         if (e.getPlayer().getWorld().equals(plugin.islandsWorld)) {
             String ownerUUID = plugin.islands.grid.getBlockOwnerUUID(e.getClickedBlock().getX(), e.getClickedBlock().getZ());
 
+            if (ownerUUID == null || !ownerUUID.equals(e.getPlayer().getUniqueId().toString())) {
+                e.setCancelled(true);
+
+                e.getPlayer().sendMessage(error("You cannot intract here."));
+            }
+        }
+    }
+
+    // Above only checks if  the block clicked is in build radius, allowing block placement in restricted areas.
+    @EventHandler
+    private void onBlockPlace(BlockPlaceEvent e) {
+        if (e.getBlock().getWorld().equals(plugin.islandsWorld)) {
+            String ownerUUID = plugin.islands.grid.getBlockOwnerUUID(e.getBlock().getX(), e.getBlock().getZ());
             if (ownerUUID == null || !ownerUUID.equals(e.getPlayer().getUniqueId().toString())) {
                 e.setCancelled(true);
 
