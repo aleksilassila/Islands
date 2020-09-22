@@ -1,14 +1,20 @@
 package me.aleksilassila.islands.commands;
 
+import me.aleksilassila.islands.Islands;
 import me.aleksilassila.islands.Main;
 import me.aleksilassila.islands.generation.IslandGrid;
 import me.aleksilassila.islands.utils.ChatUtils;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
+import org.bukkit.Location;
 import org.bukkit.block.Biome;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+
+import java.util.HashMap;
+import java.util.List;
 
 public class IslandManagmentCommands extends ChatUtils implements CommandExecutor {
     private Main plugin;
@@ -71,8 +77,11 @@ public class IslandManagmentCommands extends ChatUtils implements CommandExecuto
             return;
         }
 
-        if (plugin.getIslandsConfig().getString("islands." + islandId + ".UUID").equals(player.getUniqueId().toString())) {
+        if (plugin.getIslandsConfig().getString("islands." + islandId + ".UUID").equals(player.getUniqueId().toString()) && plugin.getIslandsConfig().getInt("islands." + islandId + ".public") == 1) {
             plugin.getIslandsConfig().set("islands." + islandId + ".UUID", Bukkit.getPlayer(args[1]).getUniqueId().toString());
+            plugin.saveIslandsConfig();
+
+            plugin.getIslandsConfig().set("islands." + islandId + ".home", String.valueOf(plugin.islands.grid.getNumberOfIslands(Bukkit.getPlayer(args[1]).getUniqueId())));
             plugin.saveIslandsConfig();
 
             player.sendMessage(success("Island owner switched to " + args[1] + "."));
@@ -94,7 +103,7 @@ public class IslandManagmentCommands extends ChatUtils implements CommandExecuto
     }
 
     private void unnameIsland(Player player, String[] args) {
-        if (args.length != 2) {
+        if (args.length != 1) {
             player.sendMessage(Messages.Help.UNNAME);
             return;
         }
@@ -110,7 +119,7 @@ public class IslandManagmentCommands extends ChatUtils implements CommandExecuto
 
         if (plugin.getIslandsConfig().getString("islands." + islandId + ".UUID").equals(player.getUniqueId().toString())) {
             plugin.getIslandsConfig().set("islands." + islandId + ".name", plugin.getIslandsConfig().getString("islands." + islandId + ".home"));
-            plugin.getIslandsConfig().set("islands." + islandId + ".public", "0");
+            plugin.getIslandsConfig().set("islands." + islandId + ".public", 0);
             plugin.saveIslandsConfig();
 
             player.sendMessage(success("Island unnamed and made private."));
@@ -137,7 +146,7 @@ public class IslandManagmentCommands extends ChatUtils implements CommandExecuto
 
         if (plugin.getIslandsConfig().getString("islands." + islandId + ".UUID").equals(player.getUniqueId().toString())) {
             plugin.getIslandsConfig().set("islands." + islandId + ".name", args[1]);
-            plugin.getIslandsConfig().set("islands." + islandId + ".public", "1");
+            plugin.getIslandsConfig().set("islands." + islandId + ".public", 1);
             plugin.saveIslandsConfig();
 
             player.sendMessage(success("Island name changed to " + args[1] + ". Anyone with your island name can now visit it."));
@@ -160,9 +169,47 @@ public class IslandManagmentCommands extends ChatUtils implements CommandExecuto
     }
 
     private void createIsland(Player player, String[] args) {
+        HashMap<Biome, List<Location>> availableLocations = plugin.islands.islandGeneration.biomes.availableLocations;
+
+        if (args.length != 2) {
+            player.sendMessage(Messages.Help.CREATE);
+
+            for (Biome biome : availableLocations.keySet()) {
+                if (availableLocations.get(biome).size() > 0) {
+                    player.sendMessage(ChatColor.GOLD + biome.toString() + ChatColor.GREEN +  " has " + ChatColor.GOLD +  availableLocations.get(biome).size() + ChatColor.GREEN +  " island variations available.");
+                }
+            }
+
+            return;
+        }
+
+        Biome targetBiome = getTargetBiome(args[1]);
+
+        if (targetBiome == null) {
+            player.sendMessage(Messages.Error.NO_BIOME);
+            return;
+        }
+
+        if (!availableLocations.containsKey(targetBiome)) {
+            player.sendMessage(Messages.Error.NO_LOCATIONS_FOR_BIOME);
+            return;
+        }
+
+        try {
+            String islandId = plugin.islands.createNewIsland(targetBiome, Islands.IslandSize.NORMAL, player.getUniqueId());
+
+            player.sendMessage(Messages.Success.ISLAND_GEN);
+            try {
+                player.teleport(plugin.islands.grid.getIslandSpawn(islandId));
+
+            } catch (IslandGrid.IslandNotFound e) {
+                player.sendMessage(Messages.Error.ISLAND_GEN);
+            }
+        } catch (Islands.IslandsException e) {
+            player.sendMessage(error(e.getMessage()));
+        }
 
     }
-
     private void regenerateIsland(Player player, String[] args) {
         if (args.length != 3) {
             player.sendMessage(Messages.Help.REGENERATE);
@@ -197,7 +244,7 @@ public class IslandManagmentCommands extends ChatUtils implements CommandExecuto
 
     private static class Messages {
         public static class Error {
-            public static final String UNAUTHORIZED = error("You don't own this island.");
+            public static final String UNAUTHORIZED = error("The island must be public and yours.");
             public static String ISLAND_GEN = error("Island regeneration failed.");
             public static String TELEPORT = error("Could not teleport.");
             public static String NO_BIOME = error("Biome not found.");
@@ -209,11 +256,11 @@ public class IslandManagmentCommands extends ChatUtils implements CommandExecuto
         }
 
         public static class Help {
-            public static String CREATE = info("Island regenerated successfully.");
-            public static String REGENERATE = info("Usage: /island regenerate <id/name> <biome>");
-            public static String NAME = info("Island regenerated successfully.");
-            public static String UNNAME = info("Island regenerated successfully.");
-            public static String GIVE = info("Island regenerated successfully.");
+            public static String CREATE = ChatColor.GRAY + "/island create <biome>";
+            public static String REGENERATE = ChatColor.GRAY + "/island regenerate <id/name> <biome>";
+            public static String NAME = ChatColor.GRAY + "/island name <name> (You have to be on target island)";
+            public static String UNNAME = ChatColor.GRAY + "/island unname (You have to be on target island)";
+            public static String GIVE = ChatColor.GRAY + "/island give <name> (You have to be on target island)";
         }
     }
 }

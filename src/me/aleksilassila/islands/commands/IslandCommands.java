@@ -38,7 +38,7 @@ public class IslandCommands {
             }
 
             try {
-                String islandId = plugin.islands.grid.getPrivateIsland(player.getUniqueId(), args[0]);
+                String islandId = plugin.islands.grid.getPublicIsland(args[0]);
 
                 player.teleport(plugin.islands.grid.getIslandSpawn(islandId));
             } catch (IslandGrid.IslandNotFound e) {
@@ -77,7 +77,8 @@ public class IslandCommands {
                     player.sendMessage(success("Found " + ids.size() + " home(s)."));
                     for (String islandId : ids) {
                         String name = plugin.getIslandsConfig().getString("islands." + islandId + ".name");
-                        player.sendMessage(ChatColor.AQUA + " - " + name);
+                        String homeNumber = plugin.getIslandsConfig().getString("islands." + islandId + ".home");
+                        player.sendMessage(ChatColor.AQUA + " - " + name + " (" + homeNumber + ")");
                     }
                 } catch (IslandGrid.IslandNotFound ignored) { }
 

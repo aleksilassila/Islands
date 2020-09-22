@@ -22,8 +22,6 @@ public class IslandGrid {
 
         this.islandsInARow = instance.plugin.getConfig().getInt("generation.islandsInARow");
         this.islandSpacing = instance.plugin.getConfig().getInt("generation.islandSpacing");
-
-        Bukkit.broadcastMessage("INT IS " + islandSpacing);
     }
 
     public static class IslandNotFound extends java.lang.Exception {
@@ -33,7 +31,7 @@ public class IslandGrid {
     }
 
     public String getIslandId(Location location) throws IslandNotFound {
-        for (String islandId : getIslandsConfig().getKeys(false)) {
+        for (String islandId : getIslandsConfig().getConfigurationSection("islands").getKeys(false)) {
             if (location.getBlockX() / islandSpacing == getIslandsConfig().getInt("islands." + islandId + ".xIndex")) {
                 if (location.getBlockZ() / islandSpacing == getIslandsConfig().getInt("islands." + islandId + ".zIndex")) {
                     return islandId;
@@ -105,8 +103,8 @@ public class IslandGrid {
 
     public String getPublicIsland(String name) throws IslandNotFound {
         for (String islandId : getIslandsConfig().getConfigurationSection("islands").getKeys(false)) {
-            if (getIslandsConfig().getString("islands." + islandId + ".name").equalsIgnoreCase(name)) {
-                return getIslandsConfig().getString("islands." + islandId + ".name");
+            if (getIslandsConfig().getString("islands." + islandId + ".name").equalsIgnoreCase(name) && getIslandsConfig().getInt("islands." + islandId + ".public") == 1) {
+                return islandId;
             }
         }
 
@@ -154,14 +152,14 @@ public class IslandGrid {
         getIslandsConfig().set("islands."+islandId+".name", name);
         getIslandsConfig().set("islands."+islandId+".home", home);
         getIslandsConfig().set("islands."+islandId+".size", islandSize);
-        getIslandsConfig().set("islands."+islandId+".public", "0");
+        getIslandsConfig().set("islands."+islandId+".public", 0);
 
         islands.plugin.saveIslandsConfig();
 
         return islandId;
     }
 
-    private int getNumberOfIslands(UUID uuid) {
+    public int getNumberOfIslands(UUID uuid) {
         int numberOfPreviousIslands;
 
         try {
