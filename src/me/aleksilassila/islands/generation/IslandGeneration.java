@@ -1,8 +1,5 @@
 package me.aleksilassila.islands.generation;
 
-import com.sk89q.worldedit.bukkit.BukkitWorld;
-import com.sk89q.worldedit.math.BlockVector3;
-import com.sk89q.worldedit.regions.CuboidRegion;
 import me.aleksilassila.islands.Islands;
 import me.aleksilassila.islands.biomes.Biomes;
 import org.bukkit.*;
@@ -20,6 +17,22 @@ public class IslandGeneration {
     public IslandGeneration(Islands islands) {
         this.islands = islands;
         this.biomes = new Biomes(islands.sourceWorld, islands.plugin);
+    }
+
+    private void copyBlocks(int sourceX, int sourceY, int sourceZ, int targetX, int targetY, int targetZ, int relativeX, int relativeZ, int islandSize) {
+        for (int y = sourceY; y < sourceY + islandSize; y++) {
+            BlockData sourceData = islands.sourceWorld.getBlockAt(sourceX, y, sourceZ).getBlockData();
+//WIP
+//            if (Math.random() < - ((8 * (y - sourceY)) / (double) islandSize) + 2) {
+//                continue;
+//            }
+
+            if (isBlockInIslandShape(relativeX, y - sourceY, relativeZ, islandSize)) {
+                islands.world.getBlockAt(targetX, targetY + (y - sourceY), targetZ).setBlockData(sourceData);
+            } else {
+                islands.world.getBlockAt(targetX, targetY + (y - sourceY), targetZ).setType(Material.AIR);
+            }
+        }
     }
 
     public boolean copyIsland(Biome biome, int islandSize, int targetX, int targetY, int targetZ) {
@@ -44,39 +57,17 @@ public class IslandGeneration {
             if (material == Material.STONE || material == Material.SANDSTONE || material == Material.WATER) {
                 break;
             }
+
             centerY--;
         }
-
-        CuboidRegion sourceRegion = new CuboidRegion(
-                new BukkitWorld(islands.sourceWorld),
-                BlockVector3.at(
-                        sourceLocation.getBlockX(),
-                        centerY + islandSize / 2,
-                        sourceLocation.getBlockZ()
-                ),
-                BlockVector3.at(
-                        sourceLocation.getBlockX() + islandSize,
-                        centerY - islandSize / 2,
-                        sourceLocation.getBlockZ() + islandSize
-                )
-        );
 
         int startX = sourceLocation.getBlockX();
         int startY = centerY - islandSize / 2;
         int startZ = sourceLocation.getBlockZ();
 
-        for (BlockVector3 point : sourceRegion) {
-            BlockData sourceData = islands.sourceWorld.getBlockAt(point.getBlockX(), point.getBlockY(), point.getBlockZ()).getBlockData();
-
-            // Relative coordinates: first block (0,0,0), second (1,0,0) etc.
-            int relativeX = point.getBlockX() - startX;
-            int relativeY = point.getBlockY() - startY;
-            int relativeZ = point.getBlockZ() - startZ;
-
-            if (isBlockInIslandShape(relativeX, relativeY, relativeZ, islandSize)){
-                islands.world.getBlockAt(targetX + relativeX, targetY + relativeY, targetZ + relativeZ).setBlockData(sourceData);
-            } else {
-                islands.world.getBlockAt(targetX + relativeX, targetY + relativeY, targetZ + relativeZ).setType(Material.AIR);
+        for (int x = 0; x < islandSize; x++) {
+            for (int z = 0; z < islandSize; z++) {
+                copyBlocks(startX + x, startY, startZ + z, targetX + x, targetY, targetZ + z, x, z, islandSize);
             }
         }
 
