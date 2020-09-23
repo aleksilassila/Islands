@@ -26,3 +26,11 @@ commands:
     description: List homes
     usage: /<command>
     permission: yourplugin.yourcommandpermi
+  trust:
+    description: Trust a player
+    usage: /<command>
+    permission: yourplugin.yourcommandpermi
+  untrust:
+    description: Untrust a player
+    usage: /<command>
+    permission: yourplugin.yourcommandpermi

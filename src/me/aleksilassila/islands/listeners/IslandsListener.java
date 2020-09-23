@@ -57,21 +57,28 @@ public class IslandsListener extends ChatUtils implements Listener {
                 if (plugin.islands.playersWithNoFall.contains(player)) {
                     plugin.islands.playersWithNoFall.remove(player);
                     e.setCancelled(true);
-                } else if (player.getWorld().equals(plugin.islandsWorld)) {
-                    e.setCancelled(true);
                 }
+            } else if (player.getWorld().equals(plugin.islandsWorld)) {
+                e.setCancelled(true);
             }
         }
     }
 
+    @EventHandler
     public void onEntityDamageEvent(EntityDamageByEntityEvent e) {
          if (e.getEntity().getWorld().equals(plugin.islandsWorld)) {
-            String ownerUUID = plugin.islands.grid.getBlockOwnerUUID(e.getEntity().getLocation().getBlockX(), e.getEntity().getLocation().getBlockZ());
+             int x = e.getEntity().getLocation().getBlockX();
+             int z = e.getEntity().getLocation().getBlockZ();
 
-            if (ownerUUID != null && e.getDamager() instanceof Player && !ownerUUID.equals(e.getDamager().getUniqueId().toString())) {
-                e.setCancelled(true);
+             String ownerUUID = plugin.islands.grid.getBlockOwnerUUID(x, z);
+                 if (ownerUUID != null && e.getDamager() instanceof Player && !ownerUUID.equals(e.getDamager().getUniqueId().toString())) {
+                     if (plugin.islands.grid.getTrusted(plugin.islands.grid.getIslandId(x, z)).contains(e.getDamager().getUniqueId().toString())) {
+                         return;
+                     }
 
-                e.getDamager().sendMessage(error("You cannot interact here."));
+                     e.setCancelled(true);
+
+                 e.getDamager().sendMessage(error("You cannot interact here."));
             }
         }
     }
@@ -80,9 +87,16 @@ public class IslandsListener extends ChatUtils implements Listener {
     public void onPlayerInteract(PlayerInteractEvent e) {
         if (e.getClickedBlock() == null) return;
         if (e.getPlayer().getWorld().equals(plugin.islandsWorld)) {
-            String ownerUUID = plugin.islands.grid.getBlockOwnerUUID(e.getClickedBlock().getX(), e.getClickedBlock().getZ());
+            int x = e.getClickedBlock().getX();
+            int z = e.getClickedBlock().getZ();
+
+            String ownerUUID = plugin.islands.grid.getBlockOwnerUUID(x, z);
 
             if (ownerUUID == null || !ownerUUID.equals(e.getPlayer().getUniqueId().toString())) {
+                if (plugin.islands.grid.getTrusted(plugin.islands.grid.getIslandId(x, z)).contains(e.getPlayer().getUniqueId().toString())) {
+                    return;
+                }
+
                 e.setCancelled(true);
 
                 e.getPlayer().sendMessage(error("You cannot interact here."));
@@ -93,9 +107,18 @@ public class IslandsListener extends ChatUtils implements Listener {
     // Above only checks if  the block clicked is in build radius, allowing block placement in restricted areas.
     @EventHandler
     private void onBlockPlace(BlockPlaceEvent e) {
+        if (e.isCancelled()) return;
         if (e.getBlock().getWorld().equals(plugin.islandsWorld)) {
-            String ownerUUID = plugin.islands.grid.getBlockOwnerUUID(e.getBlock().getX(), e.getBlock().getZ());
+            int x = e.getBlock().getX();
+            int z = e.getBlock().getZ();
+
+            String ownerUUID = plugin.islands.grid.getBlockOwnerUUID(x, z);
+
             if (ownerUUID == null || !ownerUUID.equals(e.getPlayer().getUniqueId().toString())) {
+                if (plugin.islands.grid.getTrusted(plugin.islands.grid.getIslandId(x, z)).contains(e.getPlayer().getUniqueId().toString())) {
+                    return;
+                }
+
                 e.setCancelled(true);
 
                 e.getPlayer().sendMessage(error("You cannot interact here."));

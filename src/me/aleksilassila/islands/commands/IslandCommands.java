@@ -36,7 +36,7 @@ public class IslandCommands {
             }
 
             String ownerUUID = plugin.islands.grid.getBlockOwnerUUID(player.getLocation().getBlockX(), player.getLocation().getBlockZ());
-            String islandId = plugin.islands.grid.getIslandId(player.getLocation());
+            String islandId = plugin.islands.grid.getIslandId(player.getLocation().getBlockX(), player.getLocation().getBlockZ());
 
             if (ownerUUID == null || islandId == null) {
                 player.sendMessage(error("You have to be on an island."));
@@ -48,7 +48,7 @@ public class IslandCommands {
                 return true;
             }
 
-            Player targetPlayer = Bukkit.getPlayer(args[1]);
+            Player targetPlayer = Bukkit.getPlayer(args[0]);
 
             if (targetPlayer == null) {
                 player.sendMessage(error("Player not found."));
@@ -84,7 +84,7 @@ public class IslandCommands {
             }
 
             String ownerUUID = plugin.islands.grid.getBlockOwnerUUID(player.getLocation().getBlockX(), player.getLocation().getBlockZ());
-            String islandId = plugin.islands.grid.getIslandId(player.getLocation());
+            String islandId = plugin.islands.grid.getIslandId(player.getLocation().getBlockX(), player.getLocation().getBlockZ());
 
             if (ownerUUID == null || islandId == null) {
                 player.sendMessage(error("You have to be on an island."));
@@ -96,7 +96,7 @@ public class IslandCommands {
                 return true;
             }
 
-            Player targetPlayer = Bukkit.getPlayer(args[1]);
+            Player targetPlayer = Bukkit.getPlayer(args[0]);
 
             if (targetPlayer == null) {
                 player.sendMessage(error("Player not found."));

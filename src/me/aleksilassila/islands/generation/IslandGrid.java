@@ -44,10 +44,10 @@ public class IslandGrid {
     }
 
     @Nullable
-    public String getIslandId(Location location) {
+    public String getIslandId(int x, int z) {
         for (String islandId : getIslandsConfig().getConfigurationSection("islands").getKeys(false)) {
-            if (location.getBlockX() / islandSpacing == getIslandsConfig().getInt("islands." + islandId + ".xIndex")) {
-                if (location.getBlockZ() / islandSpacing == getIslandsConfig().getInt("islands." + islandId + ".zIndex")) {
+            if (x / islandSpacing == getIslandsConfig().getInt("islands." + islandId + ".xIndex")) {
+                if (z / islandSpacing == getIslandsConfig().getInt("islands." + islandId + ".zIndex")) {
                     return islandId;
                 }
             }
@@ -262,6 +262,7 @@ public class IslandGrid {
         islands.plugin.saveIslandsConfig();
     }
 
+    @NotNull
     public Set<String> getTrusted(String islandId) {
         ConfigurationSection section = getIslandsConfig().getConfigurationSection("islands." + islandId + ".trusted");
 

@@ -71,7 +71,7 @@ public class IslandManagmentCommands extends ChatUtils implements CommandExecuto
     }
 
     private void deleteIsland(Player player, String[] args) {
-        String islandId = grid.getIslandId(player.getLocation());
+        String islandId = grid.getIslandId(player.getLocation().getBlockX(), player.getLocation().getBlockZ());
 
         if (islandId == null) {
             player.sendMessage(Messages.Error.UNAUTHORIZED);
@@ -104,7 +104,7 @@ public class IslandManagmentCommands extends ChatUtils implements CommandExecuto
             return;
         }
 
-        String islandId = grid.getIslandId(player.getLocation());
+        String islandId = grid.getIslandId(player.getLocation().getBlockX(), player.getLocation().getBlockZ());
 
         if (islandId == null) {
             player.sendMessage(Messages.Error.UNAUTHORIZED);
@@ -138,7 +138,7 @@ public class IslandManagmentCommands extends ChatUtils implements CommandExecuto
             return;
         }
 
-        String islandId = grid.getIslandId(player.getLocation());
+        String islandId = grid.getIslandId(player.getLocation().getBlockX(), player.getLocation().getBlockZ());
 
         if (islandId == null) {
             player.sendMessage(Messages.Error.UNAUTHORIZED);
@@ -160,7 +160,7 @@ public class IslandManagmentCommands extends ChatUtils implements CommandExecuto
             return;
         }
 
-        String islandId = grid.getIslandId(player.getLocation());
+        String islandId = grid.getIslandId(player.getLocation().getBlockX(), player.getLocation().getBlockZ());
 
         if (islandId == null) {
             player.sendMessage(Messages.Error.UNAUTHORIZED);
@@ -268,7 +268,7 @@ public class IslandManagmentCommands extends ChatUtils implements CommandExecuto
             return;
         }
 
-        String islandId = grid.getIslandId(player.getLocation());
+        String islandId = grid.getIslandId(player.getLocation().getBlockX(), player.getLocation().getBlockZ());
 
         if (islandId == null || !plugin.getIslandsConfig().getString("islands." + islandId + ".UUID").equals(player.getUniqueId().toString())) {
             player.sendMessage(Messages.Error.UNAUTHORIZED);
