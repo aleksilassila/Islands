@@ -1,5 +1,5 @@
 name: Islands
-version: 0.0.1
+version: 1.0
 author: Aleksi Lassila
 main: me.aleksilassila.islands.Main
 api-version: 1.16
@@ -7,30 +7,30 @@ commands:
   go:
     description: Your description
     usage: /<command>
-    permission: yourplugin.yourcommandpermission
+    permission: islands.go
   island:
-    description: Your description
+    description: Island managment
     usage: /<command> biome
-    permission: yourplugin.yourcommandpermi
+    permission: islands.manage
     aliases: [is]
   visit:
-    description: Your description
+    description: Visit islands
     usage: /<command> name
-    permission: yourplugin.yourcommandpermi
+    permission: islands.visit
     aliases: [vi]
   home:
     description: Teleport to your home island
-    usage: /<command> [home id]
-    permission: yourplugin.yourcommandpermi
+    usage: /<command> ([home id])
+    permission: islands.home
   homes:
     description: List homes
     usage: /<command>
-    permission: yourplugin.yourcommandpermi
+    permission: islands.home
   trust:
     description: Trust a player
     usage: /<command>
-    permission: yourplugin.yourcommandpermi
+    permission: islands.trust
   untrust:
     description: Untrust a player
     usage: /<command>
-    permission: yourplugin.yourcommandpermi
+    permission: islands.trust
