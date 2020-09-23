@@ -39,8 +39,12 @@ public class Main extends JavaPlugin {
         islands = new Islands(islandsWorld, islandsSourceWorld, this);
 
         new IslandManagmentCommands(this);
+
         new IslandCommands.HomeCommand(this);
         new IslandCommands.VisitCommand(this);
+        new IslandCommands.TrustCommand(this);
+        new IslandCommands.UntrustCommand(this);
+
         new GoCommand(this);
         new IslandsListener(this);
 

@@ -3,6 +3,7 @@ package me.aleksilassila.islands.commands;
 import me.aleksilassila.islands.Main;
 import me.aleksilassila.islands.generation.IslandGrid;
 import me.aleksilassila.islands.utils.ChatUtils;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -14,6 +15,102 @@ import org.bukkit.entity.Player;
 import java.util.List;
 
 public class IslandCommands {
+    public static class UntrustCommand extends ChatUtils implements CommandExecutor {
+        private Main plugin;
+
+        public UntrustCommand(Main plugin) {
+            this.plugin = plugin;
+
+            plugin.getCommand("untrust").setExecutor(this);
+        }
+
+        @Override
+        public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+            if (!(sender instanceof Player)) return false;
+
+            Player player = (Player) sender;
+
+            if (args.length != 1) {
+                player.sendMessage(info("/untrust <player> (You have to be on target island)"));
+                return true;
+            }
+
+            String ownerUUID = plugin.islands.grid.getBlockOwnerUUID(player.getLocation().getBlockX(), player.getLocation().getBlockZ());
+            String islandId = plugin.islands.grid.getIslandId(player.getLocation());
+
+            if (ownerUUID == null || islandId == null) {
+                player.sendMessage(error("You have to be on an island."));
+                return true;
+            }
+
+            if (!ownerUUID.equals(player.getUniqueId().toString())) {
+                player.sendMessage(error("You don't own this island."));
+                return true;
+            }
+
+            Player targetPlayer = Bukkit.getPlayer(args[1]);
+
+            if (targetPlayer == null) {
+                player.sendMessage(error("Player not found."));
+                return true;
+            }
+
+            plugin.islands.grid.removeTrusted(islandId, targetPlayer.getUniqueId().toString());
+
+            player.sendMessage(success("Player untrusted!"));
+
+            return true;
+        }
+    }
+
+    public static class TrustCommand extends ChatUtils implements CommandExecutor {
+        private Main plugin;
+
+        public TrustCommand(Main plugin) {
+            this.plugin = plugin;
+
+            plugin.getCommand("trust").setExecutor(this);
+        }
+
+        @Override
+        public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+            if (!(sender instanceof Player)) return false;
+
+            Player player = (Player) sender;
+
+            if (args.length != 1) {
+                player.sendMessage(info("/trust <player> (You have to be on target island)"));
+                return true;
+            }
+
+            String ownerUUID = plugin.islands.grid.getBlockOwnerUUID(player.getLocation().getBlockX(), player.getLocation().getBlockZ());
+            String islandId = plugin.islands.grid.getIslandId(player.getLocation());
+
+            if (ownerUUID == null || islandId == null) {
+                player.sendMessage(error("You have to be on an island."));
+                return true;
+            }
+
+            if (!ownerUUID.equals(player.getUniqueId().toString())) {
+                player.sendMessage(error("You don't own this island."));
+                return true;
+            }
+
+            Player targetPlayer = Bukkit.getPlayer(args[1]);
+
+            if (targetPlayer == null) {
+                player.sendMessage(error("Player not found."));
+                return true;
+            }
+
+            plugin.islands.grid.addTrusted(islandId, targetPlayer.getUniqueId().toString());
+
+            player.sendMessage(success("Player trusted!"));
+
+            return true;
+        }
+    }
+
     public static class VisitCommand extends ChatUtils implements CommandExecutor {
         private Main plugin;
 

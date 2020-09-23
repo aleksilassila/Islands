@@ -8,10 +8,7 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 public class IslandGrid {
     private Islands islands;
@@ -253,6 +250,26 @@ public class IslandGrid {
         getIslandsConfig().set("islands." + islandId + ".size", islandSize);
 
         islands.plugin.saveIslandsConfig();
+    }
+
+    public void addTrusted(String islandId, String UUID) {
+        getIslandsConfig().set("islands." + islandId + ".trusted." + UUID, "1");
+        islands.plugin.saveIslandsConfig();
+    }
+
+    public void removeTrusted(String islandId, String UUID) {
+        getIslandsConfig().set("islands." + islandId + ".trusted." + UUID, null);
+        islands.plugin.saveIslandsConfig();
+    }
+
+    public Set<String> getTrusted(String islandId) {
+        ConfigurationSection section = getIslandsConfig().getConfigurationSection("islands." + islandId + ".trusted");
+
+        if (section == null) {
+            return new HashSet<String>();
+        }
+
+        return section.getKeys(false);
     }
 
     // deleteIsland
