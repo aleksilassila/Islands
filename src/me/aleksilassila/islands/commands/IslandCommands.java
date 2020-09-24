@@ -1,6 +1,7 @@
 package me.aleksilassila.islands.commands;
 
 import me.aleksilassila.islands.Main;
+import me.aleksilassila.islands.Permissions;
 import me.aleksilassila.islands.generation.IslandGrid;
 import me.aleksilassila.islands.utils.ChatUtils;
 import org.bukkit.Bukkit;
@@ -30,6 +31,11 @@ public class IslandCommands {
 
             Player player = (Player) sender;
 
+            if (!player.hasPermission(Permissions.island.untrust)) {
+                player.sendMessage(error("You don't have permission to use this command."));
+                return true;
+            }
+
             if (args.length != 1) {
                 player.sendMessage(info("/untrust <player> (You have to be on target island)"));
                 return true;
@@ -43,7 +49,7 @@ public class IslandCommands {
                 return true;
             }
 
-            if (!ownerUUID.equals(player.getUniqueId().toString())) {
+            if (!ownerUUID.equals(player.getUniqueId().toString()) && !player.hasPermission(Permissions.Bypass.untrust)) {
                 player.sendMessage(error("You don't own this island."));
                 return true;
             }
@@ -78,6 +84,11 @@ public class IslandCommands {
 
             Player player = (Player) sender;
 
+            if (!player.hasPermission(Permissions.island.trust)) {
+                player.sendMessage(error("You don't have permission to use this command."));
+                return true;
+            }
+
             if (args.length != 1) {
                 player.sendMessage(info("/trust <player> (You have to be on target island)"));
                 return true;
@@ -91,7 +102,7 @@ public class IslandCommands {
                 return true;
             }
 
-            if (!ownerUUID.equals(player.getUniqueId().toString())) {
+            if (!ownerUUID.equals(player.getUniqueId().toString()) && !player.hasPermission(Permissions.Bypass.trust)) {
                 player.sendMessage(error("You don't own this island."));
                 return true;
             }
@@ -128,6 +139,11 @@ public class IslandCommands {
             }
 
             Player player = (Player) sender;
+
+            if (!player.hasPermission(Permissions.island.visit)) {
+                player.sendMessage(error("You don't have permission to use this command."));
+                return true;
+            }
 
             if (args.length != 1) {
                 player.sendMessage(info("Usage: /visit name"));
@@ -169,6 +185,11 @@ public class IslandCommands {
             Player player = (Player) sender;
 
             if (args.length == 1 && args[0].equalsIgnoreCase("list") || label.equalsIgnoreCase("homes")) {
+                if (!player.hasPermission(Permissions.island.listHomes)) {
+                    player.sendMessage(error("You don't have permission to use this command."));
+                    return true;
+                }
+
                 List<String> ids = plugin.islands.grid.getAllIslandIds(player.getUniqueId());
 
                 player.sendMessage(success("Found " + ids.size() + " home(s)."));
@@ -180,6 +201,11 @@ public class IslandCommands {
 
                 return true;
             } else {
+                if (!player.hasPermission(Permissions.island.home)) {
+                    player.sendMessage(error("You don't have permission to use this command."));
+                    return true;
+                }
+
                 try {
                     if (args.length != 0) {
                         Integer.parseInt(args[0]);
