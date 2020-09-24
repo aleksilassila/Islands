@@ -5,6 +5,7 @@ import me.aleksilassila.islands.biomes.Biomes;
 import org.bukkit.*;
 import org.bukkit.block.Biome;
 import org.bukkit.block.data.BlockData;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.List;
 import java.util.Random;
@@ -19,19 +20,56 @@ public class IslandGeneration {
         this.biomes = new Biomes(islands.sourceWorld, islands.plugin);
     }
 
-    private void copyBlocks(int sourceX, int sourceY, int sourceZ, int targetX, int targetY, int targetZ, int relativeX, int relativeZ, int islandSize) {
-        for (int y = sourceY; y < sourceY + islandSize; y++) {
-            BlockData sourceData = islands.sourceWorld.getBlockAt(sourceX, y, sourceZ).getBlockData();
-//WIP
-//            if (Math.random() < - ((8 * (y - sourceY)) / (double) islandSize) + 2) {
-//                continue;
-//            }
+    class CopyTask extends BukkitRunnable {
+        private final int startX;
+        private final int startY;
+        private final int startZ;
+        private final int targetX;
+        private final int targetY;
+        private final int targetZ;
+        private final int islandSize;
+        private int index;
 
-            if (isBlockInIslandShape(relativeX, y - sourceY, relativeZ, islandSize)) {
-                islands.world.getBlockAt(targetX, targetY + (y - sourceY), targetZ).setBlockData(sourceData);
-            } else {
-                islands.world.getBlockAt(targetX, targetY + (y - sourceY), targetZ).setType(Material.AIR);
+        public CopyTask(int startX, int startY, int startZ, int targetX, int targetY, int targetZ, int islandSize) {
+            this.startX = startX;
+            this.startY = startY;
+            this.startZ = startZ;
+            this.targetX = targetX;
+            this.targetY = targetY;
+            this.targetZ = targetZ;
+            this.islandSize = islandSize;
+
+            Bukkit.getLogger().info("Starting in " + startX + ", " + startY + ", " + startZ + " to " + targetX + ", " + targetY + ", " + targetZ);
+
+
+            this.index = 0;
+        }
+
+        @Override
+        public void run() {
+            for (int y = startY; y < startY + islandSize; y++) {
+                int relativeX = index / islandSize;
+                int relativeZ = index - relativeX * islandSize;
+
+                BlockData sourceData = islands.sourceWorld.getBlockAt(startX + relativeX, y, startZ + relativeZ).getBlockData();
+
+                //WIP
+    //            if (Math.random() < - ((8 * (y - sourceY)) / (double) islandSize) + 2) {
+    //                continue;
+    //            }
+
+                if (isBlockInIslandShape(relativeX, y - startY, relativeZ, islandSize)) {
+                    islands.world.getBlockAt(targetX + relativeX, targetY + (y - startY), targetZ + relativeZ).setBlockData(sourceData);
+                } else {
+                    islands.world.getBlockAt(targetX + relativeX, targetY + (y - startY), targetZ + relativeZ).setType(Material.AIR);
+                }
             }
+
+            if (index >= islandSize * islandSize) {
+                this.cancel();
+            }
+
+            index++;
         }
     }
 
@@ -65,11 +103,8 @@ public class IslandGeneration {
         int startY = centerY - islandSize / 2;
         int startZ = sourceLocation.getBlockZ();
 
-        for (int x = 0; x < islandSize; x++) {
-            for (int z = 0; z < islandSize; z++) {
-                copyBlocks(startX + x, startY, startZ + z, targetX + x, targetY, targetZ + z, x, z, islandSize);
-            }
-        }
+        // Copy blocks
+        new CopyTask(startX, startY, startZ, targetX, targetY, targetZ, islandSize).runTaskTimer(islands.plugin, 0, 1);
 
         Bukkit.getLogger().info("Updating biomes...");
         for (int x = targetX - 10; x < targetX + islandSize + 10; x++) {
