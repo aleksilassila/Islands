@@ -215,6 +215,17 @@ public class IslandManagmentCommands extends ChatUtils implements CommandExecuto
             return;
         }
 
+        if (!player.hasPermission("islands.createOne")) {
+            player.sendMessage(Messages.Error.NO_PERMISSION);
+            return;
+        }
+
+        int previousIslands = grid.getAllIslandIds(player.getUniqueId()).size();
+
+        if (previousIslands > 0) {
+            if (!player.hasPermission())
+        }
+
         Islands.IslandSize islandSize = args.length == 3 ? parseIslandSize(args[2]) : Islands.IslandSize.NORMAL;
 
         Biome targetBiome = getTargetBiome(args[1]);

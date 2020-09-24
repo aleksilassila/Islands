@@ -1,7 +1,12 @@
+createIslandMultiple:
+  default: 2
+  staff: 10
+
 island:       # Island sizing
   BIG: 80
   NORMAL: 64
   SMALL: 32
+
 generation:
   searchJump: 8               # How man blocks should be skipped when looking for biomes, bigger faster
   searchArea: 1000            # Biome search area, smaller faster
