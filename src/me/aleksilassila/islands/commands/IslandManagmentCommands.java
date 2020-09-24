@@ -40,7 +40,7 @@ public class IslandManagmentCommands extends ChatUtils implements CommandExecuto
 
             if (!player.hasPermission(Permissions.island.island)) {
                 player.sendMessage(Messages.error.NO_PERMISSION);
-                return;
+                return true;
             }
 
             if (args.length >= 1) {
