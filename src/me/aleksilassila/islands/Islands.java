@@ -1,5 +1,6 @@
 package me.aleksilassila.islands;
 
+import com.sun.istack.internal.Nullable;
 import me.aleksilassila.islands.generation.IslandGeneration;
 import me.aleksilassila.islands.generation.IslandGrid;
 import org.bukkit.Bukkit;
@@ -9,7 +10,6 @@ import org.bukkit.entity.Player;
 
 import java.util.HashSet;
 import java.util.Set;
-import java.util.UUID;
 
 
 public class Islands {
@@ -61,40 +61,49 @@ public class Islands {
         }
     }
 
-    public String createNewIsland(Biome biome, IslandSize size, UUID uuid) throws IslandsException {
+    @Nullable
+    public String createNewIsland(Biome biome, IslandSize size, Player player) throws IllegalArgumentException {
         int islandSize = parseIslandSize(size);
 
-        String islandId = grid.createIsland(uuid, islandSize);
+        String islandId = grid.createIsland(player.getUniqueId(), islandSize);
+        try {
+            boolean success = islandGeneration.copyIsland(
+                    player,
+                    biome,
+                    islandSize,
+                    plugin.getIslandsConfig().getInt("islands." + islandId + ".x"),
+                    plugin.getIslandsConfig().getInt("islands." + islandId + ".y"),
+                    plugin.getIslandsConfig().getInt("islands." + islandId + ".z")
+            );
 
-        boolean success = islandGeneration.copyIsland(
-                uuid.toString(),
-                biome,
-                islandSize,
-                plugin.getIslandsConfig().getInt("islands."+islandId+".x"),
-                plugin.getIslandsConfig().getInt("islands."+islandId+".y"),
-                plugin.getIslandsConfig().getInt("islands."+islandId+".z")
-        );
+            if (!success) {
+                grid.deleteIsland(islandId);
+                return null;
+            }
 
-        if (!success) {
-            throw new IslandsException("Could not copy island");
+            return islandId;
+        } catch (IllegalArgumentException e) {
+            throw new IllegalArgumentException();
         }
-
-        return islandId;
 
     }
 
-    public boolean regenerateIsland(String islandId, Biome biome, IslandSize islandSize, UUID uuid) {
+    public boolean regenerateIsland(String islandId, Biome biome, IslandSize islandSize, Player player) throws IllegalArgumentException {
         grid.updateIslandSize(islandId, parseIslandSize(islandSize));
 
-        boolean success = islandGeneration.copyIsland(
-                uuid.toString(),
-                biome,
-                parseIslandSize(islandSize),
-                plugin.getIslandsConfig().getInt("islands." + islandId + ".x"),
-                plugin.getIslandsConfig().getInt("islands." + islandId + ".y"),
-                plugin.getIslandsConfig().getInt("islands." + islandId + ".z")
-        );
+        try {
+            boolean success = islandGeneration.copyIsland(
+                    player,
+                    biome,
+                    parseIslandSize(islandSize),
+                    plugin.getIslandsConfig().getInt("islands." + islandId + ".x"),
+                    plugin.getIslandsConfig().getInt("islands." + islandId + ".y"),
+                    plugin.getIslandsConfig().getInt("islands." + islandId + ".z")
+            );
 
-        return success;
-    };
+            return success;
+        } catch (IllegalArgumentException e) {
+            throw new IllegalArgumentException();
+        }
+    }
 }
