@@ -9,3 +9,5 @@ generation:
   islandSpacing: 100          # At least the size of island.BIG
   islandVerticalSpacing: 50
   generationDelayInTicks: 1   # 2 Will generate 1 row per 2 ticks, 0.5 will generate 2 rows per 1 tick
+other:
+  spawnIslandName:

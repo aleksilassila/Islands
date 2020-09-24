@@ -11,6 +11,7 @@ import org.bukkit.*;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.generator.ChunkGenerator;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
@@ -20,6 +21,7 @@ public class Main extends JavaPlugin {
 
     public World islandsWorld;
     public World islandsSourceWorld;
+    public World wildernessWorld;
 
     private FileConfiguration islandsConfig;
     private File islandsConfigFile;
@@ -33,8 +35,9 @@ public class Main extends JavaPlugin {
 
         initIslandsConfig();
 
-        islandsWorld = createIslandsWorldIfNecessary();
-        islandsSourceWorld = createIslandsSourceWorldIfNecessary();
+        islandsWorld = Bukkit.getWorlds().get(0);
+        islandsSourceWorld = getSourceWorld();
+        wildernessWorld = getWilderness();
 
         islands = new Islands(islandsWorld, islandsSourceWorld, this);
 
@@ -54,6 +57,15 @@ public class Main extends JavaPlugin {
     public static WorldEditPlugin getWorldEdit() {
         return (WorldEditPlugin) Bukkit.getPluginManager().getPlugin("WorldEdit");
     }
+
+//    @Override
+//    public ChunkGenerator getDefaultWorldGenerator(String worldName, String id) {
+//        if (worldName.equals("islands")) {
+//            return new EmptyWorldGenerator();
+//        }
+//
+//        return super.getDefaultWorldGenerator(worldName, id);
+//    }
 
     @Override
     public void onDisable() {
@@ -87,7 +99,7 @@ public class Main extends JavaPlugin {
         }
     }
 
-    World createIslandsSourceWorldIfNecessary() {
+    World getSourceWorld() {
         Bukkit.getServer().getLogger().info("Creating islands source world...");
 
         WorldCreator wc = new WorldCreator("islandsSource");
@@ -102,6 +114,22 @@ public class Main extends JavaPlugin {
 
         return world;
     }
+
+    World getWilderness() {
+        Bukkit.getServer().getLogger().info("Creating wilderness...");
+
+        WorldCreator wc = new WorldCreator("wilderness");
+
+        wc.environment(World.Environment.NORMAL);
+        wc.type(WorldType.NORMAL);
+
+        World world = wc.createWorld();
+
+        world.setDifficulty(Difficulty.HARD);
+
+        return world;
+    }
+
 
     World createIslandsWorldIfNecessary() {
         Bukkit.getServer().getLogger().info("Creating islands world...");

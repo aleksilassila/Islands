@@ -97,7 +97,7 @@ public class IslandGeneration {
                     //                continue;
                     //            }
 
-                    Block target = islands.world.getBlockAt(targetX + relativeX, targetY + (y - startY), targetZ + relativeZ);
+                    Block target = islands.plugin.islandsWorld.getBlockAt(targetX + relativeX, targetY + (y - startY), targetZ + relativeZ);
                     if (isBlockInIslandShape(relativeX, y - startY, relativeZ, islandSize)) {
                         target.setBlockData(sourceBlock.getBlockData());
                     } else {
@@ -109,7 +109,7 @@ public class IslandGeneration {
 
                 if (index >= islandSize * islandSize) {
                     // Update lighting
-                    islands.world.getChunkAt(targetX + islandSize / 2, targetZ + islandSize / 2);
+                    islands.plugin.islandsWorld.getChunkAt(targetX + islandSize / 2, targetZ + islandSize / 2);
 
                     player.sendMessage(Messages.Success.GENERATION_DONE);
                     queue.remove(this);

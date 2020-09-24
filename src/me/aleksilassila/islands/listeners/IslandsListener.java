@@ -37,7 +37,7 @@ public class IslandsListener extends ChatUtils implements Listener {
             Player player = (Player) e.getEntity();
 
             if (e.getCause().equals(EntityDamageEvent.DamageCause.VOID) && player.getWorld().equals(plugin.islandsWorld)) {
-                World targetWorld = Bukkit.getWorld("world");
+                World targetWorld = plugin.wildernessWorld;
 
                 Location location = player.getLocation();
                 location.setWorld(targetWorld);

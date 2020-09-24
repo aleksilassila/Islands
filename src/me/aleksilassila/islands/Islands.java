@@ -33,7 +33,6 @@ public class Islands {
     public Islands(World world, World sourceWorld, Main plugin) {
         this.plugin = plugin;
 
-        this.world = world;
         this.sourceWorld = sourceWorld;
 
         this.islandGeneration = new IslandGeneration(this);

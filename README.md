@@ -19,7 +19,7 @@ Island Managment:
 - `/island create <biome> (<SMALL / NORMAL / BIG>)`
 - `/island regenerate <biome> (<SMALL / NORMAL / BIG>)`
 - `/island delete`
-- `/island give`, transfers island ownership
+- `/island give <player>`, transfers island ownership
 - `/island name <name>`, allows other players to `/vi <name>`
 - `/island unname`, sets island to private
 
@@ -27,8 +27,8 @@ Other
 - `/home (<id>)`
 - `/homes`, list all player's islands
 - `/visit <name>`, `/vi <name>`, visit public island
-- `/trust <name>`, allow player to interact with blocks and entities of your island
-- `/untrust <name>`
+- `/trust <player>`, allow player to interact with blocks and entities of your island
+- `/untrust <player>`
 
 ## Screenshots
 ### Functionality
@@ -67,4 +67,26 @@ Players can trust other players to play together.
 
 ![biome](screenshots/islandTypes/desert_night.png?raw=true)
 
-## Permissions and Config
+## Setting up
+
+To set up the plugin, add following lines to your `bukkit.yml` file.
+You will also have to install VoidGenerator plugin.
+
+```
+worlds:
+  <Islands World Name>:
+    generator: VoidGenerator:PLAINS
+```
+
+Replace `<Islands World Name>` with `leve-name` from `server.properties`.
+For the sake of clarity you may want to set the `level-name` to something like `islands`.
+
+Should you skip the step above, your islands will spawn in normal world instead of an empty one.
+
+Use command `/setworldspawn` to set spawn point on an island of your choice.
+
+The plugin will generate `wilderness` world for you, which is where players will spawn when they jump off their island.
+Deleting this world should be safe and players' inventories should not be reset. 
+Deletion of the world specified in `level-name` will however, empty player inventories.
+
+To further customize the plugin, check `plugins/islands/config.yml`.
