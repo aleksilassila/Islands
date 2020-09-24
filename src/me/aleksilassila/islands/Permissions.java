@@ -34,5 +34,6 @@ public class Permissions {
         public static final String listTrusted = "islands.turst.list";
         public static final String untrust = "islands.untrust";
         public static final String visit = "islands.visit";
+        public static final String island = "islands";
     }
 }

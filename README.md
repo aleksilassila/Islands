@@ -95,6 +95,7 @@ To further customize the plugin, check `plugins/islands/config.yml`.
 
 | Permission              | Affect                            |
 |-------------------------|-----------------------------------|
+| `islands`               | Use /islands command              |
 | `islands.create`        | Create island                     |
 | `islands.create.small`  | Create / regenerate small island  |
 | `islands.create.normal` | Create / regenerate normal island |
@@ -124,4 +125,3 @@ Bypasses
 | `islands.bypass.trust`       | Add trusted person to anyone's island      |
 | `islands.bypass.untrust`     | Remove trusted person from anyone's island |
 | `islands.bypass.protection`  | Interact with anyone's island              |
-

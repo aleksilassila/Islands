@@ -7,30 +7,23 @@ commands:
   go:
     description: Your description
     usage: /<command>
-    permission: islands.go
   island:
     description: Island managment
     usage: /<command> biome
-    permission: islands.manage
     aliases: [is]
   visit:
     description: Visit islands
     usage: /<command> name
-    permission: islands.visit
     aliases: [vi]
   home:
     description: Teleport to your home island
     usage: /<command> ([home id])
-    permission: islands.home
   homes:
     description: List homes
     usage: /<command>
-    permission: islands.home
   trust:
     description: Trust a player
     usage: /<command>
-    permission: islands.trust
   untrust:
     description: Untrust a player
     usage: /<command>
-    permission: islands.trust
