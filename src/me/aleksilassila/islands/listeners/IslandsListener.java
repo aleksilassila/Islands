@@ -1,6 +1,7 @@
 package me.aleksilassila.islands.listeners;
 
 import me.aleksilassila.islands.Main;
+import me.aleksilassila.islands.Permissions;
 import me.aleksilassila.islands.utils.ChatUtils;
 import org.bukkit.*;
 import org.bukkit.entity.Player;
@@ -14,17 +15,20 @@ import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 
 public class IslandsListener extends ChatUtils implements Listener {
+    private final int disableMobs;
     private Main plugin;
 
     public IslandsListener(Main plugin) {
         this.plugin = plugin;
+
+        this.disableMobs = plugin.getConfig().getInt("disableMobsOnIslands");
 
         plugin.getServer().getPluginManager().registerEvents(this, plugin);
     }
 
     @EventHandler
     public void onCreaureSpawn(CreatureSpawnEvent event) {
-        if (event.getSpawnReason().equals(CreatureSpawnEvent.SpawnReason.NATURAL) && event.getEntity().getWorld().equals(plugin.islandsWorld)) {
+        if (event.getSpawnReason().equals(CreatureSpawnEvent.SpawnReason.NATURAL) && event.getEntity().getWorld().equals(plugin.islandsWorld) && this.disableMobs == 1) {
             event.setCancelled(true);
         }
     }
@@ -71,17 +75,19 @@ public class IslandsListener extends ChatUtils implements Listener {
 
     @EventHandler
     public void onEntityDamageEvent(EntityDamageByEntityEvent e) {
-         if (e.getEntity().getWorld().equals(plugin.islandsWorld)) {
+         if (e.getEntity().getWorld().equals(plugin.islandsWorld) && e.getDamager() instanceof Player) {
+             if (e.getDamager().hasPermission(Permissions.Bypass.interactEverywhere)) return;
+
              int x = e.getEntity().getLocation().getBlockX();
              int z = e.getEntity().getLocation().getBlockZ();
 
              String ownerUUID = plugin.islands.grid.getBlockOwnerUUID(x, z);
-                 if (ownerUUID != null && e.getDamager() instanceof Player && !ownerUUID.equals(e.getDamager().getUniqueId().toString())) {
-                     if (plugin.islands.grid.getTrusted(plugin.islands.grid.getIslandId(x, z)).contains(e.getDamager().getUniqueId().toString())) {
-                         return;
-                     }
+             if (ownerUUID != null && !ownerUUID.equals(e.getDamager().getUniqueId().toString())) {
+                 if (plugin.islands.grid.getTrusted(plugin.islands.grid.getIslandId(x, z)).contains(e.getDamager().getUniqueId().toString())) {
+                     return;
+                 }
 
-                     e.setCancelled(true);
+                 e.setCancelled(true);
 
                  e.getDamager().sendMessage(error("You cannot interact here."));
             }
@@ -91,6 +97,8 @@ public class IslandsListener extends ChatUtils implements Listener {
     @EventHandler // Player interact restriction
     public void onPlayerInteract(PlayerInteractEvent e) {
         if (e.getClickedBlock() == null) return;
+        if (e.getPlayer().hasPermission(Permissions.Bypass.interactEverywhere)) return;
+
         if (e.getPlayer().getWorld().equals(plugin.islandsWorld)) {
             int x = e.getClickedBlock().getX();
             int z = e.getClickedBlock().getZ();
@@ -113,6 +121,7 @@ public class IslandsListener extends ChatUtils implements Listener {
     @EventHandler
     private void onBlockPlace(BlockPlaceEvent e) {
         if (e.isCancelled()) return;
+        if (e.getPlayer().hasPermission(Permissions.Bypass.interactEverywhere)) return;
         if (e.getBlock().getWorld().equals(plugin.islandsWorld)) {
             int x = e.getBlock().getX();
             int z = e.getBlock().getZ();

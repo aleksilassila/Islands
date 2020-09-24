@@ -90,3 +90,35 @@ Deleting this world should be safe and players' inventories should not be reset.
 Deletion of the world specified in `level-name` will however, empty player inventories.
 
 To further customize the plugin, check `plugins/islands/config.yml`.
+
+## Permissions
+
+| Permission            | Affect             |
+| --------------------- | ------------------ |
+| `islands.create`      | Create island      |
+| `islands.regenerate`  | Regenerate island  |
+| `islands.delete`      | Delete island      |
+| `islands.give`        | Give island        |
+| `islands.name`        | Name island        |
+| `islands.unname`      | Unname island      |
+| `islands.home`        | Use /home command  |
+| `islands.home.list`   | Use /homes command |
+| `islands.turst`       | Trust person       |
+| `islands.turst.list`  | Not implemented    |
+| `islands.untrust`     | Untrust person     |
+| `islands.visit`       | Visit island       |
+
+
+Bypasses
+
+| Permission                    | Affect                                     |
+| ----------------------------- | ------------------------------------------ |
+| `islands.bypass.islandLimit`  | Ignore island create limit                 |
+| `islands.bypass.regenerate`   | Regenerate anyone's island                 |
+| `islands.bypass.delete`       | Delete anyone's island                     |
+| `islands.bypass.give`         | Transfer any island's ownership            |
+| `islands.bypass.name`         | Name anyone's island                       |
+| `islands.bypass.unname`       | Unname anyone's island                     |
+| `islands.bypass.trust`        | Add trusted person to anyone's island      |
+| `islands.bypass.untrust`      | Remove trusted person from anyone's island |
+| `islands.bypass.protection`   | Interact with anyone's island              |
