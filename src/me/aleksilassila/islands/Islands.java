@@ -67,6 +67,7 @@ public class Islands {
         String islandId = grid.createIsland(uuid, islandSize);
 
         boolean success = islandGeneration.copyIsland(
+                uuid.toString(),
                 biome,
                 islandSize,
                 plugin.getIslandsConfig().getInt("islands."+islandId+".x"),
@@ -82,10 +83,11 @@ public class Islands {
 
     }
 
-    public boolean regenerateIsland(String islandId, Biome biome, IslandSize islandSize) {
+    public boolean regenerateIsland(String islandId, Biome biome, IslandSize islandSize, UUID uuid) {
         grid.updateIslandSize(islandId, parseIslandSize(islandSize));
 
         boolean success = islandGeneration.copyIsland(
+                uuid.toString(),
                 biome,
                 parseIslandSize(islandSize),
                 plugin.getIslandsConfig().getInt("islands." + islandId + ".x"),

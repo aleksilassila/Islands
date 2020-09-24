@@ -289,7 +289,7 @@ public class IslandManagmentCommands extends ChatUtils implements CommandExecuto
 
         Islands.IslandSize islandSize = args.length == 3 ? parseIslandSize(args[2]) : Islands.IslandSize.NORMAL;
 
-        boolean success = plugin.islands.regenerateIsland(islandId, targetBiome, islandSize);
+        boolean success = plugin.islands.regenerateIsland(islandId, targetBiome, islandSize, player.getUniqueId());
 
         if (success) {
             player.sendMessage(Messages.Success.ISLAND_GEN);
@@ -321,7 +321,7 @@ public class IslandManagmentCommands extends ChatUtils implements CommandExecuto
         public static class Success {
             public static final String DELETED = success("Island deleted successfully. It will be overwritten when someone creates a new island.");
             public static final String UNNAMED = success("Island unnamed and made private.");
-            public static String ISLAND_GEN = success("Island regenerated successfully.");
+            public static String ISLAND_GEN = success("Island generation started.");
 
             public static String OWNER_CHANGED(String name) {
                 return success("Island owner switched to " + name + ".");
