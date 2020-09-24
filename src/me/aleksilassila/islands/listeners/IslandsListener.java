@@ -53,11 +53,9 @@ public class IslandsListener extends ChatUtils implements Listener {
                 plugin.islands.playersWithNoFall.add(player);
 
                 e.setCancelled(true);
-            } else if (e.getCause().equals(EntityDamageEvent.DamageCause.FALL)) {
-                if (plugin.islands.playersWithNoFall.contains(player)) {
-                    plugin.islands.playersWithNoFall.remove(player);
-                    e.setCancelled(true);
-                }
+            } else if (e.getCause().equals(EntityDamageEvent.DamageCause.FALL) && plugin.islands.playersWithNoFall.contains(player)) {
+                plugin.islands.playersWithNoFall.remove(player);
+                e.setCancelled(true);
             } else if (player.getWorld().equals(plugin.islandsWorld)) {
                 e.setCancelled(true);
             }

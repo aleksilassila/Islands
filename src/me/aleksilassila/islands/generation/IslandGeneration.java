@@ -1,36 +1,139 @@
 package me.aleksilassila.islands.generation;
 
-import com.sk89q.worldedit.bukkit.BukkitWorld;
-import com.sk89q.worldedit.math.BlockVector3;
-import com.sk89q.worldedit.regions.CuboidRegion;
+import com.sun.istack.internal.Nullable;
 import me.aleksilassila.islands.Islands;
 import me.aleksilassila.islands.biomes.Biomes;
-import org.bukkit.*;
+import me.aleksilassila.islands.utils.ChatUtils;
+import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.block.Biome;
-import org.bukkit.block.data.BlockData;
+import org.bukkit.block.Block;
+import org.bukkit.entity.Player;
+import org.bukkit.scheduler.BukkitRunnable;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
 public class IslandGeneration {
 
-    private Islands islands;
+    private final Islands islands;
     public Biomes biomes;
+    public List<CopyTask> queue = new ArrayList<>();
 
     public IslandGeneration(Islands islands) {
         this.islands = islands;
         this.biomes = new Biomes(islands.sourceWorld, islands.plugin);
     }
 
-    public boolean copyIsland(Biome biome, int islandSize, int targetX, int targetY, int targetZ) {
-        List<Location> locations = biomes.availableLocations.get(biome);
+    public void addToQueue(CopyTask task) {
+        popFromQueue(task.player.getUniqueId().toString());
+        queue.add(task);
 
-        if (locations == null) {
+        task.player.sendMessage(Messages.Info.QUEUE_STATUS(queue.size()));
+    }
+
+    @Nullable
+    public CopyTask popFromQueue(String UUID) {
+        int index = 0;
+        for (CopyTask task : queue) {
+            if (index != 0 && task.player.getUniqueId().toString().equals(UUID)) {
+                queue.remove(task);
+
+                return task;
+            }
+            index++;
+        }
+
+        return null;
+    }
+
+    class CopyTask extends BukkitRunnable {
+        private final Player player;
+        private final int startX;
+        private final int startY;
+        private final int startZ;
+        private final int targetX;
+        private final int targetY;
+        private final int targetZ;
+        private final int islandSize;
+        private int index;
+
+        public CopyTask(Player player, int startX, int startY, int startZ, int targetX, int targetY, int targetZ, int islandSize) {
+            this.startX = startX;
+            this.startY = startY;
+            this.startZ = startZ;
+            this.targetX = targetX;
+            this.targetY = targetY;
+            this.targetZ = targetZ;
+            this.islandSize = islandSize;
+            this.player = player;
+
+            this.index = 0;
+        }
+
+        @Override
+        public void run() {
+            for (int y = startY; y < startY + islandSize; y++) {
+                int relativeX = index / islandSize;
+                int relativeZ = index - relativeX * islandSize;
+
+                Block sourceBlock = islands.sourceWorld.getBlockAt(startX + relativeX, y, startZ + relativeZ);
+
+                //WIP
+    //            if (Math.random() < - ((8 * (y - sourceY)) / (double) islandSize) + 2) {
+    //                continue;
+    //            }
+
+                Block target = islands.world.getBlockAt(targetX + relativeX, targetY + (y - startY), targetZ + relativeZ);
+                if (isBlockInIslandShape(relativeX, y - startY, relativeZ, islandSize)) {
+                    target.setBlockData(sourceBlock.getBlockData());
+                } else {
+                    target.setType(Material.AIR);
+                }
+
+                target.setBiome(sourceBlock.getBiome());
+            }
+
+            if (index >= islandSize * islandSize) {
+                // Update lighting
+                islands.world.getChunkAt(targetX + islandSize / 2, targetZ + islandSize / 2);
+
+                player.sendMessage(Messages.Success.GENERATION_DONE);
+                queue.remove(this);
+
+                if (queue.size() > 0) {
+                    CopyTask nextTask = queue.get(0);
+                    nextTask.runTaskTimer(islands.plugin, 0,1);
+                    nextTask.player.sendMessage(Messages.Info.GENERATION_STARTED(nextTask.islandSize * nextTask.islandSize / 20.0));
+                }
+
+                this.cancel();
+            } else if (index == islandSize * islandSize / 4) {
+                player.sendMessage(Messages.Info.GENERATION_STATUS(25));
+            } else if (index == islandSize * islandSize / 2) {
+                player.sendMessage(Messages.Info.GENERATION_STATUS(50));
+            } else if (index == islandSize * islandSize / 4 * 3) {
+                player.sendMessage(Messages.Info.GENERATION_STATUS(75));
+            }
+
+            index++;
+        }
+    }
+
+    public boolean copyIsland(Player player, Biome biome, int islandSize, int targetX, int targetY, int targetZ) throws IllegalArgumentException {
+        if (queue.size() > 0 && queue.get(0).player.getUniqueId().toString().equals(player.getUniqueId().toString())) {
             return false;
         }
 
+        List<Location> locations = biomes.availableLocations.get(biome);
+
+        if (locations == null) {
+            throw new IllegalArgumentException();
+        }
+
         if (locations.size() == 0) {
-            return false;
+            throw new IllegalArgumentException();
         }
 
         Location sourceLocation = locations.get(new Random().nextInt(locations.size()));
@@ -44,53 +147,22 @@ public class IslandGeneration {
             if (material == Material.STONE || material == Material.SANDSTONE || material == Material.WATER) {
                 break;
             }
+
             centerY--;
         }
-
-        CuboidRegion sourceRegion = new CuboidRegion(
-                new BukkitWorld(islands.sourceWorld),
-                BlockVector3.at(
-                        sourceLocation.getBlockX(),
-                        centerY + islandSize / 2,
-                        sourceLocation.getBlockZ()
-                ),
-                BlockVector3.at(
-                        sourceLocation.getBlockX() + islandSize,
-                        centerY - islandSize / 2,
-                        sourceLocation.getBlockZ() + islandSize
-                )
-        );
 
         int startX = sourceLocation.getBlockX();
         int startY = centerY - islandSize / 2;
         int startZ = sourceLocation.getBlockZ();
 
-        for (BlockVector3 point : sourceRegion) {
-            BlockData sourceData = islands.sourceWorld.getBlockAt(point.getBlockX(), point.getBlockY(), point.getBlockZ()).getBlockData();
+        CopyTask task = new CopyTask(player, startX, startY, startZ, targetX, targetY, targetZ, islandSize);
 
-            // Relative coordinates: first block (0,0,0), second (1,0,0) etc.
-            int relativeX = point.getBlockX() - startX;
-            int relativeY = point.getBlockY() - startY;
-            int relativeZ = point.getBlockZ() - startZ;
-
-            if (isBlockInIslandShape(relativeX, relativeY, relativeZ, islandSize)){
-                islands.world.getBlockAt(targetX + relativeX, targetY + relativeY, targetZ + relativeZ).setBlockData(sourceData);
-            } else {
-                islands.world.getBlockAt(targetX + relativeX, targetY + relativeY, targetZ + relativeZ).setType(Material.AIR);
-            }
+        // Copy blocks
+        if (queue.size() == 0) {
+            task.runTaskTimer(islands.plugin, 0, 1);
         }
 
-        Bukkit.getLogger().info("Updating biomes...");
-        for (int x = targetX - 10; x < targetX + islandSize + 10; x++) {
-            for (int z = targetZ - 10; z < targetZ + islandSize + 10; z++) {
-                for (int y = 0; y < islands.world.getMaxHeight(); y++) {
-                    islands.world.getBlockAt(x, y, z).setBiome(biome);
-                }
-            }
-        }
-
-        // Update lighting
-        islands.world.getChunkAt(targetX + islandSize / 2, targetZ + islandSize / 2);
+        addToQueue(task);
 
         return true;
     }
@@ -108,5 +180,26 @@ public class IslandGeneration {
     public boolean isBlockInIslandCircle(int relativeX, int relativeZ, int islandSize) {
         return (Math.pow(relativeX - islandSize / 2.0, 2) + Math.pow(relativeZ - islandSize / 2.0, 2))
                 <= Math.pow(islandSize / 2.0, 2);
+    }
+
+    static class Messages extends ChatUtils {
+        static class Success {
+
+            public static final String GENERATION_DONE = success("Island generation completed.");
+        }
+
+        static class Info {
+            public static String GENERATION_STARTED(double time) {
+                return info("Your generation event has been started. It will take approximately " + (int) time + " seconds.");
+            }
+
+            public static String QUEUE_STATUS(int queueSize) {
+                return info("Your event has been added to the queue. There are " + (queueSize - 1) + " event(s) before yours.");
+            }
+
+            public static String GENERATION_STATUS(int status) {
+                return info("Your generation event is " + status + "% completed.");
+            }
+        }
     }
 }

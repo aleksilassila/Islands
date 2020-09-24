@@ -223,23 +223,22 @@ public class IslandManagmentCommands extends ChatUtils implements CommandExecuto
             return;
         }
 
+        String islandId = null;
+
         try {
-            String islandId = plugin.islands.createNewIsland(targetBiome, islandSize, player.getUniqueId());
+            islandId = plugin.islands.createNewIsland(targetBiome, islandSize, player);
+        } catch (IllegalArgumentException e) {
+            player.sendMessage(Messages.Error.NO_LOCATIONS_FOR_BIOME);
 
-            player.sendMessage(Messages.Success.ISLAND_GEN);
-
-            Location location = grid.getIslandSpawn(islandId);
-
-            if (location != null) {
-                player.teleport(location);
-            } else {
-                player.sendMessage(Messages.Error.ISLAND_GEN_FAILED);
-            }
-
-        } catch (Islands.IslandsException e) {
-            player.sendMessage(error(e.getMessage()));
+            return;
         }
 
+        if (islandId == null) {
+            player.sendMessage(Messages.Error.ONGOING_QUEUE_EVENT);
+            return;
+        }
+
+        player.sendTitle(Messages.Success.ISLAND_GEN_TITLE, Messages.Success.ISLAND_GEN_SUBTITLE, 10, 20 * 7, 10);
     }
 
     @NotNull
@@ -289,20 +288,17 @@ public class IslandManagmentCommands extends ChatUtils implements CommandExecuto
 
         Islands.IslandSize islandSize = args.length == 3 ? parseIslandSize(args[2]) : Islands.IslandSize.NORMAL;
 
-        boolean success = plugin.islands.regenerateIsland(islandId, targetBiome, islandSize);
+        try {
+            boolean success = plugin.islands.regenerateIsland(islandId, targetBiome, islandSize, player);
 
-        if (success) {
-            player.sendMessage(Messages.Success.ISLAND_GEN);
-
-            Location location = grid.getIslandSpawn(grid.getPrivateIsland(player.getUniqueId(), args[1]));
-
-            if (location != null) {
-                player.teleport(location);
-            } else {
-                player.sendMessage(Messages.Error.TELEPORT_FAILED);
+            if (!success) {
+                player.sendMessage(Messages.Error.ONGOING_QUEUE_EVENT);
+                return;
             }
-        } else {
-            player.sendMessage(Messages.Error.ISLAND_GEN_FAILED);
+
+            player.sendTitle(Messages.Success.ISLAND_GEN_TITLE, Messages.Success.ISLAND_GEN_SUBTITLE, 10, 20 * 7, 10);
+        } catch (IllegalArgumentException e) {
+            player.sendMessage(Messages.Error.NO_LOCATIONS_FOR_BIOME);
         }
     }
 
@@ -312,6 +308,7 @@ public class IslandManagmentCommands extends ChatUtils implements CommandExecuto
             public static final String NOT_PUBLIC = error("The island must be public");
             public static final String NO_PLAYER_FOUND = error("No given player found.");
             public static final String NAME_TAKEN = error("That name is already taken.");
+            public static final String ONGOING_QUEUE_EVENT = error("Wait for your current queue event to finish.");
             public static String ISLAND_GEN_FAILED = error("Island regeneration failed.");
             public static String TELEPORT_FAILED = error("Could not teleport.");
             public static String NO_BIOME_FOUND = error("Biome not found.");
@@ -321,7 +318,9 @@ public class IslandManagmentCommands extends ChatUtils implements CommandExecuto
         public static class Success {
             public static final String DELETED = success("Island deleted successfully. It will be overwritten when someone creates a new island.");
             public static final String UNNAMED = success("Island unnamed and made private.");
-            public static String ISLAND_GEN = success("Island regenerated successfully.");
+            public static final String ISLAND_GEN_TITLE = ChatColor.GOLD + "Island generation event added to queue.";
+            public static final String ISLAND_GEN_SUBTITLE = ChatColor.GOLD + "Explore the wilderness while your island is being generated. Use /home to access your island.";
+            public static String ISLAND_GEN = success("Island generation started.");
 
             public static String OWNER_CHANGED(String name) {
                 return success("Island owner switched to " + name + ".");
