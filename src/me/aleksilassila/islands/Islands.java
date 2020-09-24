@@ -3,11 +3,12 @@ package me.aleksilassila.islands;
 import com.sun.istack.internal.Nullable;
 import me.aleksilassila.islands.generation.IslandGeneration;
 import me.aleksilassila.islands.generation.IslandGrid;
-import org.bukkit.Bukkit;
+import me.aleksilassila.islands.utils.ConfirmItem;
 import org.bukkit.World;
 import org.bukkit.block.Biome;
 import org.bukkit.entity.Player;
 
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -21,7 +22,7 @@ public class Islands {
     public IslandGrid grid;
 
     public Set<Player> playersWithNoFall = new HashSet<>();
-
+    public final HashMap<String, ConfirmItem> confirmations;
 
     public enum IslandSize {
         SMALL, // 32*32
@@ -38,7 +39,7 @@ public class Islands {
         this.islandGeneration = new IslandGeneration(this);
         this.grid = new IslandGrid(this);
 
-        Bukkit.getLogger().info("World source seed: " + sourceWorld.getSeed());
+        this.confirmations = new HashMap<>();
     }
 
     public static class IslandsException extends java.lang.Exception {

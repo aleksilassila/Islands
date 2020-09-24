@@ -31,6 +31,8 @@ public class IslandCommands {
 
             Player player = (Player) sender;
 
+            plugin.islands.confirmations.remove(player.getUniqueId().toString());
+
             if (!player.hasPermission(Permissions.island.untrust)) {
                 player.sendMessage(Messages.error.NO_PERMISSION);
                 return true;
@@ -77,7 +79,7 @@ public class IslandCommands {
     }
 
     public static class TrustCommand implements CommandExecutor {
-        private Main plugin;
+        private final Main plugin;
 
         public TrustCommand(Main plugin) {
             this.plugin = plugin;
@@ -90,6 +92,8 @@ public class IslandCommands {
             if (!(sender instanceof Player)) return false;
 
             Player player = (Player) sender;
+
+            plugin.islands.confirmations.remove(player.getUniqueId().toString());
 
             if (!player.hasPermission(Permissions.island.trust)) {
                 player.sendMessage(Messages.error.NO_PERMISSION);
@@ -147,6 +151,8 @@ public class IslandCommands {
 
             Player player = (Player) sender;
 
+            plugin.islands.confirmations.remove(player.getUniqueId().toString());
+
             if (!player.hasPermission(Permissions.island.visit)) {
                 player.sendMessage(Messages.error.NO_PERMISSION);
                 return true;
@@ -190,6 +196,8 @@ public class IslandCommands {
             }
 
             Player player = (Player) sender;
+
+            plugin.islands.confirmations.remove(player.getUniqueId().toString());
 
             if (args.length == 1 && args[0].equalsIgnoreCase("list") || label.equalsIgnoreCase("homes")) {
                 if (!player.hasPermission(Permissions.island.listHomes)) {

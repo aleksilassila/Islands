@@ -7,6 +7,7 @@ import me.aleksilassila.islands.Main;
 import me.aleksilassila.islands.Permissions;
 import me.aleksilassila.islands.generation.IslandGrid;
 import me.aleksilassila.islands.utils.ChatUtils;
+import me.aleksilassila.islands.utils.ConfirmItem;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -15,7 +16,6 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.bukkit.permissions.Permission;
 
 import java.util.HashMap;
 import java.util.List;
@@ -30,7 +30,6 @@ public class IslandManagmentCommands extends ChatUtils implements CommandExecuto
 
         plugin.getCommand("go").setExecutor(this);
         plugin.getCommand("island").setExecutor(this);
-
     }
 
     @Override
@@ -43,21 +42,40 @@ public class IslandManagmentCommands extends ChatUtils implements CommandExecuto
                 return true;
             }
 
+            boolean confirmed = false;
+            String issuedCommand = String.join(" ", label, String.join(" ", args));
+
+            ConfirmItem item = plugin.islands.confirmations.get(player.getUniqueId().toString());
+            if (item != null
+                    && item.command.equals(issuedCommand)
+                    && !item.expired()) {
+                plugin.islands.confirmations.remove(player.getUniqueId().toString());
+
+                confirmed = true;
+            } else {
+                if (item != null) {
+                    Bukkit.getLogger().info("Item.command: " + item.command);
+                    Bukkit.getLogger().info("Item.expired: " + item.expired());
+                }
+                Bukkit.getLogger().info("Issued: " + issuedCommand);
+                plugin.islands.confirmations.put(player.getUniqueId().toString(), new ConfirmItem(issuedCommand, 8 * 1000));
+            }
+
             if (args.length >= 1) {
                 if (args[0].equalsIgnoreCase("create")) {
                     createIsland(player, args);
 
                     return true;
                 } else if (args[0].equalsIgnoreCase("regenerate")) {
-                    regenerateIsland(player, args);
+                    regenerateIsland(player, args, confirmed);
 
                     return true;
                 } else if (args[0].equalsIgnoreCase("delete")) {
-                    deleteIsland(player, args);
+                    deleteIsland(player, args, confirmed);
 
                     return true;
                 } else if (args[0].equalsIgnoreCase("give")) {
-                    giveIsland(player, args);
+                    giveIsland(player, args, confirmed);
 
                     return true;
                 } else if (args[0].equalsIgnoreCase("name")) {
@@ -77,7 +95,7 @@ public class IslandManagmentCommands extends ChatUtils implements CommandExecuto
         return true;
     }
 
-    private void deleteIsland(Player player, String[] args) {
+    private void deleteIsland(Player player, String[] args, boolean confirmed) {
         if (!player.hasPermission(Permissions.island.delete)) {
             player.sendMessage(Messages.error.NO_PERMISSION);
             return;
@@ -95,14 +113,18 @@ public class IslandManagmentCommands extends ChatUtils implements CommandExecuto
             return;
         }
 
-        if (plugin.getIslandsConfig().getString("islands." + islandId + ".UUID").equals(player.getUniqueId().toString())
-                || player.hasPermission(Permissions.Bypass.delete)) {
-            grid.deleteIsland(islandId);
-
-            player.sendMessage(Messages.success.DELETED);
-        } else {
+        if (!plugin.getIslandsConfig().getString("islands." + islandId + ".UUID").equals(player.getUniqueId().toString())
+                && !player.hasPermission(Permissions.Bypass.delete)) {
             player.sendMessage(Messages.error.UNAUTHORIZED);
         }
+
+        if (!confirmed) {
+            player.sendMessage(Messages.info.CONFIRM);
+            return;
+        }
+
+        grid.deleteIsland(islandId);
+        player.sendMessage(Messages.success.DELETED);
     }
 
     private void sendHelp(Player player) {
@@ -116,7 +138,7 @@ public class IslandManagmentCommands extends ChatUtils implements CommandExecuto
         player.sendMessage(Messages.help.GIVE);
     }
 
-    private void giveIsland(Player player, String[] args) {
+    private void giveIsland(Player player, String[] args, Boolean confirmed) {
         if (!player.hasPermission(Permissions.island.give)) {
             player.sendMessage(Messages.error.NO_PERMISSION);
             return;
@@ -150,6 +172,11 @@ public class IslandManagmentCommands extends ChatUtils implements CommandExecuto
         if (plugin.getIslandsConfig().getString("islands." + islandId + ".UUID").equals(player.getUniqueId().toString())
                 || player.hasPermission(Permissions.Bypass.give)) {
             if (plugin.getIslandsConfig().getInt("islands." + islandId + ".public") == 1) {
+                if (!confirmed) {
+                    player.sendMessage(Messages.info.CONFIRM);
+                    return;
+                }
+
                 grid.giveIsland(islandId, targetPlayer);
 
                 player.sendMessage(Messages.success.OWNER_CHANGED(args[1]));
@@ -341,7 +368,7 @@ public class IslandManagmentCommands extends ChatUtils implements CommandExecuto
         return Islands.IslandSize.NORMAL;
     }
 
-    private void regenerateIsland(Player player, String[] args) {
+    private void regenerateIsland(Player player, String[] args, boolean confirmed) {
         HashMap<Biome, List<Location>> availableLocations = plugin.islands.islandGeneration.biomes.availableLocations;
 
         if (!player.hasPermission(Permissions.island.regenerate)) {
@@ -410,6 +437,11 @@ public class IslandManagmentCommands extends ChatUtils implements CommandExecuto
             return;
         }
 
+        if (!confirmed) {
+            player.sendMessage(Messages.info.CONFIRM);
+            return;
+        }
+
         try {
             boolean success = plugin.islands.regenerateIsland(islandId, targetBiome, islandSize, player);
 
@@ -459,6 +491,10 @@ public class IslandManagmentCommands extends ChatUtils implements CommandExecuto
             public static String ISLAND_RECEIVED(String playerName, String islandName) {
                 return success("You are now the owner of " + playerName + "'s island " + islandName + ".");
             }
+        }
+
+        public static class info {
+            public static final String CONFIRM = info("Are you sure? Repeat the command to confirm.");
         }
 
         public static class help {

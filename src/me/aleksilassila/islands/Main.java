@@ -2,16 +2,14 @@ package me.aleksilassila.islands;
 
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import me.aleksilassila.islands.commands.GoCommand;
-import me.aleksilassila.islands.commands.IslandManagmentCommands;
 import me.aleksilassila.islands.commands.IslandCommands;
+import me.aleksilassila.islands.commands.IslandManagmentCommands;
 import me.aleksilassila.islands.generation.EmptyWorldGenerator;
 import me.aleksilassila.islands.listeners.IslandsListener;
 import org.bukkit.*;
-
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
-import org.bukkit.generator.ChunkGenerator;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
