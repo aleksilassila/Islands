@@ -231,6 +231,28 @@ public class IslandManagmentCommands extends ChatUtils implements CommandExecuto
             return;
         }
 
+        Islands.IslandSize islandSize = args.length == 3 ? parseIslandSize(args[2]) : Islands.IslandSize.NORMAL;
+
+        String permissionRequired;
+
+        switch (islandSize) {
+            case BIG:
+                permissionRequired = Permissions.island.createBig;
+                break;
+            case SMALL:
+                permissionRequired = Permissions.island.createSmall;
+                break;
+            case NORMAL:
+            default:
+                permissionRequired = Permissions.island.createNormal;
+                break;
+        }
+
+        if (!player.hasPermission(permissionRequired)) {
+            player.sendMessage(Messages.Error.NO_PERMISSION);
+            return;
+        }
+
         HashMap<Biome, List<Location>> availableLocations = plugin.islands.islandGeneration.biomes.availableLocations;
 
         if (args.length < 2) {
@@ -251,8 +273,6 @@ public class IslandManagmentCommands extends ChatUtils implements CommandExecuto
         if (previousIslands == plugin.getConfig().getInt("islandsLimit") && !player.hasPermission(Permissions.Bypass.create)) {
             player.sendMessage(Messages.Error.ISLAND_LIMIT);
         }
-
-        Islands.IslandSize islandSize = args.length == 3 ? parseIslandSize(args[2]) : Islands.IslandSize.NORMAL;
 
         Biome targetBiome = getTargetBiome(args[1]);
 
@@ -303,6 +323,28 @@ public class IslandManagmentCommands extends ChatUtils implements CommandExecuto
             return;
         }
 
+        Islands.IslandSize islandSize = args.length == 3 ? parseIslandSize(args[2]) : Islands.IslandSize.NORMAL;
+
+        String permissionRequired;
+
+        switch (islandSize) {
+            case BIG:
+                permissionRequired = Permissions.island.createBig;
+                break;
+            case SMALL:
+                permissionRequired = Permissions.island.createSmall;
+                break;
+            case NORMAL:
+            default:
+                permissionRequired = Permissions.island.createNormal;
+                break;
+        }
+
+        if (!player.hasPermission(permissionRequired)) {
+            player.sendMessage(Messages.Error.NO_PERMISSION);
+            return;
+        }
+
         if (args.length < 2) {
             player.sendMessage(Messages.Help.REGENERATE);
 
@@ -336,8 +378,6 @@ public class IslandManagmentCommands extends ChatUtils implements CommandExecuto
             player.sendMessage(Messages.Error.NO_LOCATIONS_FOR_BIOME);
             return;
         }
-
-        Islands.IslandSize islandSize = args.length == 3 ? parseIslandSize(args[2]) : Islands.IslandSize.NORMAL;
 
         try {
             boolean success = plugin.islands.regenerateIsland(islandId, targetBiome, islandSize, player);

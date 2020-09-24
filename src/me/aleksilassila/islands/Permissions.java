@@ -18,6 +18,9 @@ public class Permissions {
 
     public static class island {
         public static final String create = "islands.create";
+        public static final String createBig = "islands.create.big";
+        public static final String createNormal = "islands.create.normal";
+        public static final String createSmall = "islands.create.small";
         public static final String regenerate = "islands.regenerate";
         public static final String delete = "islands.delete";
         public static final String give = "islands.give";
