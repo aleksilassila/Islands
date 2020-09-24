@@ -20,10 +20,20 @@ public class IslandGeneration {
     private final Islands islands;
     public Biomes biomes;
     public List<CopyTask> queue = new ArrayList<>();
+    private int buildDelay;
+    private int rowsBuiltPerDelay = 1;
 
     public IslandGeneration(Islands islands) {
         this.islands = islands;
         this.biomes = new Biomes(islands.sourceWorld, islands.plugin);
+        double delay = islands.plugin.getConfig().getDouble("generation.generationDelayInTicks");
+
+        if (delay < 1.0) {
+            this.buildDelay = 1;
+            this.rowsBuiltPerDelay = (int) Math.round(1 / delay);
+        } else {
+            this.buildDelay = (int) delay;
+        }
     }
 
     public void addToQueue(CopyTask task) {
@@ -74,50 +84,54 @@ public class IslandGeneration {
 
         @Override
         public void run() {
-            for (int y = startY; y < startY + islandSize; y++) {
-                int relativeX = index / islandSize;
-                int relativeZ = index - relativeX * islandSize;
+            loop:
+            for (int count = 0; count < rowsBuiltPerDelay; count++) {
+                for (int y = startY; y < startY + islandSize; y++) {
+                    int relativeX = index / islandSize;
+                    int relativeZ = index - relativeX * islandSize;
 
-                Block sourceBlock = islands.sourceWorld.getBlockAt(startX + relativeX, y, startZ + relativeZ);
+                    Block sourceBlock = islands.sourceWorld.getBlockAt(startX + relativeX, y, startZ + relativeZ);
 
-                //WIP
-    //            if (Math.random() < - ((8 * (y - sourceY)) / (double) islandSize) + 2) {
-    //                continue;
-    //            }
+                    //WIP
+                    //            if (Math.random() < - ((8 * (y - sourceY)) / (double) islandSize) + 2) {
+                    //                continue;
+                    //            }
 
-                Block target = islands.world.getBlockAt(targetX + relativeX, targetY + (y - startY), targetZ + relativeZ);
-                if (isBlockInIslandShape(relativeX, y - startY, relativeZ, islandSize)) {
-                    target.setBlockData(sourceBlock.getBlockData());
-                } else {
-                    target.setType(Material.AIR);
+                    Block target = islands.world.getBlockAt(targetX + relativeX, targetY + (y - startY), targetZ + relativeZ);
+                    if (isBlockInIslandShape(relativeX, y - startY, relativeZ, islandSize)) {
+                        target.setBlockData(sourceBlock.getBlockData());
+                    } else {
+                        target.setType(Material.AIR);
+                    }
+
+                    target.setBiome(sourceBlock.getBiome());
                 }
 
-                target.setBiome(sourceBlock.getBiome());
-            }
+                if (index >= islandSize * islandSize) {
+                    // Update lighting
+                    islands.world.getChunkAt(targetX + islandSize / 2, targetZ + islandSize / 2);
 
-            if (index >= islandSize * islandSize) {
-                // Update lighting
-                islands.world.getChunkAt(targetX + islandSize / 2, targetZ + islandSize / 2);
+                    player.sendMessage(Messages.Success.GENERATION_DONE);
+                    queue.remove(this);
 
-                player.sendMessage(Messages.Success.GENERATION_DONE);
-                queue.remove(this);
+                    if (queue.size() > 0) {
+                        CopyTask nextTask = queue.get(0);
+                        nextTask.runTaskTimer(islands.plugin, 0, buildDelay);
+                        nextTask.player.sendMessage(Messages.Info.GENERATION_STARTED(nextTask.islandSize * nextTask.islandSize / 20.0));
+                    }
 
-                if (queue.size() > 0) {
-                    CopyTask nextTask = queue.get(0);
-                    nextTask.runTaskTimer(islands.plugin, 0,1);
-                    nextTask.player.sendMessage(Messages.Info.GENERATION_STARTED(nextTask.islandSize * nextTask.islandSize / 20.0));
+                    this.cancel();
+                    break loop;
+                } else if (index == islandSize * islandSize / 4) {
+                    player.sendMessage(Messages.Info.GENERATION_STATUS(25));
+                } else if (index == islandSize * islandSize / 2) {
+                    player.sendMessage(Messages.Info.GENERATION_STATUS(50));
+                } else if (index == islandSize * islandSize / 4 * 3) {
+                    player.sendMessage(Messages.Info.GENERATION_STATUS(75));
                 }
 
-                this.cancel();
-            } else if (index == islandSize * islandSize / 4) {
-                player.sendMessage(Messages.Info.GENERATION_STATUS(25));
-            } else if (index == islandSize * islandSize / 2) {
-                player.sendMessage(Messages.Info.GENERATION_STATUS(50));
-            } else if (index == islandSize * islandSize / 4 * 3) {
-                player.sendMessage(Messages.Info.GENERATION_STATUS(75));
+                index++;
             }
-
-            index++;
         }
     }
 
@@ -159,7 +173,7 @@ public class IslandGeneration {
 
         // Copy blocks
         if (queue.size() == 0) {
-            task.runTaskTimer(islands.plugin, 0, 1);
+            task.runTaskTimer(islands.plugin, 0, buildDelay);
         }
 
         addToQueue(task);

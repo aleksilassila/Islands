@@ -122,7 +122,7 @@ public class IslandGrid {
 
     private int getIslandY(int xIndex, int zIndex) {
         int islandIndex = (xIndex * islandsInARow + zIndex);
-        return 20 + ((islandIndex + xIndex) % 3) * 70;
+        return 10 + ((islandIndex + xIndex) % 3) * islands.plugin.getConfig().getInt("generation.islandVerticalSpacing");
     }
 
     @NotNull

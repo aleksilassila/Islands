@@ -1,9 +1,11 @@
-island:
+island:       # Island sizing
   BIG: 80
   NORMAL: 64
   SMALL: 32
 generation:
-  searchJump: 8
-  searchArea: 1000
-  islandsInARow: 3
-  islandSpacing: 100
+  searchJump: 8               # How man blocks should be skipped when looking for biomes, bigger faster
+  searchArea: 1000            # Biome search area, smaller faster
+  islandsInARow: 4
+  islandSpacing: 100          # At least the size of island.BIG
+  islandVerticalSpacing: 50
+  generationDelayInTicks: 1   # 2 Will generate 1 row per 2 ticks, 0.5 will generate 2 rows per 1 tick
