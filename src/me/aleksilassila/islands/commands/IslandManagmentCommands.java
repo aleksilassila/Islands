@@ -1,5 +1,6 @@
 package me.aleksilassila.islands.commands;
 
+import com.mojang.brigadier.Message;
 import com.sun.istack.internal.NotNull;
 import com.sun.istack.internal.Nullable;
 import me.aleksilassila.islands.Islands;
@@ -173,6 +174,11 @@ public class IslandManagmentCommands extends ChatUtils implements CommandExecuto
                 return;
             }
 
+            if (plugin.getConfig().getStringList("illegalIslandNames").contains(args[1])) {
+                player.sendMessage(Messages.Error.NAME_BLOCKED);
+                return;
+            }
+
             grid.nameIsland(islandId, args[1]);
 
             player.sendMessage(Messages.Success.NAME_CHANGED(args[1]));
@@ -309,6 +315,7 @@ public class IslandManagmentCommands extends ChatUtils implements CommandExecuto
             public static final String NO_PLAYER_FOUND = error("No given player found.");
             public static final String NAME_TAKEN = error("That name is already taken.");
             public static final String ONGOING_QUEUE_EVENT = error("Wait for your current queue event to finish.");
+            public static final String NAME_BLOCKED = error("You can't use that name");
             public static String ISLAND_GEN_FAILED = error("Island regeneration failed.");
             public static String TELEPORT_FAILED = error("Could not teleport.");
             public static String NO_BIOME_FOUND = error("Biome not found.");

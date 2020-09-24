@@ -253,24 +253,29 @@ public class IslandGrid {
     }
 
     public void addTrusted(String islandId, String UUID) {
-        getIslandsConfig().set("islands." + islandId + ".trusted." + UUID, "1");
+        List<String> trusted = getIslandsConfig().getStringList("islands." + islandId + ".trusted");
+        trusted.add(UUID);
+        getIslandsConfig().set("islands." + islandId + ".trusted", trusted);
+
         islands.plugin.saveIslandsConfig();
     }
 
     public void removeTrusted(String islandId, String UUID) {
-        getIslandsConfig().set("islands." + islandId + ".trusted." + UUID, null);
+        List<String> trusted = getIslandsConfig().getStringList("islands." + islandId + ".trusted");
+        trusted.remove(UUID);
+        getIslandsConfig().set("islands." + islandId + ".trusted", trusted);
         islands.plugin.saveIslandsConfig();
     }
 
     @NotNull
-    public Set<String> getTrusted(String islandId) {
+    public List<String> getTrusted(String islandId) {
         ConfigurationSection section = getIslandsConfig().getConfigurationSection("islands." + islandId + ".trusted");
 
         if (section == null) {
-            return new HashSet<String>();
+            return new ArrayList<>();
         }
 
-        return section.getKeys(false);
+        return getIslandsConfig().getStringList("islands." + islandId + ".trusted");
     }
 
     // deleteIsland
