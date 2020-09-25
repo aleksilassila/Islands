@@ -15,7 +15,9 @@ import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.PrintWriter;
 
 public class Main extends JavaPlugin {
 
@@ -25,6 +27,8 @@ public class Main extends JavaPlugin {
 
     private FileConfiguration islandsConfig;
     private File islandsConfigFile;
+    private FileConfiguration biomesConfig;
+    private File biomesConfigFile;
 
     public Islands islands;
 
@@ -46,6 +50,7 @@ public class Main extends JavaPlugin {
         saveConfig();
 
         initIslandsConfig();
+        initBiomesConfig();
 
         islandsWorld = Bukkit.getWorlds().get(0);
         islandsSourceWorld = getSourceWorld();
@@ -91,7 +96,7 @@ public class Main extends JavaPlugin {
         try {
             islandsConfig.save(islandsConfigFile);
         } catch (IOException e) {
-            getLogger().warning("Unable to save islandsConfig");
+            getLogger().severe("Unable to save islandsConfig");
         }
     }
 
@@ -105,6 +110,38 @@ public class Main extends JavaPlugin {
         islandsConfig = new YamlConfiguration();
         try {
             islandsConfig.load(islandsConfigFile);
+        } catch (IOException | InvalidConfigurationException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public FileConfiguration getBiomesConfig() {
+        return this.biomesConfig;
+    }
+
+    public void saveBiomesConfig() {
+        try {
+            biomesConfig.save(biomesConfigFile);
+        } catch (IOException e) {
+            getLogger().severe("Unable to save biomesConfig");
+        }
+    }
+
+    public void clearBiomesConfig() {
+        biomesConfigFile.delete();
+        initBiomesConfig();
+    }
+
+    private void initBiomesConfig() {
+        biomesConfigFile = new File(getDataFolder(), "biomes.yml");
+        if (!biomesConfigFile.exists()) {
+            biomesConfigFile.getParentFile().mkdirs();
+            saveResource("biomes.yml", false);
+         }
+
+        biomesConfig = new YamlConfiguration();
+        try {
+            biomesConfig.load(biomesConfigFile);
         } catch (IOException | InvalidConfigurationException e) {
             e.printStackTrace();
         }

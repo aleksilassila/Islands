@@ -1,5 +1,6 @@
-package me.aleksilassila.islands.biomes;
+package me.aleksilassila.islands.generation;
 
+import com.sun.istack.internal.Nullable;
 import me.aleksilassila.islands.Main;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -9,22 +10,99 @@ import org.bukkit.block.Biome;
 import java.util.*;
 
 public class Biomes {
+    private Main plugin;
+
     private World world;
     public HashMap<Biome, List<Location>> availableLocations;
     private int biggestIslandSize = 80;
 
     int biomeSearchJumpBlocks;
-    //int biomeSearchSize = 5000;
     int biomeSearchSize;
 
     public Biomes(World world, Main plugin) {
         this.world = world;
         this.biggestIslandSize = plugin.getConfig().getInt("island.BIG");
+        this.plugin = plugin;
 
         this.biomeSearchJumpBlocks = plugin.getConfig().getInt("generation.searchJump");
         this.biomeSearchSize = plugin.getConfig().getInt("generation.searchArea");
 
+        this.availableLocations = new HashMap<>();
+
+        // Generate biomes and save them to config
+        if (plugin.getBiomesConfig().getString("seed") == null || !plugin.getBiomesConfig().getString("seed").equals(String.valueOf(plugin.islandsSourceWorld.getSeed()))) {
+            generateAndSaveBiomes();
+        } else { // Load existing biomes from config
+            loadBiomesFromConfig();
+        }
+    }
+
+    private void loadBiomesFromConfig() {
+        // Loop biomes
+        for (String key : plugin.getBiomesConfig().getKeys(false)) {
+            Biome biome = getTargetBiome(key);
+            if (biome != null) {
+                List<Location> locations = new ArrayList<>();
+
+                // Loop locations inside a biome
+                for (String coordinatesIndex : plugin.getBiomesConfig().getConfigurationSection(key).getKeys(false)) {
+                    List<String> locationStrings = plugin.getBiomesConfig().getStringList(key + "." + coordinatesIndex);
+
+                    if (locationStrings.size() != 3) continue;
+
+                    Location location = new Location(
+                            plugin.islandsSourceWorld,
+                            Integer.parseInt(locationStrings.get(0)),
+                            Integer.parseInt(locationStrings.get(1)),
+                            Integer.parseInt(locationStrings.get(2))
+                    );
+
+                    locations.add(location);
+                }
+
+
+                this.availableLocations.put(biome, locations);
+            }
+        }
+    }
+
+    private void generateAndSaveBiomes() {
+        plugin.clearBiomesConfig();
         this.availableLocations = getAllAvailableIslandLocations();
+
+        plugin.getBiomesConfig().set("seed", String.valueOf(plugin.islandsSourceWorld.getSeed()));
+
+        for (Biome biome : availableLocations.keySet()) {
+            List<Location> locationsList = availableLocations.get(biome);
+
+            int index = 0;
+            for (Location location : locationsList) {
+                List<String> stringsList = new ArrayList<>();
+
+                stringsList.add(String.valueOf(location.getBlockX()));
+                stringsList.add(String.valueOf(location.getBlockY()));
+                stringsList.add(String.valueOf(location.getBlockZ()));
+
+                plugin.getBiomesConfig().set(biome.toString() + "." + index, stringsList);
+                index++;
+            }
+
+        }
+
+        plugin.saveBiomesConfig();
+    }
+
+    @Nullable
+    private static Biome getTargetBiome(String biome) {
+         Biome targetBiome = null;
+
+         for (Biome b : Biome.values()) {
+             if (b.name().equalsIgnoreCase(biome)) {
+                 targetBiome = b;
+             }
+         }
+
+         return targetBiome;
     }
 
     public HashMap<Biome, List<Location>> getAllAvailableIslandLocations() {

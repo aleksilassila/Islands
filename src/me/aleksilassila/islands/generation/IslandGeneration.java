@@ -2,7 +2,6 @@ package me.aleksilassila.islands.generation;
 
 import com.sun.istack.internal.Nullable;
 import me.aleksilassila.islands.Islands;
-import me.aleksilassila.islands.biomes.Biomes;
 import me.aleksilassila.islands.utils.ChatUtils;
 import org.bukkit.Location;
 import org.bukkit.Material;
