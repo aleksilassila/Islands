@@ -231,12 +231,12 @@ public class IslandCommands {
                 }
             }
 
-            if (player.getWorld().getName().equals("world_nether")) {
+            if (player.getWorld().getName().equals("world_nether") && !player.hasPermission(Permissions.Bypass.home)) {
                 player.sendMessage(Messages.info.IN_OVERWORLD);
                 return true;
             }
 
-            if (player.getWorld().getName().equals("world")) {
+            if (player.getWorld().getName().equals("world") && !player.hasPermission(Permissions.Bypass.home)) {
                 // Check if is on surface
                 Location playerLocation = player.getLocation();
 

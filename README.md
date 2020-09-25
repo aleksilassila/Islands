@@ -125,3 +125,4 @@ Bypasses
 | `islands.bypass.trust`       | Add trusted person to anyone's island      |
 | `islands.bypass.untrust`     | Remove trusted person from anyone's island |
 | `islands.bypass.protection`  | Interact with anyone's island              |
+| `islands.bypass.home`        | Use /home from anywhere                    |

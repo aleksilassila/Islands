@@ -14,6 +14,7 @@ public class Permissions {
         public static final String listTrusted = "islands.bypass.turst.list";
 
         public static final String interactEverywhere = "islands.bypass.protection";
+        public static final String home = "islands.bypass.home";
     }
 
     public static class island {
