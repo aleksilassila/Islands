@@ -55,10 +55,12 @@ public class Main extends JavaPlugin {
 
         new IslandManagmentCommands(this);
 
-        new IslandCommands.HomeCommand(this);
-        new IslandCommands.VisitCommand(this);
-        new IslandCommands.TrustCommand(this);
-        new IslandCommands.UntrustCommand(this);
+        IslandCommands islandCommands = new IslandCommands(this);
+
+        islandCommands.new HomeCommand();
+        islandCommands.new VisitCommand();
+        islandCommands.new TrustCommand();
+        islandCommands.new UntrustCommand();
 
         new GoCommand(this);
         new IslandsListener(this);

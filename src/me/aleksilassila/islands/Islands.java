@@ -10,6 +10,7 @@ import org.bukkit.entity.Player;
 
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 
@@ -23,6 +24,7 @@ public class Islands {
 
     public Set<Player> playersWithNoFall = new HashSet<>();
     public final HashMap<String, ConfirmItem> confirmations;
+    public Map<String, Long> teleportCooldowns;
 
     public enum IslandSize {
         SMALL, // 32*32
@@ -33,13 +35,13 @@ public class Islands {
 
     public Islands(World world, World sourceWorld, Main plugin) {
         this.plugin = plugin;
-
         this.sourceWorld = sourceWorld;
+        this.teleportCooldowns = new HashMap<>();
+        this.confirmations = new HashMap<>();
 
         this.islandGeneration = new IslandGeneration(this);
         this.grid = new IslandGrid(this);
 
-        this.confirmations = new HashMap<>();
     }
 
     public static class IslandsException extends java.lang.Exception {

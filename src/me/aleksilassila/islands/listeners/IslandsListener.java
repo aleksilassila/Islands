@@ -14,6 +14,8 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 
+import java.util.Date;
+
 public class IslandsListener extends ChatUtils implements Listener {
     private final int disableMobs;
     private Main plugin;
@@ -69,6 +71,8 @@ public class IslandsListener extends ChatUtils implements Listener {
                 e.setCancelled(true);
             } else if (player.getWorld().equals(plugin.islandsWorld)) {
                 e.setCancelled(true);
+            } else {
+                plugin.islands.teleportCooldowns.put(player.getUniqueId().toString(), new Date().getTime());
             }
         }
     }

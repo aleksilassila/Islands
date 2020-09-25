@@ -1,5 +1,6 @@
 package me.aleksilassila.islands.commands;
 
+import me.aleksilassila.islands.Islands;
 import me.aleksilassila.islands.Main;
 import me.aleksilassila.islands.Permissions;
 import me.aleksilassila.islands.generation.IslandGrid;
@@ -13,15 +14,22 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+import java.util.Date;
 import java.util.List;
 
 public class IslandCommands {
-    public static class UntrustCommand implements CommandExecutor {
-        private Main plugin;
+    private Main plugin;
+    private Islands islands;
+    private IslandGrid grid;
 
-        public UntrustCommand(Main plugin) {
-            this.plugin = plugin;
+    public IslandCommands(Main plugin) {
+        this.plugin = plugin;
+        this.islands = plugin.islands;
+        this.grid = plugin.islands.grid;
+    }
 
+    public class UntrustCommand implements CommandExecutor {
+        public UntrustCommand() {
             plugin.getCommand("untrust").setExecutor(this);
         }
 
@@ -78,12 +86,8 @@ public class IslandCommands {
         }
     }
 
-    public static class TrustCommand implements CommandExecutor {
-        private final Main plugin;
-
-        public TrustCommand(Main plugin) {
-            this.plugin = plugin;
-
+    public class TrustCommand implements CommandExecutor {
+        public TrustCommand() {
             plugin.getCommand("trust").setExecutor(this);
         }
 
@@ -133,12 +137,9 @@ public class IslandCommands {
         }
     }
 
-    public static class VisitCommand implements CommandExecutor {
-        private Main plugin;
+    public class VisitCommand implements CommandExecutor {
 
-        public VisitCommand(Main plugin) {
-            this.plugin = plugin;
-
+        public VisitCommand() {
             plugin.getCommand("visit").setExecutor(this);
         }
 
@@ -163,6 +164,10 @@ public class IslandCommands {
                 return true;
             }
 
+            if (!canTeleport(player)) {
+                player.sendMessage(Messages.error.COOLDOWN(teleportCooldown(player)));
+                return true;
+            }
 
             String islandId = plugin.islands.grid.getPublicIsland(args[0]);
 
@@ -176,14 +181,8 @@ public class IslandCommands {
         }
     }
 
-    public static class HomeCommand implements CommandExecutor {
-        private Main plugin;
-        private IslandGrid grid;
-
-        public HomeCommand(Main plugin) {
-            this.plugin = plugin;
-            this.grid = plugin.islands.grid;
-
+    public class HomeCommand implements CommandExecutor {
+        public HomeCommand() {
             plugin.getCommand("home").setExecutor(this);
             plugin.getCommand("homes").setExecutor(this);
         }
@@ -218,6 +217,11 @@ public class IslandCommands {
             } else {
                 if (!player.hasPermission(Permissions.island.home)) {
                     player.sendMessage(Messages.error.NO_PERMISSION);
+                    return true;
+                }
+
+                if (!canTeleport(player)) {
+                    player.sendMessage(Messages.error.COOLDOWN(teleportCooldown(player)));
                     return true;
                 }
 
@@ -263,6 +267,30 @@ public class IslandCommands {
         }
     }
 
+    private boolean canTeleport(Player player) {
+        if (plugin.islands.teleportCooldowns.containsKey(player.getUniqueId().toString())) {
+            long cooldownTime  = plugin.getConfig().getInt("tpCooldownTime") * 1000;
+            long timePassed = new Date().getTime() - plugin.islands.teleportCooldowns.get(player.getUniqueId().toString());
+
+            return timePassed >= cooldownTime;
+        }
+
+        return true;
+    }
+
+    private int teleportCooldown(Player player) {
+        if (plugin.islands.teleportCooldowns.containsKey(player.getUniqueId().toString())) {
+            long cooldownTime  = plugin.getConfig().getInt("tpCooldownTime") * 1000;
+            long timePassed = new Date().getTime() - plugin.islands.teleportCooldowns.get(player.getUniqueId().toString());
+
+            long remaining = cooldownTime - timePassed;
+
+            return remaining < 0 ? 0 : (int)(remaining / 1000);
+        }
+
+        return 0;
+    }
+
     static class Messages extends ChatUtils {
         static class error {
             public static final String ISLAND_NOT_FOUND = error("404 - Home not found.");
@@ -271,6 +299,10 @@ public class IslandCommands {
             public static final String NOT_OWNED = error("You don't own this island.");
             public static final String PLAYER_NOT_FOUND = error("Player not found.");
             public static final String WRONG_WORLD = error("You can't use that command in this world.");
+
+            public static String COOLDOWN(int remainingTime) {
+                return error("You took damage recently. You have to wait for " + remainingTime + "s before teleporting.");
+            }
         }
 
         static class success {
