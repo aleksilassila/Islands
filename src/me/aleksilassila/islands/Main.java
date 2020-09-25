@@ -1,6 +1,5 @@
 package me.aleksilassila.islands;
 
-import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import me.aleksilassila.islands.commands.GoCommand;
 import me.aleksilassila.islands.commands.IslandCommands;
 import me.aleksilassila.islands.commands.IslandManagmentCommands;
@@ -34,10 +33,6 @@ public class Main extends JavaPlugin {
 
     @Override
     public void onEnable() {
-        if (getWorldEdit() == null) {
-            Bukkit.getLogger().severe("No WorldEdit found. You might run into errors.");
-        }
-
         if (!setupPermissions()) {
             Bukkit.getLogger().severe("No Vault found. Permissions disabled.");
             getServer().getPluginManager().disablePlugin(this);
@@ -69,10 +64,6 @@ public class Main extends JavaPlugin {
         new IslandsListener(this);
 
         getLogger().info("Islands enabled!");
-    }
-
-    public static WorldEditPlugin getWorldEdit() {
-        return (WorldEditPlugin) Bukkit.getPluginManager().getPlugin("WorldEdit");
     }
 
     private boolean setupPermissions() {
