@@ -54,11 +54,6 @@ public class IslandManagmentCommands extends ChatUtils implements CommandExecuto
 
                 confirmed = true;
             } else {
-                if (item != null) {
-                    Bukkit.getLogger().info("Item.command: " + item.command);
-                    Bukkit.getLogger().info("Item.expired: " + item.expired());
-                }
-                Bukkit.getLogger().info("Issued: " + issuedCommand);
                 plugin.islands.confirmations.put(player.getUniqueId().toString(), new ConfirmItem(issuedCommand, 8 * 1000));
             }
 

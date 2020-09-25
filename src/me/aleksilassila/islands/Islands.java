@@ -85,6 +85,7 @@ public class Islands {
 
             return islandId;
         } catch (IllegalArgumentException e) {
+            grid.deleteIsland(islandId);
             throw new IllegalArgumentException();
         }
 
