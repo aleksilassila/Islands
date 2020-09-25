@@ -15,6 +15,7 @@ import org.bukkit.block.Biome;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 
 import java.util.HashMap;
@@ -321,10 +322,24 @@ public class IslandManagmentCommands extends ChatUtils implements CommandExecuto
             return;
         }
 
+
         int previousIslands = grid.getAllIslandIds(player.getUniqueId()).size();
 
-        if (previousIslands == plugin.getConfig().getInt("islandsLimit") && !player.hasPermission(Permissions.Bypass.create)) {
+        int islandsLimit = plugin.getConfig().getInt("defaultIslandLimit");
+
+        ConfigurationSection section = plugin.getConfig().getConfigurationSection("groupLimits");
+
+        if (plugin.perms != null && section != null) {
+            for (String group : plugin.perms.getGroups()) {
+                if (plugin.perms.playerInGroup(player, group) && section.getInt(group) > islandsLimit) {
+                    islandsLimit = section.getInt(group);
+                }
+            }
+        }
+
+        if (previousIslands >= islandsLimit && !player.hasPermission(Permissions.Bypass.create)) {
             player.sendMessage(Messages.error.ISLAND_LIMIT);
+            return;
         }
 
         Biome targetBiome = getTargetBiome(args[1]);

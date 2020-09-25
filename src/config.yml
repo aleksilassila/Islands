@@ -1,8 +1,8 @@
-createIslandMultiple:
-  default: 2
-  staff: 10
+defaultIslandLimit: 2
+groupLimits:                  # Requires vault to work, all limits can be bypassed with islands.bypass.islandLimit
+  staff: 5
 
-island:       # Island sizing
+island:                       # Island sizing
   BIG: 80
   NORMAL: 64
   SMALL: 32
