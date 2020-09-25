@@ -15,9 +15,7 @@ import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
-import java.io.PrintWriter;
 
 public class Main extends JavaPlugin {
 
@@ -133,10 +131,10 @@ public class Main extends JavaPlugin {
     }
 
     private void initBiomesConfig() {
-        biomesConfigFile = new File(getDataFolder(), "biomes.yml");
+        biomesConfigFile = new File(getDataFolder(), "biomeCache.yml");
         if (!biomesConfigFile.exists()) {
             biomesConfigFile.getParentFile().mkdirs();
-            saveResource("biomes.yml", false);
+            saveResource("biomeCache.yml", false);
          }
 
         biomesConfig = new YamlConfiguration();
