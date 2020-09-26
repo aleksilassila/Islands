@@ -5,122 +5,97 @@ import com.sun.istack.internal.Nullable;
 import me.aleksilassila.islands.Islands;
 import me.aleksilassila.islands.Main;
 import me.aleksilassila.islands.Permissions;
+import me.aleksilassila.islands.commands.subcommands.*;
 import me.aleksilassila.islands.generation.IslandGrid;
 import me.aleksilassila.islands.utils.ChatUtils;
 import me.aleksilassila.islands.utils.ConfirmItem;
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.Location;
+import me.aleksilassila.islands.utils.Messages;
 import org.bukkit.block.Biome;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
-import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 
-import java.util.HashMap;
-import java.util.List;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 
 public class IslandManagmentCommands extends ChatUtils implements CommandExecutor {
     private final Main plugin;
     private final IslandGrid grid;
+    private Set<Subcommand> subcommands;
 
     public IslandManagmentCommands(Main plugin) {
         this.plugin = plugin;
         this.grid = plugin.islands.grid;
 
-        plugin.getCommand("go").setExecutor(this);
         plugin.getCommand("island").setExecutor(this);
+
+        subcommands = new HashSet<>();
+
+        subcommands.add(new createSubcommand(plugin));
+        subcommands.add(new regenerateSubcommand(plugin));
+        subcommands.add(new deleteSubcommand(plugin));
+        subcommands.add(new nameSubcommand(plugin));
+        subcommands.add(new unnameSubcommand(plugin));
+        subcommands.add(new giveSubcommand(plugin));
     }
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-        if (sender instanceof Player) {
-            Player player = (Player) sender;
+        if (!(sender instanceof Player)) {
+            return true;
+        }
 
-            if (!Permissions.checkPermission(player, Permissions.island.island)) {
-                player.sendMessage(Messages.error.NO_PERMISSION);
+        Player player = (Player) sender;
+
+        if (!Permissions.checkPermission(player, Permissions.island.island)) {
+            player.sendMessage(Messages.error.NO_PERMISSION);
+            return true;
+        }
+
+        boolean confirmed = false;
+        String issuedCommand = String.join(" ", label, String.join(" ", args));
+
+        ConfirmItem item = plugin.islands.confirmations.get(player.getUniqueId().toString());
+        if (item != null
+                && item.command.equals(issuedCommand)
+                && !item.expired()) {
+            plugin.islands.confirmations.remove(player.getUniqueId().toString());
+
+            confirmed = true;
+        } else {
+            plugin.islands.confirmations.put(player.getUniqueId().toString(), new ConfirmItem(issuedCommand, 8 * 1000));
+        }
+
+        if (args.length >= 1) {
+            Subcommand target = getSubcommand(args[0]);
+
+            if (target == null) {
+                player.sendMessage(Messages.error.SUBCOMMAND_NOT_FOUND);
                 return true;
             }
-
-            boolean confirmed = false;
-            String issuedCommand = String.join(" ", label, String.join(" ", args));
-
-            ConfirmItem item = plugin.islands.confirmations.get(player.getUniqueId().toString());
-            if (item != null
-                    && item.command.equals(issuedCommand)
-                    && !item.expired()) {
-                plugin.islands.confirmations.remove(player.getUniqueId().toString());
-
-                confirmed = true;
-            } else {
-                plugin.islands.confirmations.put(player.getUniqueId().toString(), new ConfirmItem(issuedCommand, 8 * 1000));
+            try {
+                target.onCommand(player, Arrays.copyOfRange(args, 1, args.length), confirmed);
+                return true;
+            } catch (Exception e) {
+                player.sendMessage(Messages.error.ERROR);
+                return true;
             }
-
-            if (args.length >= 1) {
-                if (args[0].equalsIgnoreCase("create")) {
-                    createIsland(player, args);
-
-                    return true;
-                } else if (args[0].equalsIgnoreCase("regenerate")) {
-                    regenerateIsland(player, args, confirmed);
-
-                    return true;
-                } else if (args[0].equalsIgnoreCase("delete")) {
-                    deleteIsland(player, args, confirmed);
-
-                    return true;
-                } else if (args[0].equalsIgnoreCase("give")) {
-                    giveIsland(player, args, confirmed);
-
-                    return true;
-                } else if (args[0].equalsIgnoreCase("name")) {
-                    nameIsland(player, args);
-
-                    return true;
-                } else if (args[0].equalsIgnoreCase("unname")) {
-                    unnameIsland(player, args);
-
-                    return true;
-                }
-            }
-
-            sendHelp(player);
         }
+
+        sendHelp(player);
 
         return true;
     }
 
-    private void deleteIsland(Player player, String[] args, boolean confirmed) {
-        if (!Permissions.checkPermission(player, Permissions.island.delete)) {
-            player.sendMessage(Messages.error.NO_PERMISSION);
-            return;
+    @Nullable
+    private Subcommand getSubcommand(String name) {
+        for (Subcommand subcommand : subcommands) {
+            if (subcommand.getName().equalsIgnoreCase(name)) return subcommand;
         }
 
-        if (!player.getWorld().equals(plugin.islandsWorld)) {
-            player.sendMessage(Messages.error.WRONG_WORLD);
-            return;
-        }
-
-        String islandId = grid.getIslandId(player.getLocation().getBlockX(), player.getLocation().getBlockZ());
-
-        if (islandId == null) {
-            player.sendMessage(Messages.error.UNAUTHORIZED);
-            return;
-        }
-
-        if (!plugin.getIslandsConfig().getString("islands." + islandId + ".UUID").equals(player.getUniqueId().toString())
-                && !Permissions.checkPermission(player, Permissions.bypass.delete)) {
-            player.sendMessage(Messages.error.UNAUTHORIZED);
-        }
-
-        if (!confirmed) {
-            player.sendMessage(Messages.info.CONFIRM);
-            return;
-        }
-
-        grid.deleteIsland(islandId);
-        player.sendMessage(Messages.success.DELETED);
+        return null;
     }
 
     private void sendHelp(Player player) {
@@ -134,386 +109,29 @@ public class IslandManagmentCommands extends ChatUtils implements CommandExecuto
         player.sendMessage(Messages.help.GIVE);
     }
 
-    private void giveIsland(Player player, String[] args, Boolean confirmed) {
-        if (!Permissions.checkPermission(player, Permissions.island.give)) {
-            player.sendMessage(Messages.error.NO_PERMISSION);
-            return;
-        }
-
-        if (!player.getWorld().equals(plugin.islandsWorld)) {
-            player.sendMessage(Messages.error.WRONG_WORLD);
-            return;
-        }
-
-
-        if (args.length != 2) {
-            player.sendMessage(Messages.help.GIVE);
-            return;
-        }
-
-        String islandId = grid.getIslandId(player.getLocation().getBlockX(), player.getLocation().getBlockZ());
-
-        if (islandId == null) {
-            player.sendMessage(Messages.error.UNAUTHORIZED);
-            return;
-        }
-
-        Player targetPlayer = Bukkit.getPlayer(args[1]);
-
-        if (targetPlayer == null) {
-            player.sendMessage(Messages.error.NO_PLAYER_FOUND);
-            return;
-        }
-
-        if (plugin.getIslandsConfig().getString("islands." + islandId + ".UUID").equals(player.getUniqueId().toString())
-                || Permissions.checkPermission(player, Permissions.bypass.give)) {
-            if (plugin.getIslandsConfig().getInt("islands." + islandId + ".public") == 1) {
-                if (!confirmed) {
-                    player.sendMessage(Messages.info.CONFIRM);
-                    return;
+    public static class Utils {
+        @NotNull
+        public Islands.IslandSize parseIslandSize(String size) {
+            for (Islands.IslandSize targetSize : Islands.IslandSize.values()) {
+                if (targetSize.name().equalsIgnoreCase(size)) {
+                    return targetSize;
                 }
-
-                grid.giveIsland(islandId, targetPlayer);
-
-                player.sendMessage(Messages.success.OWNER_CHANGED(args[1]));
-                targetPlayer.sendMessage(Messages.success.ISLAND_RECEIVED(targetPlayer.getName(), args[1]));
-            } else {
-                player.sendMessage(Messages.error.NOT_PUBLIC);
-            }
-        } else {
-            player.sendMessage(Messages.error.UNAUTHORIZED);
-        }
-    }
-
-    private void unnameIsland(Player player, String[] args) {
-        if (!Permissions.checkPermission(player, Permissions.island.unname)) {
-            player.sendMessage(Messages.error.NO_PERMISSION);
-            return;
-        }
-
-        if (!player.getWorld().equals(plugin.islandsWorld)) {
-            player.sendMessage(Messages.error.WRONG_WORLD);
-            return;
-        }
-
-        if (args.length != 1) {
-            player.sendMessage(Messages.help.UNNAME);
-            return;
-        }
-
-        String islandId = grid.getIslandId(player.getLocation().getBlockX(), player.getLocation().getBlockZ());
-
-        if (islandId == null) {
-            player.sendMessage(Messages.error.UNAUTHORIZED);
-            return;
-        }
-
-        if (plugin.getIslandsConfig().getString("islands." + islandId + ".UUID").equals(player.getUniqueId().toString())
-                || Permissions.checkPermission(player, Permissions.bypass.unname)) {
-            grid.unnameIsland(islandId);
-
-            player.sendMessage(Messages.success.UNNAMED);
-        } else {
-            player.sendMessage(Messages.error.UNAUTHORIZED);
-        }
-    }
-
-    private void nameIsland(Player player, String[] args) {
-        if (!Permissions.checkPermission(player, Permissions.island.name)) {
-            player.sendMessage(Messages.error.NO_PERMISSION);
-            return;
-        }
-
-        if (!player.getWorld().equals(plugin.islandsWorld)) {
-            player.sendMessage(Messages.error.WRONG_WORLD);
-            return;
-        }
-
-        if (args.length != 2) {
-            player.sendMessage(Messages.help.NAME);
-            return;
-        }
-
-        String islandId = grid.getIslandId(player.getLocation().getBlockX(), player.getLocation().getBlockZ());
-
-        if (islandId == null) {
-            player.sendMessage(Messages.error.UNAUTHORIZED);
-            return;
-        }
-
-        if (plugin.getIslandsConfig().getString("islands." + islandId + ".UUID").equals(player.getUniqueId().toString())
-                || Permissions.checkPermission(player, Permissions.bypass.name)) {
-            if (grid.getPublicIsland(args[1]) != null) {
-                player.sendMessage(Messages.error.NAME_TAKEN);
-                return;
             }
 
-            if (plugin.getConfig().getStringList("illegalIslandNames").contains(args[1])) {
-                player.sendMessage(Messages.error.NAME_BLOCKED);
-                return;
-            }
-
-            grid.nameIsland(islandId, args[1]);
-
-            player.sendMessage(Messages.success.NAME_CHANGED(args[1]));
-        } else {
-            player.sendMessage(Messages.error.UNAUTHORIZED);
+            return Islands.IslandSize.NORMAL;
         }
-    }
 
-    @Nullable
-    private Biome getTargetBiome(String biome) {
-         Biome targetBiome = null;
+        @Nullable
+        public Biome getTargetBiome(String biome) {
+             Biome targetBiome = null;
 
-         for (Biome b : Biome.values()) {
-             if (b.name().equalsIgnoreCase(biome)) {
-                 targetBiome = b;
+             for (Biome b : Biome.values()) {
+                 if (b.name().equalsIgnoreCase(biome)) {
+                     targetBiome = b;
+                 }
              }
-         }
 
-         return targetBiome;
-    }
-
-    private void createIsland(Player player, String[] args) {
-        if (!Permissions.checkPermission(player, Permissions.island.create)) {
-            player.sendMessage(Messages.error.NO_PERMISSION);
-            return;
-        }
-
-        Islands.IslandSize islandSize = args.length == 3 ? parseIslandSize(args[2]) : Islands.IslandSize.NORMAL;
-
-        String permissionRequired;
-
-        switch (islandSize) {
-            case BIG:
-                permissionRequired = Permissions.island.createBig;
-                break;
-            case SMALL:
-                permissionRequired = Permissions.island.createSmall;
-                break;
-            case NORMAL:
-            default:
-                permissionRequired = Permissions.island.createNormal;
-                break;
-        }
-
-        if (!Permissions.checkPermission(player, permissionRequired)) {
-            player.sendMessage(Messages.error.NO_PERMISSION);
-            return;
-        }
-
-        HashMap<Biome, List<Location>> availableLocations = plugin.islands.islandGeneration.biomes.availableLocations;
-
-        if (args.length < 2) {
-            player.sendMessage(Messages.help.CREATE);
-
-            for (Biome biome : availableLocations.keySet()) {
-                if (availableLocations.get(biome).size() > 0) {
-                    player.sendMessage(ChatColor.GOLD + biome.toString() + ChatColor.GREEN +  " has " + ChatColor.GOLD
-                            +  availableLocations.get(biome).size() + ChatColor.GREEN +  " island variations available.");
-                }
-            }
-
-            return;
-        }
-
-
-        int previousIslands = grid.getAllIslandIds(player.getUniqueId()).size();
-
-        int islandsLimit = plugin.getConfig().getInt("defaultIslandLimit");
-
-        ConfigurationSection section = plugin.getConfig().getConfigurationSection("groupLimits");
-
-        if (plugin.perms != null && section != null) {
-            for (String group : plugin.perms.getGroups()) {
-                if (plugin.perms.playerInGroup(player, group) && section.getInt(group) > islandsLimit) {
-                    islandsLimit = section.getInt(group);
-                }
-            }
-        }
-
-        if (previousIslands >= islandsLimit && !Permissions.checkPermission(player, Permissions.bypass.create)) {
-            player.sendMessage(Messages.error.ISLAND_LIMIT);
-            return;
-        }
-
-        Biome targetBiome = getTargetBiome(args[1]);
-
-        if (targetBiome == null) {
-            player.sendMessage(Messages.error.NO_BIOME_FOUND);
-            return;
-        }
-
-        if (!availableLocations.containsKey(targetBiome)) {
-            player.sendMessage(Messages.error.NO_LOCATIONS_FOR_BIOME);
-            return;
-        }
-
-        String islandId = null;
-
-        try {
-            islandId = plugin.islands.createNewIsland(targetBiome, islandSize, player);
-        } catch (IllegalArgumentException e) {
-            player.sendMessage(Messages.error.NO_LOCATIONS_FOR_BIOME);
-
-            return;
-        }
-
-        if (islandId == null) {
-            player.sendMessage(Messages.error.ONGOING_QUEUE_EVENT);
-            return;
-        }
-
-        player.sendTitle(Messages.success.ISLAND_GEN_TITLE, Messages.success.ISLAND_GEN_SUBTITLE, 10, 20 * 7, 10);
-    }
-
-    @NotNull
-    private Islands.IslandSize parseIslandSize(String size) {
-        for (Islands.IslandSize targetSize : Islands.IslandSize.values()) {
-            if (targetSize.name().equalsIgnoreCase(size)) {
-                return targetSize;
-            }
-        }
-
-        return Islands.IslandSize.NORMAL;
-    }
-
-    private void regenerateIsland(Player player, String[] args, boolean confirmed) {
-        HashMap<Biome, List<Location>> availableLocations = plugin.islands.islandGeneration.biomes.availableLocations;
-
-        if (!Permissions.checkPermission(player, Permissions.island.regenerate)) {
-            player.sendMessage(Messages.error.NO_PERMISSION);
-            return;
-        }
-
-        Islands.IslandSize islandSize = args.length == 3 ? parseIslandSize(args[2]) : Islands.IslandSize.NORMAL;
-
-        String permissionRequired;
-
-        switch (islandSize) {
-            case BIG:
-                permissionRequired = Permissions.island.createBig;
-                break;
-            case SMALL:
-                permissionRequired = Permissions.island.createSmall;
-                break;
-            case NORMAL:
-            default:
-                permissionRequired = Permissions.island.createNormal;
-                break;
-        }
-
-        if (!Permissions.checkPermission(player, permissionRequired)) {
-            player.sendMessage(Messages.error.NO_PERMISSION);
-            return;
-        }
-
-        if (!player.getWorld().equals(plugin.islandsWorld)) {
-            player.sendMessage(Messages.error.WRONG_WORLD);
-            return;
-        }
-
-        if (args.length < 2) {
-            player.sendMessage(Messages.help.REGENERATE);
-
-            for (Biome biome : availableLocations.keySet()) {
-                if (availableLocations.get(biome).size() > 0) {
-                    player.sendMessage(ChatColor.GOLD + biome.toString() + ChatColor.GREEN +  " has " + ChatColor.GOLD
-                            +  availableLocations.get(biome).size() + ChatColor.GREEN +  " island variations available.");
-                }
-            }
-
-            return;
-        }
-
-        String islandId = grid.getIslandId(player.getLocation().getBlockX(), player.getLocation().getBlockZ());
-
-        if (islandId == null ||
-                (!plugin.getIslandsConfig().getString("islands." + islandId + ".UUID").equals(player.getUniqueId().toString())
-                && !Permissions.checkPermission(player, Permissions.bypass.regenerate))) {
-            player.sendMessage(Messages.error.UNAUTHORIZED);
-            return;
-        }
-
-        Biome targetBiome = getTargetBiome(args[1]);
-
-        if (targetBiome == null) {
-            player.sendMessage(Messages.error.NO_BIOME_FOUND);
-            return;
-        }
-
-        if (!plugin.islands.islandGeneration.biomes.availableLocations.containsKey(targetBiome)) {
-            player.sendMessage(Messages.error.NO_LOCATIONS_FOR_BIOME);
-            return;
-        }
-
-        if (!confirmed) {
-            player.sendMessage(Messages.info.CONFIRM);
-            return;
-        }
-
-        try {
-            boolean success = plugin.islands.regenerateIsland(islandId, targetBiome, islandSize, player);
-
-            if (!success) {
-                player.sendMessage(Messages.error.ONGOING_QUEUE_EVENT);
-                return;
-            }
-
-            player.sendTitle(Messages.success.ISLAND_GEN_TITLE, Messages.success.ISLAND_GEN_SUBTITLE, 10, 20 * 7, 10);
-        } catch (IllegalArgumentException e) {
-            player.sendMessage(Messages.error.NO_LOCATIONS_FOR_BIOME);
-        }
-    }
-
-    private static class Messages {
-        public static class error {
-            public static final String UNAUTHORIZED = error("You don't own this island.");
-            public static final String NOT_PUBLIC = error("The island must be public");
-            public static final String NO_PLAYER_FOUND = error("No given player found.");
-            public static final String NAME_TAKEN = error("That name is already taken.");
-            public static final String ONGOING_QUEUE_EVENT = error("Wait for your current queue event to finish.");
-            public static final String NAME_BLOCKED = error("You can't use that name");
-            public static final String NO_PERMISSION = error("You don't have permission to use that command.");
-            public static final String ISLAND_LIMIT = error("You already have maximum amount of islands.");
-            public static final String WRONG_WORLD = error("You can't use that command in this world.");
-            public static String ISLAND_GEN_FAILED = error("Island regeneration failed.");
-            public static String TELEPORT_FAILED = error("Could not teleport.");
-            public static String NO_BIOME_FOUND = error("Biome not found.");
-            public static String NO_LOCATIONS_FOR_BIOME = error("No available locations for specified biome.");
-        }
-
-        public static class success {
-            public static final String DELETED = success("Island deleted successfully. It will be overwritten when someone creates a new island.");
-            public static final String UNNAMED = success("Island unnamed and made private.");
-            public static final String ISLAND_GEN_TITLE = ChatColor.GOLD + "Island generation event added to queue.";
-            public static final String ISLAND_GEN_SUBTITLE = ChatColor.GOLD + "Explore the wilderness while your island is being generated. Use /home to access your island.";
-            public static String ISLAND_GEN = success("Island generation started.");
-
-            public static String OWNER_CHANGED(String name) {
-                return success("Island owner switched to " + name + ".");
-            }
-
-            public static String NAME_CHANGED(String name) {
-                return success("Island name changed to " + name + ". Anyone with your island name can now visit it.");
-            }
-
-            public static String ISLAND_RECEIVED(String playerName, String islandName) {
-                return success("You are now the owner of " + playerName + "'s island " + islandName + ".");
-            }
-        }
-
-        public static class info {
-            public static final String CONFIRM = info("Are you sure? Repeat the command to confirm.");
-        }
-
-        public static class help {
-            public static String CREATE = ChatColor.GRAY + "/island create <biome> (<BIG/NORMAL/SMALL>)";
-            public static String REGENERATE = ChatColor.GRAY + "/island regenerate <biome> (<BIG/NORMAL/SMALL>) (You have to be on target island)";
-            public static String NAME = ChatColor.GRAY + "/island name <name> (You have to be on target island)";
-            public static String UNNAME = ChatColor.GRAY + "/island unname (You have to be on target island)";
-            public static String GIVE = ChatColor.GRAY + "/island give <name> (You have to be on target island)";
-            public static String DELETE = ChatColor.GRAY + "/island delete (You have to be on target island)";
+             return targetBiome;
         }
     }
 }

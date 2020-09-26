@@ -1,6 +1,5 @@
 package me.aleksilassila.islands;
 
-import me.aleksilassila.islands.commands.GoCommand;
 import me.aleksilassila.islands.commands.IslandCommands;
 import me.aleksilassila.islands.commands.IslandManagmentCommands;
 import me.aleksilassila.islands.generation.EmptyWorldGenerator;
@@ -60,7 +59,6 @@ public class Main extends JavaPlugin {
         islandCommands.new TrustCommand();
         islandCommands.new UntrustCommand();
 
-        new GoCommand(this);
         new IslandsListener(this);
 
         getLogger().info("Islands enabled!");

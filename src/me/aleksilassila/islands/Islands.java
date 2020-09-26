@@ -1,9 +1,11 @@
 package me.aleksilassila.islands;
 
+import com.sun.istack.internal.NotNull;
 import com.sun.istack.internal.Nullable;
 import me.aleksilassila.islands.generation.IslandGeneration;
 import me.aleksilassila.islands.generation.IslandGrid;
 import me.aleksilassila.islands.utils.ConfirmItem;
+import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.block.Biome;
 import org.bukkit.entity.Player;
@@ -50,6 +52,7 @@ public class Islands {
         }
     }
 
+    @NotNull
     public int parseIslandSize(IslandSize size) {
         switch (size) {
             case SMALL:
@@ -75,7 +78,10 @@ public class Islands {
                     islandSize,
                     plugin.getIslandsConfig().getInt("islands." + islandId + ".x"),
                     plugin.getIslandsConfig().getInt("islands." + islandId + ".y"),
-                    plugin.getIslandsConfig().getInt("islands." + islandId + ".z")
+                    plugin.getIslandsConfig().getInt("islands." + islandId + ".z"),
+                    false,
+                    0,
+                    0
             );
 
             if (!success) {
@@ -91,8 +97,9 @@ public class Islands {
 
     }
 
-    public boolean regenerateIsland(String islandId, Biome biome, IslandSize islandSize, Player player) throws IllegalArgumentException {
+    public boolean regenerateIsland(String islandId, Biome biome, IslandSize islandSize, Player player, boolean shouldClearArea) throws IllegalArgumentException {
         grid.updateIslandSize(islandId, parseIslandSize(islandSize));
+        Bukkit.getLogger().info("Should clear " + shouldClearArea);
 
         try {
             boolean success = islandGeneration.copyIsland(
@@ -101,7 +108,10 @@ public class Islands {
                     parseIslandSize(islandSize),
                     plugin.getIslandsConfig().getInt("islands." + islandId + ".x"),
                     plugin.getIslandsConfig().getInt("islands." + islandId + ".y"),
-                    plugin.getIslandsConfig().getInt("islands." + islandId + ".z")
+                    plugin.getIslandsConfig().getInt("islands." + islandId + ".z"),
+                    shouldClearArea,
+                    plugin.getIslandsConfig().getInt("islands." + islandId + ".xIndex"),
+                    plugin.getIslandsConfig().getInt("islands." + islandId + ".zIndex")
             );
 
             return success;

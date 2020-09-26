@@ -14,7 +14,7 @@ public class IslandGrid {
     private Islands islands;
 
     private int islandsInARow;
-    private int islandSpacing;
+    public int islandSpacing;
 
     public IslandGrid(Islands instance) {
         this.islands = instance;

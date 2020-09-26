@@ -3,6 +3,7 @@ package me.aleksilassila.islands.generation;
 import com.sun.istack.internal.Nullable;
 import me.aleksilassila.islands.Islands;
 import me.aleksilassila.islands.utils.ChatUtils;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Biome;
@@ -25,6 +26,7 @@ public class IslandGeneration {
     public IslandGeneration(Islands islands) {
         this.islands = islands;
         this.biomes = new Biomes(islands.sourceWorld, islands.plugin);
+
         double delay = islands.plugin.getConfig().getDouble("generation.generationDelayInTicks");
 
         if (delay < 1.0) {
@@ -66,9 +68,17 @@ public class IslandGeneration {
         private final int targetY;
         private final int targetZ;
         private final int islandSize;
+
         private int index;
 
-        public CopyTask(Player player, int startX, int startY, int startZ, int targetX, int targetY, int targetZ, int islandSize) {
+        private boolean clearingArea;
+        private int clearingIndex;
+
+        private final int xIndex;
+        private final int zIndex;
+
+
+        public CopyTask(Player player, int startX, int startY, int startZ, int targetX, int targetY, int targetZ, int islandSize, boolean shouldClearArea, int xIndex, int zIndex) {
             this.startX = startX;
             this.startY = startY;
             this.startZ = startZ;
@@ -77,12 +87,51 @@ public class IslandGeneration {
             this.targetZ = targetZ;
             this.islandSize = islandSize;
             this.player = player;
+            this.clearingArea = shouldClearArea;
+            this.clearingIndex = 0;
+            this.xIndex = xIndex;
+            this.zIndex = zIndex;
 
             this.index = 0;
         }
 
         @Override
         public void run() {
+            if (clearingArea) {
+                for (int count = 0; count < rowsBuiltPerDelay; count++) {
+                    for (int y = startY; y < startY + islands.grid.islandSpacing; y++) {
+                        int relativeX = clearingIndex / islands.grid.islandSpacing;
+                        int relativeZ = clearingIndex - relativeX * islands.grid.islandSpacing;
+
+                        Block target = islands.plugin.islandsWorld.getBlockAt(
+                                xIndex * islands.grid.islandSpacing + relativeX,
+                                targetY + (y - startY),
+                                zIndex * islands.grid.islandSpacing + relativeZ
+                        );
+
+                        target.setType(Material.AIR);
+                        target.setBiome(Biome.PLAINS);
+                    }
+
+                    if (clearingIndex >= islands.grid.islandSpacing * islands.grid.islandSpacing) {
+                        player.sendMessage(Messages.Success.CLEARING_DONE);
+
+                        clearingArea = false;
+                        break;
+                    } else if (clearingIndex == islands.grid.islandSpacing * islands.grid.islandSpacing / 4) {
+                        player.sendMessage(Messages.Info.CLEARING_STATUS(25));
+                    } else if (clearingIndex == islands.grid.islandSpacing * islands.grid.islandSpacing / 2) {
+                        player.sendMessage(Messages.Info.CLEARING_STATUS(50));
+                    } else if (clearingIndex == islands.grid.islandSpacing * islands.grid.islandSpacing / 4 * 3) {
+                        player.sendMessage(Messages.Info.CLEARING_STATUS(75));
+                    }
+
+                    clearingIndex++;
+                }
+
+                return;
+            }
+
             loop:
             for (int count = 0; count < rowsBuiltPerDelay; count++) {
                 for (int y = startY; y < startY + islandSize; y++) {
@@ -134,7 +183,7 @@ public class IslandGeneration {
         }
     }
 
-    public boolean copyIsland(Player player, Biome biome, int islandSize, int targetX, int targetY, int targetZ) throws IllegalArgumentException {
+    public boolean copyIsland(Player player, Biome biome, int islandSize, int targetX, int targetY, int targetZ, boolean shouldClearArea, int xIndex, int zIndex) throws IllegalArgumentException {
         if (queue.size() > 0 && queue.get(0).player.getUniqueId().toString().equals(player.getUniqueId().toString())) {
             return false;
         }
@@ -168,9 +217,8 @@ public class IslandGeneration {
         int startY = centerY - islandSize / 2;
         int startZ = sourceLocation.getBlockZ();
 
-        CopyTask task = new CopyTask(player, startX, startY, startZ, targetX, targetY, targetZ, islandSize);
+        CopyTask task = new CopyTask(player, startX, startY, startZ, targetX, targetY, targetZ, islandSize, shouldClearArea, xIndex, zIndex);
 
-        // Copy blocks
         if (queue.size() == 0) {
             task.runTaskTimer(islands.plugin, 0, buildDelay);
         }
@@ -199,6 +247,7 @@ public class IslandGeneration {
         static class Success {
 
             public static final String GENERATION_DONE = success("Island generation completed.");
+            public static final String CLEARING_DONE = success("Island clearing done.");
         }
 
         static class Info {
@@ -212,6 +261,10 @@ public class IslandGeneration {
 
             public static String GENERATION_STATUS(int status) {
                 return info("Your generation event is " + status + "% completed.");
+            }
+
+            public static String CLEARING_STATUS(int status) {
+                return info("Clearing event " + status + "% completed.");
             }
         }
     }
