@@ -8,6 +8,10 @@ import me.aleksilassila.islands.utils.Messages;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 public class giveSubcommand extends Subcommand {
     private Main plugin;
     private IslandGrid grid;
@@ -68,6 +72,15 @@ public class giveSubcommand extends Subcommand {
             player.sendMessage(Messages.error.UNAUTHORIZED);
         }
 
+    }
+
+    @Override
+    public List<String> onTabComplete(Player player, String[] args) {
+        if (args.length == 1) {
+            return new ArrayList<String>(Arrays.asList("<name>"));
+        }
+
+        return null;
     }
 
     @Override

@@ -12,6 +12,8 @@ import org.bukkit.Location;
 import org.bukkit.block.Biome;
 import org.bukkit.entity.Player;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
@@ -119,6 +121,24 @@ public class regenerateSubcommand extends Subcommand {
         } catch (IllegalArgumentException e) {
             player.sendMessage(Messages.error.NO_LOCATIONS_FOR_BIOME);
         }
+    }
+
+    @Override
+    public List<String> onTabComplete(Player player, String[] args) {
+        if (args.length == 1) {
+            HashMap<Biome, List<Location>> availableLocations = plugin.islands.islandGeneration.biomes.availableLocations;
+            List<String> availableArgs = new ArrayList<>();
+
+            for (Biome biome : availableLocations.keySet()) {
+                availableArgs.add(biome.name());
+            }
+
+            return availableArgs;
+        } else if (args.length == 2) {
+            return new ArrayList<>(Arrays.asList("BIG", "NORMAL", "SMALL"));
+        }
+
+        return null;
     }
 
     @Override

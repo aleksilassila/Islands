@@ -10,17 +10,17 @@ import me.aleksilassila.islands.generation.IslandGrid;
 import me.aleksilassila.islands.utils.ChatUtils;
 import me.aleksilassila.islands.utils.ConfirmItem;
 import me.aleksilassila.islands.utils.Messages;
+import org.bukkit.Bukkit;
 import org.bukkit.block.Biome;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.command.TabExecutor;
 import org.bukkit.entity.Player;
 
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
-public class IslandManagmentCommands extends ChatUtils implements CommandExecutor {
+public class IslandManagmentCommands extends ChatUtils implements TabExecutor {
     private final Main plugin;
     private final IslandGrid grid;
     private Set<Subcommand> subcommands;
@@ -107,6 +107,28 @@ public class IslandManagmentCommands extends ChatUtils implements CommandExecuto
         player.sendMessage(Messages.help.NAME);
         player.sendMessage(Messages.help.UNNAME);
         player.sendMessage(Messages.help.GIVE);
+    }
+
+    @Override
+    public List<String> onTabComplete(CommandSender sender, Command command, String label, String[] args) {
+        if (!(sender instanceof Player)) return null;
+
+        Player player = (Player) sender;
+
+        List<String> avalableArgs = new ArrayList<>();
+
+        if (args.length == 1) {
+            for (Subcommand subcommand : subcommands) {
+                avalableArgs.add(subcommand.getName());
+            }
+        } else if (args.length > 1) {
+            Subcommand currentSubcommand = getSubcommand(args[0]);
+            if (currentSubcommand == null) return null;
+
+            avalableArgs = currentSubcommand.onTabComplete(player, Arrays.copyOfRange(args, 1, args.length));
+        }
+
+        return avalableArgs;
     }
 
     public static class Utils {

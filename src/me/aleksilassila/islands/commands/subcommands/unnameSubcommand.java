@@ -7,6 +7,8 @@ import me.aleksilassila.islands.generation.IslandGrid;
 import me.aleksilassila.islands.utils.Messages;
 import org.bukkit.entity.Player;
 
+import java.util.List;
+
 public class unnameSubcommand extends Subcommand {
     private Main plugin;
     private IslandGrid grid;
@@ -48,6 +50,11 @@ public class unnameSubcommand extends Subcommand {
         } else {
             player.sendMessage(Messages.error.UNAUTHORIZED);
         }
+    }
+
+    @Override
+    public List<String> onTabComplete(Player player, String[] args) {
+        return null;
     }
 
     @Override

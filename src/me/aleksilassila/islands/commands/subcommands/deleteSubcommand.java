@@ -7,6 +7,8 @@ import me.aleksilassila.islands.generation.IslandGrid;
 import me.aleksilassila.islands.utils.Messages;
 import org.bukkit.entity.Player;
 
+import java.util.List;
+
 public class deleteSubcommand extends Subcommand {
     private Main plugin;
     private IslandGrid grid;
@@ -47,6 +49,11 @@ public class deleteSubcommand extends Subcommand {
 
         grid.deleteIsland(islandId);
         player.sendMessage(Messages.success.DELETED);
+    }
+
+    @Override
+    public List<String> onTabComplete(Player player, String[] args) {
+        return null;
     }
 
     @Override

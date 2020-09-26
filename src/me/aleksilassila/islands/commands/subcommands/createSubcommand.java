@@ -7,12 +7,15 @@ import me.aleksilassila.islands.commands.IslandManagmentCommands;
 import me.aleksilassila.islands.commands.Subcommand;
 import me.aleksilassila.islands.generation.IslandGrid;
 import me.aleksilassila.islands.utils.Messages;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.block.Biome;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
@@ -119,6 +122,24 @@ public class createSubcommand extends Subcommand {
         }
 
         player.sendTitle(Messages.success.ISLAND_GEN_TITLE, Messages.success.ISLAND_GEN_SUBTITLE, 10, 20 * 7, 10);
+    }
+
+    @Override
+    public List<String> onTabComplete(Player player, String[] args) {
+        if (args.length == 1) {
+            HashMap<Biome, List<Location>> availableLocations = plugin.islands.islandGeneration.biomes.availableLocations;
+            List<String> availableArgs = new ArrayList<>();
+
+            for (Biome biome : availableLocations.keySet()) {
+                availableArgs.add(biome.name());
+            }
+
+            return availableArgs;
+        } else if (args.length == 2) {
+            return new ArrayList<>(Arrays.asList("BIG", "NORMAL", "SMALL"));
+        }
+
+        return null;
     }
 
     @Override
