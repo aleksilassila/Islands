@@ -34,7 +34,7 @@ public class Main extends JavaPlugin {
     @Override
     public void onEnable() {
         if (!setupPermissions()) {
-            Bukkit.getLogger().severe("No Vault found. Permissions disabled.");
+            Bukkit.getLogger().severe("No Vault found. Some permissions disabled.");
             getServer().getPluginManager().disablePlugin(this);
             return;
         }

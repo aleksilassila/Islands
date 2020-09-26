@@ -1,7 +1,28 @@
 package me.aleksilassila.islands;
 
+import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
+
+import java.util.Arrays;
+
 public class Permissions {
-    public static class Bypass {
+    public static boolean checkPermission(Player player, String permission) {
+        if (player.hasPermission(permission)) return true;
+
+        String[] parts = permission.split("\\.");
+
+        Bukkit.getLogger().info("Parts: " + String.join(" ", parts));
+
+        for (int index = 0; index < parts.length; index++) {
+            String joined = String.join(".", Arrays.copyOfRange(parts, 0, index + 1));
+            Bukkit.getLogger().info("Starred: " + joined + ".*");
+            if (player.hasPermission(joined + ".*")) return true;
+        }
+
+        return false;
+    }
+
+    public static class bypass {
         public static final String create = "islands.bypass.islandLimit";       // Create unlimited islands
         public static final String regenerate = "islands.bypass.regenerate";    // Regenerate any island
         public static final String delete = "islands.bypass.delete";            // Delete any island

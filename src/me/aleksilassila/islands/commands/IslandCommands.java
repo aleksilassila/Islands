@@ -41,7 +41,7 @@ public class IslandCommands {
 
             plugin.islands.confirmations.remove(player.getUniqueId().toString());
 
-            if (!player.hasPermission(Permissions.island.untrust)) {
+            if (!Permissions.checkPermission(player, Permissions.island.untrust)) {
                 player.sendMessage(Messages.error.NO_PERMISSION);
                 return true;
             }
@@ -66,7 +66,7 @@ public class IslandCommands {
                 return true;
             }
 
-            if (!ownerUUID.equals(player.getUniqueId().toString()) && !player.hasPermission(Permissions.Bypass.untrust)) {
+            if (!ownerUUID.equals(player.getUniqueId().toString()) && !Permissions.checkPermission(player, Permissions.bypass.untrust)) {
                 player.sendMessage(Messages.error.NOT_OWNED);
                 return true;
             }
@@ -99,7 +99,7 @@ public class IslandCommands {
 
             plugin.islands.confirmations.remove(player.getUniqueId().toString());
 
-            if (!player.hasPermission(Permissions.island.trust)) {
+            if (!Permissions.checkPermission(player, Permissions.island.trust)) {
                 player.sendMessage(Messages.error.NO_PERMISSION);
                 return true;
             }
@@ -117,7 +117,7 @@ public class IslandCommands {
                 return true;
             }
 
-            if (!ownerUUID.equals(player.getUniqueId().toString()) && !player.hasPermission(Permissions.Bypass.trust)) {
+            if (!ownerUUID.equals(player.getUniqueId().toString()) && !Permissions.checkPermission(player, Permissions.bypass.trust)) {
                 player.sendMessage(Messages.error.NOT_OWNED);
                 return true;
             }
@@ -154,7 +154,7 @@ public class IslandCommands {
 
             plugin.islands.confirmations.remove(player.getUniqueId().toString());
 
-            if (!player.hasPermission(Permissions.island.visit)) {
+            if (!Permissions.checkPermission(player, Permissions.island.visit)) {
                 player.sendMessage(Messages.error.NO_PERMISSION);
                 return true;
             }
@@ -199,7 +199,7 @@ public class IslandCommands {
             plugin.islands.confirmations.remove(player.getUniqueId().toString());
 
             if (args.length == 1 && args[0].equalsIgnoreCase("list") || label.equalsIgnoreCase("homes")) {
-                if (!player.hasPermission(Permissions.island.listHomes)) {
+                if (!Permissions.checkPermission(player, Permissions.island.listHomes)) {
                     player.sendMessage(Messages.error.NO_PERMISSION);
                     return true;
                 }
@@ -215,7 +215,7 @@ public class IslandCommands {
 
                 return true;
             } else {
-                if (!player.hasPermission(Permissions.island.home)) {
+                if (!Permissions.checkPermission(player, Permissions.island.home)) {
                     player.sendMessage(Messages.error.NO_PERMISSION);
                     return true;
                 }
@@ -235,12 +235,12 @@ public class IslandCommands {
                 }
             }
 
-            if (player.getWorld().getName().equals("world_nether") && !player.hasPermission(Permissions.Bypass.home)) {
+            if (player.getWorld().getName().equals("world_nether") && !Permissions.checkPermission(player, Permissions.bypass.home)) {
                 player.sendMessage(Messages.info.IN_OVERWORLD);
                 return true;
             }
 
-            if (player.getWorld().getName().equals("world") && !player.hasPermission(Permissions.Bypass.home)) {
+            if (player.getWorld().getName().equals("world") && !Permissions.checkPermission(player, Permissions.bypass.home)) {
                 // Check if is on surface
                 Location playerLocation = player.getLocation();
 

@@ -38,7 +38,7 @@ public class IslandManagmentCommands extends ChatUtils implements CommandExecuto
         if (sender instanceof Player) {
             Player player = (Player) sender;
 
-            if (!player.hasPermission(Permissions.island.island)) {
+            if (!Permissions.checkPermission(player, Permissions.island.island)) {
                 player.sendMessage(Messages.error.NO_PERMISSION);
                 return true;
             }
@@ -92,7 +92,7 @@ public class IslandManagmentCommands extends ChatUtils implements CommandExecuto
     }
 
     private void deleteIsland(Player player, String[] args, boolean confirmed) {
-        if (!player.hasPermission(Permissions.island.delete)) {
+        if (!Permissions.checkPermission(player, Permissions.island.delete)) {
             player.sendMessage(Messages.error.NO_PERMISSION);
             return;
         }
@@ -110,7 +110,7 @@ public class IslandManagmentCommands extends ChatUtils implements CommandExecuto
         }
 
         if (!plugin.getIslandsConfig().getString("islands." + islandId + ".UUID").equals(player.getUniqueId().toString())
-                && !player.hasPermission(Permissions.Bypass.delete)) {
+                && !Permissions.checkPermission(player, Permissions.bypass.delete)) {
             player.sendMessage(Messages.error.UNAUTHORIZED);
         }
 
@@ -135,7 +135,7 @@ public class IslandManagmentCommands extends ChatUtils implements CommandExecuto
     }
 
     private void giveIsland(Player player, String[] args, Boolean confirmed) {
-        if (!player.hasPermission(Permissions.island.give)) {
+        if (!Permissions.checkPermission(player, Permissions.island.give)) {
             player.sendMessage(Messages.error.NO_PERMISSION);
             return;
         }
@@ -166,7 +166,7 @@ public class IslandManagmentCommands extends ChatUtils implements CommandExecuto
         }
 
         if (plugin.getIslandsConfig().getString("islands." + islandId + ".UUID").equals(player.getUniqueId().toString())
-                || player.hasPermission(Permissions.Bypass.give)) {
+                || Permissions.checkPermission(player, Permissions.bypass.give)) {
             if (plugin.getIslandsConfig().getInt("islands." + islandId + ".public") == 1) {
                 if (!confirmed) {
                     player.sendMessage(Messages.info.CONFIRM);
@@ -186,7 +186,7 @@ public class IslandManagmentCommands extends ChatUtils implements CommandExecuto
     }
 
     private void unnameIsland(Player player, String[] args) {
-        if (!player.hasPermission(Permissions.island.unname)) {
+        if (!Permissions.checkPermission(player, Permissions.island.unname)) {
             player.sendMessage(Messages.error.NO_PERMISSION);
             return;
         }
@@ -209,7 +209,7 @@ public class IslandManagmentCommands extends ChatUtils implements CommandExecuto
         }
 
         if (plugin.getIslandsConfig().getString("islands." + islandId + ".UUID").equals(player.getUniqueId().toString())
-                || player.hasPermission(Permissions.Bypass.unname)) {
+                || Permissions.checkPermission(player, Permissions.bypass.unname)) {
             grid.unnameIsland(islandId);
 
             player.sendMessage(Messages.success.UNNAMED);
@@ -219,7 +219,7 @@ public class IslandManagmentCommands extends ChatUtils implements CommandExecuto
     }
 
     private void nameIsland(Player player, String[] args) {
-        if (!player.hasPermission(Permissions.island.name)) {
+        if (!Permissions.checkPermission(player, Permissions.island.name)) {
             player.sendMessage(Messages.error.NO_PERMISSION);
             return;
         }
@@ -242,7 +242,7 @@ public class IslandManagmentCommands extends ChatUtils implements CommandExecuto
         }
 
         if (plugin.getIslandsConfig().getString("islands." + islandId + ".UUID").equals(player.getUniqueId().toString())
-                || player.hasPermission(Permissions.Bypass.name)) {
+                || Permissions.checkPermission(player, Permissions.bypass.name)) {
             if (grid.getPublicIsland(args[1]) != null) {
                 player.sendMessage(Messages.error.NAME_TAKEN);
                 return;
@@ -275,7 +275,7 @@ public class IslandManagmentCommands extends ChatUtils implements CommandExecuto
     }
 
     private void createIsland(Player player, String[] args) {
-        if (!player.hasPermission(Permissions.island.create)) {
+        if (!Permissions.checkPermission(player, Permissions.island.create)) {
             player.sendMessage(Messages.error.NO_PERMISSION);
             return;
         }
@@ -297,7 +297,7 @@ public class IslandManagmentCommands extends ChatUtils implements CommandExecuto
                 break;
         }
 
-        if (!player.hasPermission(permissionRequired)) {
+        if (!Permissions.checkPermission(player, permissionRequired)) {
             player.sendMessage(Messages.error.NO_PERMISSION);
             return;
         }
@@ -332,7 +332,7 @@ public class IslandManagmentCommands extends ChatUtils implements CommandExecuto
             }
         }
 
-        if (previousIslands >= islandsLimit && !player.hasPermission(Permissions.Bypass.create)) {
+        if (previousIslands >= islandsLimit && !Permissions.checkPermission(player, Permissions.bypass.create)) {
             player.sendMessage(Messages.error.ISLAND_LIMIT);
             return;
         }
@@ -381,7 +381,7 @@ public class IslandManagmentCommands extends ChatUtils implements CommandExecuto
     private void regenerateIsland(Player player, String[] args, boolean confirmed) {
         HashMap<Biome, List<Location>> availableLocations = plugin.islands.islandGeneration.biomes.availableLocations;
 
-        if (!player.hasPermission(Permissions.island.regenerate)) {
+        if (!Permissions.checkPermission(player, Permissions.island.regenerate)) {
             player.sendMessage(Messages.error.NO_PERMISSION);
             return;
         }
@@ -403,7 +403,7 @@ public class IslandManagmentCommands extends ChatUtils implements CommandExecuto
                 break;
         }
 
-        if (!player.hasPermission(permissionRequired)) {
+        if (!Permissions.checkPermission(player, permissionRequired)) {
             player.sendMessage(Messages.error.NO_PERMISSION);
             return;
         }
@@ -430,7 +430,7 @@ public class IslandManagmentCommands extends ChatUtils implements CommandExecuto
 
         if (islandId == null ||
                 (!plugin.getIslandsConfig().getString("islands." + islandId + ".UUID").equals(player.getUniqueId().toString())
-                && !player.hasPermission(Permissions.Bypass.regenerate))) {
+                && !Permissions.checkPermission(player, Permissions.bypass.regenerate))) {
             player.sendMessage(Messages.error.UNAUTHORIZED);
             return;
         }
