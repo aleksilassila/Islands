@@ -68,8 +68,11 @@ public class Main extends JavaPlugin {
 
     private boolean setupPermissions() {
         RegisteredServiceProvider<Permission> rsp = getServer().getServicesManager().getRegistration(Permission.class);
-        perms = rsp.getProvider();
-        return perms != null;
+        if (rsp != null) {
+            perms = rsp.getProvider();
+            return true;
+        }
+        return false;
     }
 
     @Override

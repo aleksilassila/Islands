@@ -3,6 +3,7 @@ version: 1.0
 author: Aleksi Lassila
 main: me.aleksilassila.islands.Main
 api-version: 1.16
+softdepend: [Vault]
 commands:
   go:
     description: Your description
