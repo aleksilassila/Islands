@@ -57,6 +57,8 @@ Players can trust other players to play together.
 
 ### Example Islands
 
+![biome](screenshots/islandTypes/badlands.png?raw=true)
+
 ![biome](screenshots/islandTypes/desert_small.png?raw=true)
 
 ![biome](screenshots/islandTypes/jungle.png?raw=true)
