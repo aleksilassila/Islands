@@ -8,7 +8,7 @@ that can be reset often without losing players' progress.
 - Solves griefing and map resetting entirely.
 - Create islands with any overworld biome
 - Customizable island sizes
-- Griefing protection
+- Island protection
 - Visiting other people's islands
   * Tip for admins: `/island name spawn` for accessing spawn via `/vi spawn`
 - Customizable generation settings and speed, optimize for any hardware

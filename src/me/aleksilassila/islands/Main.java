@@ -61,6 +61,9 @@ public class Main extends JavaPlugin {
 
         new IslandsListener(this);
 
+        int pluginId = 8974; // <-- Replace with the id of your plugin!
+        Metrics metrics = new Metrics(this, pluginId);
+
         getLogger().info("Islands enabled!");
     }
 
