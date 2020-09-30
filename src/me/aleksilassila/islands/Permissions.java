@@ -11,11 +11,8 @@ public class Permissions {
 
         String[] parts = permission.split("\\.");
 
-        Bukkit.getLogger().info("Parts: " + String.join(" ", parts));
-
         for (int index = 0; index < parts.length; index++) {
             String joined = String.join(".", Arrays.copyOfRange(parts, 0, index + 1));
-            Bukkit.getLogger().info("Starred: " + joined + ".*");
             if (player.hasPermission(joined + ".*")) return true;
         }
 

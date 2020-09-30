@@ -110,7 +110,7 @@ To further customize the plugin, check `plugins/islands/config.yml`.
 | `islands.home`          | Use /home command                 |
 | `islands.home.list`     | Use /homes command                |
 | `islands.turst`         | Trust person                      |
-| `islands.turst.list`    | Not implemented                   |
+| `islands.turst.list`    | List island's trusted players     |
 | `islands.untrust`       | Untrust person                    |
 | `islands.visit`         | Visit island                      |
 
@@ -125,6 +125,7 @@ Bypasses
 | `islands.bypass.name`        | Name anyone's island                       |
 | `islands.bypass.unname`      | Unname anyone's island                     |
 | `islands.bypass.trust`       | Add trusted person to anyone's island      |
+| `islands.bypass.trust.list`  | List any island's trusted players          |
 | `islands.bypass.untrust`     | Remove trusted person from anyone's island |
 | `islands.bypass.protection`  | Interact with anyone's island              |
 | `islands.bypass.home`        | Use /home from anywhere                    |

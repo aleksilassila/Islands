@@ -1,13 +1,10 @@
 name: Islands
-version: 1.0
+version: 1.1
 author: Aleksi Lassila
 main: me.aleksilassila.islands.Main
 api-version: 1.16
 softdepend: [Vault]
 commands:
-  go:
-    description: Your description
-    usage: /<command>
   island:
     description: Island managment
     usage: /<command> biome
@@ -24,7 +21,10 @@ commands:
     usage: /<command>
   trust:
     description: Trust a player
+    usage: /<command> player
+  trusted:
+    description: List trusted players
     usage: /<command>
   untrust:
     description: Untrust a player
-    usage: /<command>
+    usage: /<command> player

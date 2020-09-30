@@ -28,115 +28,6 @@ public class IslandCommands {
         this.grid = plugin.islands.grid;
     }
 
-    public class UntrustCommand implements CommandExecutor {
-        public UntrustCommand() {
-            plugin.getCommand("untrust").setExecutor(this);
-        }
-
-        @Override
-        public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-            if (!(sender instanceof Player)) return false;
-
-            Player player = (Player) sender;
-
-            plugin.islands.confirmations.remove(player.getUniqueId().toString());
-
-            if (!Permissions.checkPermission(player, Permissions.island.untrust)) {
-                player.sendMessage(Messages.error.NO_PERMISSION);
-                return true;
-            }
-
-
-            if (!player.getWorld().equals(plugin.islandsWorld)) {
-                player.sendMessage(Messages.error.WRONG_WORLD);
-                return true;
-            }
-
-
-            if (args.length != 1) {
-                player.sendMessage(Messages.help.UNTRUST);
-                return true;
-            }
-
-            String ownerUUID = plugin.islands.grid.getBlockOwnerUUID(player.getLocation().getBlockX(), player.getLocation().getBlockZ());
-            String islandId = plugin.islands.grid.getIslandId(player.getLocation().getBlockX(), player.getLocation().getBlockZ());
-
-            if (ownerUUID == null || islandId == null) {
-                player.sendMessage(Messages.error.NOT_ON_ISLAND);
-                return true;
-            }
-
-            if (!ownerUUID.equals(player.getUniqueId().toString()) && !Permissions.checkPermission(player, Permissions.bypass.untrust)) {
-                player.sendMessage(Messages.error.NOT_OWNED);
-                return true;
-            }
-
-            Player targetPlayer = Bukkit.getPlayer(args[0]);
-
-            if (targetPlayer == null) {
-                player.sendMessage(Messages.error.PLAYER_NOT_FOUND);
-                return true;
-            }
-
-            plugin.islands.grid.removeTrusted(islandId, targetPlayer.getUniqueId().toString());
-
-            player.sendMessage(Messages.success.UNTRUSTED);
-
-            return true;
-        }
-    }
-
-    public class TrustCommand implements CommandExecutor {
-        public TrustCommand() {
-            plugin.getCommand("trust").setExecutor(this);
-        }
-
-        @Override
-        public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-            if (!(sender instanceof Player)) return false;
-
-            Player player = (Player) sender;
-
-            plugin.islands.confirmations.remove(player.getUniqueId().toString());
-
-            if (!Permissions.checkPermission(player, Permissions.island.trust)) {
-                player.sendMessage(Messages.error.NO_PERMISSION);
-                return true;
-            }
-
-            if (args.length != 1) {
-                player.sendMessage(Messages.help.TRUST);
-                return true;
-            }
-
-            String ownerUUID = plugin.islands.grid.getBlockOwnerUUID(player.getLocation().getBlockX(), player.getLocation().getBlockZ());
-            String islandId = plugin.islands.grid.getIslandId(player.getLocation().getBlockX(), player.getLocation().getBlockZ());
-
-            if (ownerUUID == null || islandId == null) {
-                player.sendMessage(Messages.error.NOT_ON_ISLAND);
-                return true;
-            }
-
-            if (!ownerUUID.equals(player.getUniqueId().toString()) && !Permissions.checkPermission(player, Permissions.bypass.trust)) {
-                player.sendMessage(Messages.error.NOT_OWNED);
-                return true;
-            }
-
-            Player targetPlayer = Bukkit.getPlayer(args[0]);
-
-            if (targetPlayer == null) {
-                player.sendMessage(Messages.error.PLAYER_NOT_FOUND);
-                return true;
-            }
-
-            plugin.islands.grid.addTrusted(islandId, targetPlayer.getUniqueId().toString());
-
-            player.sendMessage(Messages.success.TRUSTED);
-
-            return true;
-        }
-    }
-
     public class VisitCommand implements CommandExecutor {
 
         public VisitCommand() {
@@ -174,7 +65,7 @@ public class IslandCommands {
             if (islandId != null) {
                 player.teleport(plugin.islands.grid.getIslandSpawn(islandId));
             } else {
-                player.sendMessage(Messages.error.ISLAND_NOT_FOUND);
+                player.sendMessage(Messages.error.HOME_NOT_FOUND);
             }
 
             return true;
@@ -295,10 +186,7 @@ public class IslandCommands {
         static class error {
             public static final String ISLAND_NOT_FOUND = error("404 - Home not found.");
             public static final String NO_PERMISSION = error("You don't have permission to use this command.");
-            public static final String NOT_ON_ISLAND = error("You have to be on an island.");
-            public static final String NOT_OWNED = error("You don't own this island.");
-            public static final String PLAYER_NOT_FOUND = error("Player not found.");
-            public static final String WRONG_WORLD = error("You can't use that command in this world.");
+            public static final String HOME_NOT_FOUND = error("404 - Home not found :(");
 
             public static String COOLDOWN(int remainingTime) {
                 return error("You took damage recently. You have to wait for " + remainingTime + "s before teleporting.");
@@ -306,8 +194,7 @@ public class IslandCommands {
         }
 
         static class success {
-            public static final String UNTRUSTED = success("Player untrusted!");
-            public static final String TRUSTED = success("Player trusted!");
+
 
             public static String HOMES_FOUND(int amount) {
                 return success("Found " + amount + " home(s).");
@@ -320,9 +207,6 @@ public class IslandCommands {
         }
 
         static class help {
-
-            public static final String UNTRUST = info("/untrust <player> (You have to be on target island)");
-            public static final String TRUST = info("/trust <player> (You have to be on target island)");
             public static final String VISIT = info("Usage: /visit name");
             public static final String HOME = error("Usage: /home <id>");
         }

@@ -15,8 +15,9 @@ public class Messages extends ChatUtils {
             public static final String WRONG_WORLD = error("You can't use that command in this world.");
             public static final String SUBCOMMAND_NOT_FOUND = error("Invalid subcommand.");
             public static final String ERROR = "An internal error occurred. Contact staff.";
-            public static String ISLAND_GEN_FAILED = error("Island regeneration failed.");
-            public static String TELEPORT_FAILED = error("Could not teleport.");
+            public static final String NOT_ON_ISLAND = error("You have to be on an island.");
+            public static final String NOT_OWNED = error("You don't own this island.");
+            public static final String PLAYER_NOT_FOUND = error("Player not found.");
             public static String NO_BIOME_FOUND = error("Biome not found.");
             public static String NO_LOCATIONS_FOR_BIOME = error("No available locations for specified biome.");
         }
@@ -26,7 +27,8 @@ public class Messages extends ChatUtils {
             public static final String UNNAMED = success("Island unnamed and made private.");
             public static final String ISLAND_GEN_TITLE = ChatColor.GOLD + "Island generation event added to queue.";
             public static final String ISLAND_GEN_SUBTITLE = ChatColor.GOLD + "Explore the wilderness while your island is being generated. Use /home to access your island.";
-            public static String ISLAND_GEN = success("Island generation started.");
+            public static final String UNTRUSTED = success("Player untrusted!");
+            public static final String TRUSTED = success("Player trusted!");
 
             public static String OWNER_CHANGED(String name) {
                 return success("Island owner switched to " + name + ".");
@@ -43,9 +45,19 @@ public class Messages extends ChatUtils {
 
         public static class info {
             public static final String CONFIRM = info("Are you sure? Repeat the command to confirm.");
+
+            public static String TRUSTED_INFO(int numberOfPlayers) {
+                return info("You have trusted " + numberOfPlayers + " player(s).");
+            }
+
+            public static String TRUSTED_PLAYER(String displayName) {
+                return ChatColor.GRAY + " - " + displayName;
+            }
         }
 
         public static class help {
+            public static final String UNTRUST = info("/untrust <player> (You have to be on target island)");
+            public static final String TRUST = info("/trust <player> (You have to be on target island)");
             public static String CREATE = ChatColor.GRAY + "/island create <biome> (<BIG/NORMAL/SMALL>)";
             public static String REGENERATE = ChatColor.GRAY + "/island regenerate <biome> (<BIG/NORMAL/SMALL>) (You have to be on target island)";
             public static String NAME = ChatColor.GRAY + "/island name <name> (You have to be on target island)";

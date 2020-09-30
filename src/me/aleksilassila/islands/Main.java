@@ -2,6 +2,7 @@ package me.aleksilassila.islands;
 
 import me.aleksilassila.islands.commands.IslandCommands;
 import me.aleksilassila.islands.commands.IslandManagmentCommands;
+import me.aleksilassila.islands.commands.TrustCommands;
 import me.aleksilassila.islands.generation.EmptyWorldGenerator;
 import me.aleksilassila.islands.listeners.IslandsListener;
 import net.milkbowl.vault.permission.Permission;
@@ -56,8 +57,12 @@ public class Main extends JavaPlugin {
 
         islandCommands.new HomeCommand();
         islandCommands.new VisitCommand();
-        islandCommands.new TrustCommand();
-        islandCommands.new UntrustCommand();
+
+        TrustCommands trustCommands = new TrustCommands(this);
+
+        trustCommands.new UntrustCommand();
+        trustCommands.new TrustCommand();
+        trustCommands.new ListTrustedCommand();
 
         new IslandsListener(this);
 

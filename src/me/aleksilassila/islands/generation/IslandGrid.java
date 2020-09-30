@@ -3,6 +3,7 @@ package me.aleksilassila.islands.generation;
 import com.sun.istack.internal.NotNull;
 import com.sun.istack.internal.Nullable;
 import me.aleksilassila.islands.Islands;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -269,12 +270,6 @@ public class IslandGrid {
 
     @NotNull
     public List<String> getTrusted(String islandId) {
-        ConfigurationSection section = getIslandsConfig().getConfigurationSection("islands." + islandId + ".trusted");
-
-        if (section == null) {
-            return new ArrayList<>();
-        }
-
         return getIslandsConfig().getStringList("islands." + islandId + ".trusted");
     }
 
