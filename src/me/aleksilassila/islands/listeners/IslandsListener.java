@@ -13,24 +13,35 @@ import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.player.PlayerPortalEvent;
 
 import java.util.Date;
 
 public class IslandsListener extends ChatUtils implements Listener {
-    private final int disableMobs;
-    private Main plugin;
+    private final Main plugin;
+
+    private final boolean disableMobs;
+    private final boolean blockPortals;
 
     public IslandsListener(Main plugin) {
         this.plugin = plugin;
 
-        this.disableMobs = plugin.getConfig().getInt("disableMobsOnIslands");
+        this.disableMobs = plugin.getConfig().getBoolean("disableMobsOnIslands");
+        this.blockPortals = plugin.getConfig().getBoolean("blockOverworldPortalCreation");
 
         plugin.getServer().getPluginManager().registerEvents(this, plugin);
     }
 
     @EventHandler
+    public void onTeleport(PlayerPortalEvent event) {
+        if (blockPortals && event.getTo().getWorld().equals(plugin.islandsWorld)) {
+            event.setCanCreatePortal(false);
+        }
+    }
+
+    @EventHandler
     public void onCreaureSpawn(CreatureSpawnEvent event) {
-        if (event.getSpawnReason().equals(CreatureSpawnEvent.SpawnReason.NATURAL) && event.getEntity().getWorld().equals(plugin.islandsWorld) && this.disableMobs == 1) {
+        if (event.getSpawnReason().equals(CreatureSpawnEvent.SpawnReason.NATURAL) && event.getEntity().getWorld().equals(plugin.islandsWorld) && disableMobs) {
             event.setCancelled(true);
         }
     }

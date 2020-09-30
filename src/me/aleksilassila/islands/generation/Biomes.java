@@ -1,5 +1,6 @@
 package me.aleksilassila.islands.generation;
 
+import com.sun.istack.internal.NotNull;
 import com.sun.istack.internal.Nullable;
 import me.aleksilassila.islands.Main;
 import org.bukkit.Bukkit;
@@ -18,6 +19,7 @@ public class Biomes {
 
     int biomeSearchJumpBlocks;
     int biomeSearchSize;
+    int maxLocationsPerBiome;
 
     public Biomes(World world, Main plugin) {
         this.world = world;
@@ -26,6 +28,7 @@ public class Biomes {
 
         this.biomeSearchJumpBlocks = plugin.getConfig().getInt("generation.searchJump");
         this.biomeSearchSize = plugin.getConfig().getInt("generation.searchArea");
+        this.maxLocationsPerBiome = plugin.getConfig().getInt("generation.maxVariationsPerBiome");
 
         this.availableLocations = new HashMap<>();
 
@@ -111,7 +114,8 @@ public class Biomes {
 
         for (Biome biome : availableBiomes) {
             Bukkit.getLogger().info("Generating island positions for " + biome.name());
-            availableLocations.put(biome, getPossibleIslandLocations(biome, biggestIslandSize));
+            List<Location> potentialLocations = getPossibleIslandLocations(biome, biggestIslandSize);
+            if (potentialLocations.size() > 0) availableLocations.put(biome, potentialLocations);
         }
 
         return availableLocations;
@@ -134,6 +138,7 @@ public class Biomes {
         return biomes;
     }
 
+    @NotNull
     public List<Location> getPossibleIslandLocations(Biome biome, int islandSize) {
         List<Location> locations = new ArrayList<Location>();
         List<int[]> jumpInThesePositions = new ArrayList<int[]>();
@@ -158,7 +163,7 @@ public class Biomes {
                     jumpInThesePositions.add(new int[]{x, z});
                     z += islandSize;
 
-                    if (locations.size() >= 10) {
+                    if (locations.size() >= maxLocationsPerBiome) {
                         break loop;
                     }
                 }
