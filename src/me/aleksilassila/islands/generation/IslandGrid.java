@@ -47,7 +47,7 @@ public class IslandGrid {
     }
 
     public void giveIsland(String islandId, Player player) {
-        getIslandsConfig().set("islands." + islandId + ".home", String.valueOf(getNumberOfIslands(player.getUniqueId()) + 1));
+        getIslandsConfig().set("islands." + islandId + ".home", getNewHomeId(player.getUniqueId()));
         getIslandsConfig().set("islands." + islandId + ".UUID", player.getUniqueId().toString());
         islands.plugin.saveIslandsConfig();
     }
@@ -165,7 +165,7 @@ public class IslandGrid {
         int realY = getIslandY(xIndex, zIndex);
         int realZ = zIndex * islandSpacing + islandSpacing / 2 - islandSize / 2;
 
-        String home = String.valueOf(getNumberOfIslands(uuid) + 1);
+        String home = getNewHomeId(uuid);
 
         String islandId = xIndex + "x" + zIndex;
 
@@ -212,7 +212,7 @@ public class IslandGrid {
                     }
                 }
 
-                return addIslandToConfig(x, z, islandSize, uuid, String.valueOf(getNumberOfIslands(uuid) + 1));
+                return addIslandToConfig(x, z, islandSize, uuid, getNewHomeId(uuid));
             }
         }
 
@@ -289,6 +289,24 @@ public class IslandGrid {
     public void setSpawnPoint(String islandId, int x, int y) {
         getIslandsConfig().set("islands." + islandId + ".spawnPoint.x", x);
         getIslandsConfig().set("islands." + islandId + ".spawnPoint.y", y);
+    }
+
+    public String getNewHomeId(UUID uuid) {
+        List<String> ids = getAllIslandIds(uuid);
+        List<String> homeIds = new ArrayList<>();
+
+        for (String islandId : ids) {
+            String homeNumber = getIslandsConfig().getString("islands." + islandId + ".home");
+            homeIds.add(homeNumber);
+        }
+
+        String home = String.valueOf(getNumberOfIslands(uuid) + 1);
+
+        for (int i = 1; i <= getNumberOfIslands(uuid) + 1; i++) {
+            if (!homeIds.contains(String.valueOf(i))) home = String.valueOf(i);
+        }
+
+        return home;
     }
 
     // deleteIsland
