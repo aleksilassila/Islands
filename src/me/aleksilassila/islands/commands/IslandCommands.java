@@ -5,7 +5,6 @@ import me.aleksilassila.islands.Main;
 import me.aleksilassila.islands.Permissions;
 import me.aleksilassila.islands.generation.IslandGrid;
 import me.aleksilassila.islands.utils.ChatUtils;
-import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -45,7 +44,7 @@ public class IslandCommands {
 
             plugin.islands.confirmations.remove(player.getUniqueId().toString());
 
-            if (!Permissions.checkPermission(player, Permissions.island.visit)) {
+            if (!Permissions.checkPermission(player, Permissions.command.visit)) {
                 player.sendMessage(Messages.error.NO_PERMISSION);
                 return true;
             }
@@ -55,7 +54,7 @@ public class IslandCommands {
                 return true;
             }
 
-            if (!canTeleport(player)) {
+            if (!canTeleport(player) && !player.hasPermission(Permissions.bypass.home)) {
                 player.sendMessage(Messages.error.COOLDOWN(teleportCooldown(player)));
                 return true;
             }
@@ -90,7 +89,7 @@ public class IslandCommands {
             plugin.islands.confirmations.remove(player.getUniqueId().toString());
 
             if (args.length == 1 && args[0].equalsIgnoreCase("list") || label.equalsIgnoreCase("homes")) {
-                if (!Permissions.checkPermission(player, Permissions.island.listHomes)) {
+                if (!Permissions.checkPermission(player, Permissions.command.listHomes)) {
                     player.sendMessage(Messages.error.NO_PERMISSION);
                     return true;
                 }
@@ -106,12 +105,12 @@ public class IslandCommands {
 
                 return true;
             } else {
-                if (!Permissions.checkPermission(player, Permissions.island.home)) {
+                if (!Permissions.checkPermission(player, Permissions.command.home)) {
                     player.sendMessage(Messages.error.NO_PERMISSION);
                     return true;
                 }
 
-                if (!canTeleport(player)) {
+                if (!canTeleport(player) && !player.hasPermission(Permissions.bypass.home)) {
                     player.sendMessage(Messages.error.COOLDOWN(teleportCooldown(player)));
                     return true;
                 }

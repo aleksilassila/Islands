@@ -22,7 +22,7 @@ public class nameSubcommand extends Subcommand {
 
     @Override
     public void onCommand(Player player, String[] args, boolean confirmed) {
-        if (!Permissions.checkPermission(player, Permissions.island.name)) {
+        if (!Permissions.checkPermission(player, Permissions.command.name)) {
             player.sendMessage(Messages.error.NO_PERMISSION);
             return;
         }

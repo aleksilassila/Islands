@@ -10,10 +10,8 @@ import me.aleksilassila.islands.generation.IslandGrid;
 import me.aleksilassila.islands.utils.ChatUtils;
 import me.aleksilassila.islands.utils.ConfirmItem;
 import me.aleksilassila.islands.utils.Messages;
-import org.bukkit.Bukkit;
 import org.bukkit.block.Biome;
 import org.bukkit.command.Command;
-import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabExecutor;
 import org.bukkit.entity.Player;
@@ -39,6 +37,7 @@ public class IslandManagmentCommands extends ChatUtils implements TabExecutor {
         subcommands.add(new nameSubcommand(plugin));
         subcommands.add(new unnameSubcommand(plugin));
         subcommands.add(new giveSubcommand(plugin));
+        subcommands.add(new setSpawnSubcommand(plugin));
     }
 
     @Override
@@ -49,7 +48,7 @@ public class IslandManagmentCommands extends ChatUtils implements TabExecutor {
 
         Player player = (Player) sender;
 
-        if (!Permissions.checkPermission(player, Permissions.island.island)) {
+        if (!Permissions.checkPermission(player, Permissions.command.island)) {
             player.sendMessage(Messages.error.NO_PERMISSION);
             return true;
         }

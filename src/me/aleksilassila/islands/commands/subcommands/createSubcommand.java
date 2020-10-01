@@ -7,7 +7,6 @@ import me.aleksilassila.islands.commands.IslandManagmentCommands;
 import me.aleksilassila.islands.commands.Subcommand;
 import me.aleksilassila.islands.generation.IslandGrid;
 import me.aleksilassila.islands.utils.Messages;
-import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.block.Biome;
@@ -32,7 +31,7 @@ public class createSubcommand extends Subcommand {
 
     @Override
     public void onCommand(Player player, String[] args, boolean confirmed) {
-        if (!Permissions.checkPermission(player, Permissions.island.create)) {
+        if (!Permissions.checkPermission(player, Permissions.command.create)) {
             player.sendMessage(Messages.error.NO_PERMISSION);
             return;
         }
@@ -43,14 +42,14 @@ public class createSubcommand extends Subcommand {
 
         switch (islandSize) {
             case BIG:
-                permissionRequired = Permissions.island.createBig;
+                permissionRequired = Permissions.command.createBig;
                 break;
             case SMALL:
-                permissionRequired = Permissions.island.createSmall;
+                permissionRequired = Permissions.command.createSmall;
                 break;
             case NORMAL:
             default:
-                permissionRequired = Permissions.island.createNormal;
+                permissionRequired = Permissions.command.createNormal;
                 break;
         }
 

@@ -26,6 +26,7 @@ public class Permissions {
         public static final String give = "islands.bypass.give";                // Transfer any island ownership
         public static final String name = "islands.bypass.name";                // Name any island
         public static final String unname = "islands.bypass.unname";            // Unname any island
+        public static final String setSpawn = "islands.bypass.setspawn";        // Set any island's spawn
 
         public static final String trust = "islands.bypass.trust";
         public static final String untrust = "islands.bypass.untrust";
@@ -35,24 +36,24 @@ public class Permissions {
         public static final String home = "islands.bypass.home";
     }
 
-    public static class island {
-        public static final String create = "islands.create";
-        public static final String createBig = "islands.create.big";
-        public static final String createNormal = "islands.create.normal";
-        public static final String createSmall = "islands.create.small";
-        public static final String regenerate = "islands.regenerate";
-        public static final String delete = "islands.delete";
-        public static final String give = "islands.give";
-        public static final String name = "islands.name";
-        public static final String unname = "islands.unname";
+    public static class command {
+        public static final String create = "islands.command.create";
+        public static final String createBig = "islands.command.create.big";
+        public static final String createNormal = "islands.command.create.normal";
+        public static final String createSmall = "islands.command.create.small";
+        public static final String regenerate = "islands.command.regenerate";
+        public static final String delete = "islands.command.delete";
+        public static final String give = "islands.command.give";
+        public static final String name = "islands.command.name";
+        public static final String unname = "islands.command.unname";
+        public static final String setSpawn = "islands.command.setspawn";
 
-
-        public static final String home = "islands.home";
-        public static final String listHomes = "islands.home.list";
-        public static final String trust = "islands.turst";
-        public static final String listTrusted = "islands.turst.list";
-        public static final String untrust = "islands.untrust";
-        public static final String visit = "islands.visit";
-        public static final String island = "islands";
+        public static final String home = "islands.command.home";
+        public static final String listHomes = "islands.command.home.list";
+        public static final String trust = "islands.command.turst";
+        public static final String listTrusted = "islands.command.turst.list";
+        public static final String untrust = "islands.command.untrust";
+        public static final String visit = "islands.command.visit";
+        public static final String island = "islands.command";
     }
 }

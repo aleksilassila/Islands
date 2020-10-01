@@ -20,7 +20,7 @@ public class deleteSubcommand extends Subcommand {
 
     @Override
     public void onCommand(Player player, String[] args, boolean confirmed) {
-        if (!Permissions.checkPermission(player, Permissions.island.delete)) {
+        if (!Permissions.checkPermission(player, Permissions.command.delete)) {
             player.sendMessage(Messages.error.NO_PERMISSION);
             return;
         }

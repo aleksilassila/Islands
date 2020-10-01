@@ -29,6 +29,7 @@ public class Messages extends ChatUtils {
             public static final String ISLAND_GEN_SUBTITLE = ChatColor.GOLD + "Explore the wilderness while your island is being generated. Use /home to access your island.";
             public static final String UNTRUSTED = success("Player untrusted!");
             public static final String TRUSTED = success("Player trusted!");
+            public static final String SPAWNPOINT_CHANGED = success("Island spawn point changed.");
 
             public static String OWNER_CHANGED(String name) {
                 return success("Island owner switched to " + name + ".");
@@ -58,6 +59,7 @@ public class Messages extends ChatUtils {
         public static class help {
             public static final String UNTRUST = info("/untrust <player> (You have to be on target island)");
             public static final String TRUST = info("/trust <player> (You have to be on target island)");
+            public static final String SETSPAWN = info("/island setspawn");
             public static String CREATE = ChatColor.GRAY + "/island create <biome> (<BIG/NORMAL/SMALL>)";
             public static String REGENERATE = ChatColor.GRAY + "/island regenerate <biome> (<BIG/NORMAL/SMALL>) (You have to be on target island)";
             public static String NAME = ChatColor.GRAY + "/island name <name> (You have to be on target island)";

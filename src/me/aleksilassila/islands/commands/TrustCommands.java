@@ -32,7 +32,7 @@ public class TrustCommands {
 
             plugin.islands.confirmations.remove(player.getUniqueId().toString());
 
-            if (!Permissions.checkPermission(player, Permissions.island.untrust)) {
+            if (!Permissions.checkPermission(player, Permissions.command.untrust)) {
                 player.sendMessage(Messages.error.NO_PERMISSION);
                 return true;
             }
@@ -90,7 +90,7 @@ public class TrustCommands {
 
             plugin.islands.confirmations.remove(player.getUniqueId().toString());
 
-            if (!Permissions.checkPermission(player, Permissions.island.trust)) {
+            if (!Permissions.checkPermission(player, Permissions.command.trust)) {
                 player.sendMessage(Messages.error.NO_PERMISSION);
                 return true;
             }
@@ -141,7 +141,7 @@ public class TrustCommands {
 
             plugin.islands.confirmations.remove(player.getUniqueId().toString());
 
-            if (!Permissions.checkPermission(player, Permissions.island.listTrusted)) {
+            if (!Permissions.checkPermission(player, Permissions.command.listTrusted)) {
                 player.sendMessage(Messages.error.NO_PERMISSION);
                 return true;
             }

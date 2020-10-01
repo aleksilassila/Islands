@@ -273,6 +273,11 @@ public class IslandGrid {
         return getIslandsConfig().getStringList("islands." + islandId + ".trusted");
     }
 
+    public void setSpawnPoint(String islandId, int x, int y) {
+        getIslandsConfig().set("islands." + islandId + ".spawnPoint.x", x);
+        getIslandsConfig().set("islands." + islandId + ".spawnPoint.y", y);
+    }
+
     // deleteIsland
     // moveIsland
 }

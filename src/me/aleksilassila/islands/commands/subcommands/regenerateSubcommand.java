@@ -40,7 +40,7 @@ public class regenerateSubcommand extends Subcommand {
         String islandId;
         Biome targetBiome;
 
-        if (!Permissions.checkPermission(player, Permissions.island.regenerate)) {
+        if (!Permissions.checkPermission(player, Permissions.command.regenerate)) {
             player.sendMessage(Messages.error.NO_PERMISSION);
             return;
         }
@@ -49,14 +49,14 @@ public class regenerateSubcommand extends Subcommand {
 
         switch (islandSize) {
             case BIG:
-                permissionRequired = Permissions.island.createBig;
+                permissionRequired = Permissions.command.createBig;
                 break;
             case SMALL:
-                permissionRequired = Permissions.island.createSmall;
+                permissionRequired = Permissions.command.createSmall;
                 break;
             case NORMAL:
             default:
-                permissionRequired = Permissions.island.createNormal;
+                permissionRequired = Permissions.command.createNormal;
                 break;
         }
 
