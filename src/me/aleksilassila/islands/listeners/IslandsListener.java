@@ -1,6 +1,7 @@
 package me.aleksilassila.islands.listeners;
 
 import me.aleksilassila.islands.Main;
+import me.aleksilassila.islands.utils.Messages;
 import me.aleksilassila.islands.utils.Permissions;
 import me.aleksilassila.islands.utils.ChatUtils;
 import org.bukkit.ChatColor;
@@ -128,7 +129,7 @@ public class IslandsListener extends ChatUtils implements Listener {
 
                  e.setCancelled(true);
 
-                 e.getDamager().sendMessage(error("You cannot interact here."));
+                 e.getDamager().sendMessage(Messages.error.NOT_TRUSTED);
             }
         }
     }
@@ -151,7 +152,7 @@ public class IslandsListener extends ChatUtils implements Listener {
 
                 e.setCancelled(true);
 
-                e.getPlayer().sendMessage(error("You cannot interact here."));
+                e.getPlayer().sendMessage(Messages.error.NOT_TRUSTED);
             }
         }
     }
@@ -161,6 +162,7 @@ public class IslandsListener extends ChatUtils implements Listener {
     private void onBlockPlace(BlockPlaceEvent e) {
         if (e.isCancelled()) return;
         if (e.getPlayer().hasPermission(Permissions.bypass.interactEverywhere)) return;
+
         if (e.getBlock().getWorld().equals(plugin.islandsWorld)) {
             int x = e.getBlock().getX();
             int z = e.getBlock().getZ();
@@ -174,8 +176,9 @@ public class IslandsListener extends ChatUtils implements Listener {
 
                 e.setCancelled(true);
 
-                e.getPlayer().sendMessage(error("You cannot interact here."));
+                if (ownerUUID != null) e.getPlayer().sendMessage(Messages.error.NOT_TRUSTED);
             }
+
         }
     }
 }

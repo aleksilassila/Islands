@@ -244,7 +244,7 @@ public class IslandGrid {
         int relativeX = x - (xIndex * islandSpacing + islandSpacing / 2 - islandSize / 2);
         int relativeZ = z - (zIndex * islandSpacing + islandSpacing / 2 - islandSize / 2);
 
-        boolean isInside = islands.islandGeneration.isBlockInIslandCircle(relativeX, relativeZ, islandSize);
+        boolean isInside = islands.islandGeneration.isBlockInIslandCylinder(relativeX + 2, relativeZ + 2, islandSize + 4);
 
         if (!isInside) return null;
 

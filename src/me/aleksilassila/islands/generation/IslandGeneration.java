@@ -239,7 +239,7 @@ public class IslandGeneration {
                 <= Math.pow(islandSize / 2.0, 2);
     }
 
-    public boolean isBlockInIslandCircle(int relativeX, int relativeZ, int islandSize) {
+    public boolean isBlockInIslandCylinder(int relativeX, int relativeZ, int islandSize) {
         return (Math.pow(relativeX - islandSize / 2.0, 2) + Math.pow(relativeZ - islandSize / 2.0, 2))
                 <= Math.pow(islandSize / 2.0, 2);
     }
