@@ -3,9 +3,12 @@ package me.aleksilassila.islands.listeners;
 import me.aleksilassila.islands.Main;
 import me.aleksilassila.islands.Permissions;
 import me.aleksilassila.islands.utils.ChatUtils;
-import org.bukkit.*;
+import org.bukkit.ChatColor;
+import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockFromToEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
@@ -13,7 +16,9 @@ import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerPortalEvent;
+import org.bukkit.event.player.PlayerRespawnEvent;
 
 import java.util.Date;
 
@@ -32,7 +37,26 @@ public class IslandsListener extends ChatUtils implements Listener {
         plugin.getServer().getPluginManager().registerEvents(this, plugin);
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.LOWEST)
+    public void onPlayerJoin(PlayerJoinEvent event) {
+        if (!event.getPlayer().hasPlayedBefore()) {
+            String spawnIsland = plugin.islands.grid.getSpawnIsland();
+            if (spawnIsland != null) {
+                event.getPlayer().teleport(plugin.islands.grid.getIslandSpawn(spawnIsland));
+            }
+        }
+    }
+
+    @EventHandler(priority = EventPriority.LOWEST)
+    public void onPlayerRespawn(PlayerRespawnEvent event) {
+        String spawnIsland = plugin.islands.grid.getSpawnIsland();
+
+        if (spawnIsland != null) {
+            event.setRespawnLocation(plugin.islands.grid.getIslandSpawn(spawnIsland));
+        }
+    }
+
+    @EventHandler(priority = EventPriority.LOWEST)
     public void onTeleport(PlayerPortalEvent event) {
         if (blockPortals && event.getTo().getWorld().equals(plugin.islandsWorld)) {
             event.setCanCreatePortal(false);
@@ -40,7 +64,7 @@ public class IslandsListener extends ChatUtils implements Listener {
     }
 
     @EventHandler
-    public void onCreaureSpawn(CreatureSpawnEvent event) {
+    public void onCreatureSpawn(CreatureSpawnEvent event) {
         if (event.getSpawnReason().equals(CreatureSpawnEvent.SpawnReason.NATURAL) && event.getEntity().getWorld().equals(plugin.islandsWorld) && disableMobs) {
             event.setCancelled(true);
         }

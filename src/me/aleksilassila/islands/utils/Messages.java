@@ -30,6 +30,7 @@ public class Messages extends ChatUtils {
             public static final String UNTRUSTED = success("Player untrusted!");
             public static final String TRUSTED = success("Player trusted!");
             public static final String SPAWNPOINT_CHANGED = success("Island spawn point changed.");
+            public static final String OWNER_REMOVED = success("Island owner removed.");
 
             public static String OWNER_CHANGED(String name) {
                 return success("Island owner switched to " + name + ".");
