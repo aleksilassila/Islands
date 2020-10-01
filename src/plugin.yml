@@ -1,5 +1,5 @@
 name: Islands
-version: 1.2.0
+version: 1.2.2
 author: Aleksi Lassila
 main: me.aleksilassila.islands.Main
 api-version: 1.16
@@ -7,7 +7,7 @@ softdepend: [Vault]
 commands:
   island:
     description: Island managment
-    usage: /<command> biome
+    usage: /<command>
     aliases: [is]
   visit:
     description: Visit islands

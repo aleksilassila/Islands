@@ -2,6 +2,7 @@ package me.aleksilassila.islands.commands;
 
 import me.aleksilassila.islands.Islands;
 import me.aleksilassila.islands.Main;
+import me.aleksilassila.islands.utils.Messages;
 import me.aleksilassila.islands.utils.Permissions;
 import me.aleksilassila.islands.generation.IslandGrid;
 import me.aleksilassila.islands.utils.ChatUtils;
@@ -143,7 +144,13 @@ public class IslandCommands {
                 }
             }
 
-            String homeId = args.length == 0 ? "1" : args[0];
+            int homeId;
+
+            try {
+                homeId = args.length == 0 ? 1 : Integer.parseInt(args[0]);
+            } catch (NumberFormatException e) {
+                homeId = 1;
+            }
 
             Location location = grid.getIslandSpawn(grid.getHomeIsland(player.getUniqueId(), homeId));
 
@@ -179,35 +186,5 @@ public class IslandCommands {
         }
 
         return 0;
-    }
-
-    static class Messages extends ChatUtils {
-        static class error {
-            public static final String ISLAND_NOT_FOUND = error("404 - Home not found.");
-            public static final String NO_PERMISSION = error("You don't have permission to use this command.");
-            public static final String HOME_NOT_FOUND = error("404 - Home not found :(");
-
-            public static String COOLDOWN(int remainingTime) {
-                return error("You took damage recently. You have to wait for " + remainingTime + "s before teleporting.");
-            }
-        }
-
-        static class success {
-
-
-            public static String HOMES_FOUND(int amount) {
-                return success("Found " + amount + " home(s).");
-            }
-        }
-
-        static class info {
-            public static final String ON_SURFACE = info("You can only use this command on surface.");
-            public static final String IN_OVERWORLD = info("You can only use this command in overworld.");
-        }
-
-        static class help {
-            public static final String VISIT = info("Usage: /visit name");
-            public static final String HOME = error("Usage: /home <id>");
-        }
     }
 }

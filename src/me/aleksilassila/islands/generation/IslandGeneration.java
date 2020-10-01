@@ -3,6 +3,7 @@ package me.aleksilassila.islands.generation;
 import com.sun.istack.internal.Nullable;
 import me.aleksilassila.islands.Islands;
 import me.aleksilassila.islands.utils.ChatUtils;
+import me.aleksilassila.islands.utils.Messages;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -41,7 +42,7 @@ public class IslandGeneration {
         popFromQueue(task.player.getUniqueId().toString());
         queue.add(task);
 
-        task.player.sendMessage(Messages.Info.QUEUE_STATUS(queue.size()));
+        task.player.sendMessage(Messages.info.QUEUE_STATUS(queue.size()));
     }
 
     @Nullable
@@ -114,16 +115,16 @@ public class IslandGeneration {
                     }
 
                     if (clearingIndex >= islands.grid.islandSpacing * islands.grid.islandSpacing) {
-                        player.sendMessage(Messages.Success.CLEARING_DONE);
+                        player.sendMessage(Messages.success.CLEARING_DONE);
 
                         clearingArea = false;
                         break;
                     } else if (clearingIndex == islands.grid.islandSpacing * islands.grid.islandSpacing / 4) {
-                        player.sendMessage(Messages.Info.CLEARING_STATUS(25));
+                        player.sendMessage(Messages.info.CLEARING_STATUS(25));
                     } else if (clearingIndex == islands.grid.islandSpacing * islands.grid.islandSpacing / 2) {
-                        player.sendMessage(Messages.Info.CLEARING_STATUS(50));
+                        player.sendMessage(Messages.info.CLEARING_STATUS(50));
                     } else if (clearingIndex == islands.grid.islandSpacing * islands.grid.islandSpacing / 4 * 3) {
-                        player.sendMessage(Messages.Info.CLEARING_STATUS(75));
+                        player.sendMessage(Messages.info.CLEARING_STATUS(75));
                     }
 
                     clearingIndex++;
@@ -159,23 +160,23 @@ public class IslandGeneration {
                     // Update lighting
                     islands.plugin.islandsWorld.getChunkAt(targetX + islandSize / 2, targetZ + islandSize / 2);
 
-                    player.sendMessage(Messages.Success.GENERATION_DONE);
+                    player.sendMessage(Messages.success.GENERATION_DONE);
                     queue.remove(this);
 
                     if (queue.size() > 0) {
                         CopyTask nextTask = queue.get(0);
                         nextTask.runTaskTimer(islands.plugin, 0, buildDelay);
-                        nextTask.player.sendMessage(Messages.Info.GENERATION_STARTED(nextTask.islandSize * nextTask.islandSize / 20.0));
+                        nextTask.player.sendMessage(Messages.info.GENERATION_STARTED(nextTask.islandSize * nextTask.islandSize / 20.0));
                     }
 
                     this.cancel();
                     break loop;
                 } else if (index == islandSize * islandSize / 4) {
-                    player.sendMessage(Messages.Info.GENERATION_STATUS(25));
+                    player.sendMessage(Messages.info.GENERATION_STATUS(25));
                 } else if (index == islandSize * islandSize / 2) {
-                    player.sendMessage(Messages.Info.GENERATION_STATUS(50));
+                    player.sendMessage(Messages.info.GENERATION_STATUS(50));
                 } else if (index == islandSize * islandSize / 4 * 3) {
-                    player.sendMessage(Messages.Info.GENERATION_STATUS(75));
+                    player.sendMessage(Messages.info.GENERATION_STATUS(75));
                 }
 
                 index++;
@@ -241,31 +242,5 @@ public class IslandGeneration {
     public boolean isBlockInIslandCircle(int relativeX, int relativeZ, int islandSize) {
         return (Math.pow(relativeX - islandSize / 2.0, 2) + Math.pow(relativeZ - islandSize / 2.0, 2))
                 <= Math.pow(islandSize / 2.0, 2);
-    }
-
-    static class Messages extends ChatUtils {
-        static class Success {
-
-            public static final String GENERATION_DONE = success("Island generation completed.");
-            public static final String CLEARING_DONE = success("Island clearing done.");
-        }
-
-        static class Info {
-            public static String GENERATION_STARTED(double time) {
-                return info("Your generation event has been started. It will take approximately " + (int) time + " seconds.");
-            }
-
-            public static String QUEUE_STATUS(int queueSize) {
-                return info("Your event has been added to the queue. There are " + (queueSize - 1) + " event(s) before yours.");
-            }
-
-            public static String GENERATION_STATUS(int status) {
-                return info("Your generation event is " + status + "% completed.");
-            }
-
-            public static String CLEARING_STATUS(int status) {
-                return info("Clearing event " + status + "% completed.");
-            }
-        }
     }
 }

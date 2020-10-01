@@ -42,6 +42,12 @@ public class unnameSubcommand extends Subcommand {
             return;
         }
 
+        if (plugin.getIslandsConfig().getInt("islands." + islandId + ".home") <= 0
+                || plugin.getIslandsConfig().getString("islands." + islandId + ".UUID") == null) {
+            player.sendMessage(Messages.error.ISLAND_NO_OWNER);
+            return;
+        }
+
         if (plugin.getIslandsConfig().getString("islands." + islandId + ".UUID").equals(player.getUniqueId().toString())
                 || Permissions.checkPermission(player, Permissions.bypass.unname)) {
             grid.unnameIsland(islandId);

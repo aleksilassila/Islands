@@ -31,9 +31,9 @@ public class IslandGrid {
     }
 
     public void unnameIsland(String islandId) {
-        String homeId = islands.plugin.getIslandsConfig().getString("islands." + islandId + ".home");
+        int homeId = islands.plugin.getIslandsConfig().getInt("islands." + islandId + ".home");
 
-        getIslandsConfig().set("islands." + islandId + ".name", homeId);
+        getIslandsConfig().set("islands." + islandId + ".name", String.valueOf(homeId));
         getIslandsConfig().set("islands." + islandId + ".public", 0);
 
         islands.plugin.saveIslandsConfig();
@@ -111,11 +111,11 @@ public class IslandGrid {
     }
 
     @Nullable
-    public String getHomeIsland(UUID uuid, String homeId) {
+    public String getHomeIsland(UUID uuid, int homeId) {
         List<String> allIslands = getAllIslandIds(uuid);
 
         for (String islandId : allIslands) {
-            if (getIslandsConfig().getString("islands." + islandId + ".home").equals(homeId)) {
+            if (getIslandsConfig().getInt("islands." + islandId + ".home") == homeId) {
                 return islandId;
             }
         }
@@ -165,7 +165,7 @@ public class IslandGrid {
         int realY = getIslandY(xIndex, zIndex);
         int realZ = zIndex * islandSpacing + islandSpacing / 2 - islandSize / 2;
 
-        String home = getNewHomeId(uuid);
+        int home = getNewHomeId(uuid);
 
         String islandId = xIndex + "x" + zIndex;
 
@@ -212,7 +212,7 @@ public class IslandGrid {
                     }
                 }
 
-                return addIslandToConfig(x, z, islandSize, uuid, getNewHomeId(uuid));
+                return addIslandToConfig(x, z, islandSize, uuid, String.valueOf(getNewHomeId(uuid)));
             }
         }
 
@@ -291,19 +291,19 @@ public class IslandGrid {
         getIslandsConfig().set("islands." + islandId + ".spawnPoint.y", y);
     }
 
-    public String getNewHomeId(UUID uuid) {
+    public int getNewHomeId(UUID uuid) {
         List<String> ids = getAllIslandIds(uuid);
-        List<String> homeIds = new ArrayList<>();
+        List<Integer> homeIds = new ArrayList<>();
 
         for (String islandId : ids) {
-            String homeNumber = getIslandsConfig().getString("islands." + islandId + ".home");
+            int homeNumber = getIslandsConfig().getInt("islands." + islandId + ".home");
             homeIds.add(homeNumber);
         }
 
-        String home = String.valueOf(getNumberOfIslands(uuid) + 1);
+        int home = getNumberOfIslands(uuid) + 1;
 
         for (int i = 1; i <= getNumberOfIslands(uuid) + 1; i++) {
-            if (!homeIds.contains(String.valueOf(i))) home = String.valueOf(i);
+            if (!homeIds.contains(i)) home = i;
         }
 
         return home;
