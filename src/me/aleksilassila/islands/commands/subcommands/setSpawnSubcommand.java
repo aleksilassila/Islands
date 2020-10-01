@@ -1,14 +1,12 @@
 package me.aleksilassila.islands.commands.subcommands;
 
 import me.aleksilassila.islands.Main;
-import me.aleksilassila.islands.Permissions;
+import me.aleksilassila.islands.utils.Permissions;
 import me.aleksilassila.islands.commands.Subcommand;
 import me.aleksilassila.islands.generation.IslandGrid;
 import me.aleksilassila.islands.utils.Messages;
 import org.bukkit.entity.Player;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class setSpawnSubcommand extends Subcommand {

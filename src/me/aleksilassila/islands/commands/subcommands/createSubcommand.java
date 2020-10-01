@@ -2,7 +2,7 @@ package me.aleksilassila.islands.commands.subcommands;
 
 import me.aleksilassila.islands.Islands;
 import me.aleksilassila.islands.Main;
-import me.aleksilassila.islands.Permissions;
+import me.aleksilassila.islands.utils.Permissions;
 import me.aleksilassila.islands.commands.IslandManagmentCommands;
 import me.aleksilassila.islands.commands.Subcommand;
 import me.aleksilassila.islands.generation.IslandGrid;

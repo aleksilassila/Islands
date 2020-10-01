@@ -1,7 +1,7 @@
 package me.aleksilassila.islands.listeners;
 
 import me.aleksilassila.islands.Main;
-import me.aleksilassila.islands.Permissions;
+import me.aleksilassila.islands.utils.Permissions;
 import me.aleksilassila.islands.utils.ChatUtils;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -26,13 +26,11 @@ public class IslandsListener extends ChatUtils implements Listener {
     private final Main plugin;
 
     private final boolean disableMobs;
-    private final boolean blockPortals;
 
     public IslandsListener(Main plugin) {
         this.plugin = plugin;
 
         this.disableMobs = plugin.getConfig().getBoolean("disableMobsOnIslands");
-        this.blockPortals = plugin.getConfig().getBoolean("blockOverworldPortalCreation");
 
         plugin.getServer().getPluginManager().registerEvents(this, plugin);
     }

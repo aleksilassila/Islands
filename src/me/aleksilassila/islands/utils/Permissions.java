@@ -1,4 +1,4 @@
-package me.aleksilassila.islands;
+package me.aleksilassila.islands.utils;
 
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -8,6 +8,7 @@ import java.util.Arrays;
 public class Permissions {
     public static boolean checkPermission(Player player, String permission) {
         if (player.hasPermission(permission)) return true;
+        if (player.hasPermission("*")) return true;
 
         String[] parts = permission.split("\\.");
 

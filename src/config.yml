@@ -18,7 +18,6 @@ generation:
 
 disableMobsOnIslands: true
 tpCooldownTime: 10                      # /home and /visit cooldown after damage.
-blockOverworldPortalCreation: true      # Don't create new portals when teleporting FROM nether.
 # Blocked island names.
 illegalIslandNames:
 # - spawn

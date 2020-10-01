@@ -1,7 +1,7 @@
 package me.aleksilassila.islands.commands;
 
 import me.aleksilassila.islands.Main;
-import me.aleksilassila.islands.Permissions;
+import me.aleksilassila.islands.utils.Permissions;
 import me.aleksilassila.islands.utils.Messages;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
