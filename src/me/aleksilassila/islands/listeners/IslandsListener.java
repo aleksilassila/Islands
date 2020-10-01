@@ -57,9 +57,11 @@ public class IslandsListener extends ChatUtils implements Listener {
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
-    public void onTeleport(PlayerPortalEvent event) {
-        if (blockPortals && event.getTo().getWorld().equals(plugin.islandsWorld)) {
-            event.setCanCreatePortal(false);
+    public void onPortalEvent(PlayerPortalEvent event) {
+        if (event.getTo().getWorld().equals(plugin.islandsWorld)) {
+            Location to = event.getTo();
+            to.setWorld(plugin.wildernessWorld);
+            event.setTo(to);
         }
     }
 
