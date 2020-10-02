@@ -132,14 +132,19 @@ public class IslandManagmentCommands extends ChatUtils implements TabExecutor {
 
     public static class Utils {
         @NotNull
-        public Islands.IslandSize parseIslandSize(String size) {
-            for (Islands.IslandSize targetSize : Islands.IslandSize.values()) {
-                if (targetSize.name().equalsIgnoreCase(size)) {
-                    return targetSize;
+        public int parseIslandSize(String size) {
+            try {
+                return Integer.valueOf(size);
+            } catch (NumberFormatException e) {
+                for (Islands.IslandSize targetSize : Islands.IslandSize.values()) {
+                    if (targetSize.name().equalsIgnoreCase(size)) {
+                        return targetSize.getSize();
+                    }
                 }
+
+                return Islands.IslandSize.NORMAL.getSize();
             }
 
-            return Islands.IslandSize.NORMAL;
         }
 
         @Nullable

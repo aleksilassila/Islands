@@ -103,6 +103,7 @@ To further customize the plugin, check `plugins/islands/config.yml`.
 | `islands.create.small`  | Create / regenerate small island  |
 | `islands.create.normal` | Create / regenerate normal island |
 | `islands.create.big`    | Create / regenerate big island    |
+| `islands.create.custom` | Create / regenerate custom sized island    |
 | `islands.regenerate`    | Regenerate island                 |
 | `islands.delete`        | Delete island                     |
 | `islands.give`          | Give island                       |

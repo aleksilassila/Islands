@@ -28,15 +28,13 @@ public class regenerateSubcommand extends Subcommand {
         this.grid = plugin.islands.grid;
     }
 
-    private boolean isSmallerThanOldIsland(Islands.IslandSize newSize, String islandId) {
-        return plugin.islands.parseIslandSize(newSize) < plugin.getIslandsConfig().getInt("islands." + islandId + ".size");
+    private boolean isSmallerThanOldIsland(int newSize, String islandId) {
+        return newSize < plugin.getIslandsConfig().getInt("islands." + islandId + ".size");
     }
 
     @Override
     public void onCommand(Player player, String[] args, boolean confirmed) {
         HashMap<Biome, List<Location>> availableLocations = plugin.islands.islandGeneration.biomes.availableLocations;
-        Islands.IslandSize islandSize;
-        String permissionRequired;
         String islandId;
         Biome targetBiome;
 
@@ -45,23 +43,27 @@ public class regenerateSubcommand extends Subcommand {
             return;
         }
 
-        islandSize = args.length == 2 ? utils.parseIslandSize(args[1]) : Islands.IslandSize.NORMAL;
+        int islandSize = args.length == 2 ? utils.parseIslandSize(args[1]) : utils.parseIslandSize(String.valueOf(Islands.IslandSize.NORMAL.getSize()));
 
-        switch (islandSize) {
-            case BIG:
-                permissionRequired = Permissions.command.createBig;
-                break;
-            case SMALL:
-                permissionRequired = Permissions.command.createSmall;
-                break;
-            case NORMAL:
-            default:
-                permissionRequired = Permissions.command.createNormal;
-                break;
+        String permissionRequired;
+
+        if (islandSize == Islands.IslandSize.BIG.getSize()) {
+            permissionRequired = Permissions.command.createBig;
+        } else if (islandSize == Islands.IslandSize.SMALL.getSize()) {
+            permissionRequired = Permissions.command.createSmall;
+        } else if (islandSize == Islands.IslandSize.NORMAL.getSize()) {
+            permissionRequired = Permissions.command.createNormal;
+        } else {
+            permissionRequired = Permissions.command.createCustom;
         }
 
         if (!Permissions.checkPermission(player, permissionRequired)) {
             player.sendMessage(Messages.error.NO_PERMISSION);
+            return;
+        }
+
+        if (islandSize < Islands.IslandSize.SMALL.getSize() || islandSize + 4 >= grid.islandSpacing) {
+            player.sendMessage(Messages.error.INVALID_ISLAND_SIZE);
             return;
         }
 

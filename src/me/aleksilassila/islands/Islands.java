@@ -29,10 +29,19 @@ public class Islands {
     public Map<String, Long> teleportCooldowns;
 
     public enum IslandSize {
-        SMALL, // 32*32
-        NORMAL, // 64*64
-        BIG, // 80*80
-        HUGE
+        SMALL(32), // 32*32
+        NORMAL(64), // 64*64
+        BIG(80); // 80*80
+
+        private final int size;
+
+        public int getSize() {
+            return size;
+        }
+
+        IslandSize(int size) {
+            this.size = size;
+        }
     }
 
     public Islands(World world, World sourceWorld, Main plugin) {
@@ -67,9 +76,7 @@ public class Islands {
     }
 
     @Nullable
-    public String createNewIsland(Biome biome, IslandSize size, Player player) throws IllegalArgumentException {
-        int islandSize = parseIslandSize(size);
-
+    public String createNewIsland(Biome biome, int islandSize, Player player) throws IllegalArgumentException {
         String islandId = grid.createIsland(player.getUniqueId(), islandSize);
         try {
             boolean success = islandGeneration.copyIsland(
@@ -97,15 +104,14 @@ public class Islands {
 
     }
 
-    public boolean regenerateIsland(String islandId, Biome biome, IslandSize islandSize, Player player, boolean shouldClearArea) throws IllegalArgumentException {
-        grid.updateIslandSize(islandId, parseIslandSize(islandSize));
-        Bukkit.getLogger().info("Should clear " + shouldClearArea);
+    public boolean regenerateIsland(String islandId, Biome biome, int islandSize, Player player, boolean shouldClearArea) throws IllegalArgumentException {
+        grid.updateIslandSize(islandId, islandSize);
 
         try {
             boolean success = islandGeneration.copyIsland(
                     player,
                     biome,
-                    parseIslandSize(islandSize),
+                    islandSize,
                     plugin.getIslandsConfig().getInt("islands." + islandId + ".x"),
                     plugin.getIslandsConfig().getInt("islands." + islandId + ".y"),
                     plugin.getIslandsConfig().getInt("islands." + islandId + ".z"),

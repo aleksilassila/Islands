@@ -24,6 +24,7 @@ public class Messages extends ChatUtils {
             public static final String ISLAND_NOT_FOUND = error("404 - Home not found.");
             public static final String HOME_NOT_FOUND = error("404 - Home not found :(");
             public static final String NOT_TRUSTED = error("You need owner's permission to interact here.");
+            public static final String INVALID_ISLAND_SIZE = error("Island size exceeds limits.");
 
             public static String COOLDOWN(int remainingTime) {
                 return error("You took damage recently. You have to wait for " + remainingTime + "s before teleporting.");

@@ -42,6 +42,7 @@ public class Permissions {
         public static final String createBig = "islands.command.create.big";
         public static final String createNormal = "islands.command.create.normal";
         public static final String createSmall = "islands.command.create.small";
+        public static final String createCustom = "islands.command.create.custom";
         public static final String regenerate = "islands.command.regenerate";
         public static final String delete = "islands.command.delete";
         public static final String give = "islands.command.give";
