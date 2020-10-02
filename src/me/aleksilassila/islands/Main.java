@@ -5,6 +5,7 @@ import me.aleksilassila.islands.commands.IslandManagmentCommands;
 import me.aleksilassila.islands.commands.TrustCommands;
 import me.aleksilassila.islands.generation.EmptyWorldGenerator;
 import me.aleksilassila.islands.listeners.IslandsListener;
+import me.aleksilassila.islands.utils.UpdateChecker;
 import net.milkbowl.vault.permission.Permission;
 import org.bukkit.*;
 import org.bukkit.configuration.InvalidConfigurationException;
@@ -38,6 +39,14 @@ public class Main extends JavaPlugin {
             getServer().getPluginManager().disablePlugin(this);
             return;
         }
+
+        new UpdateChecker(this, 84303).getVersion(version -> {
+            if (this.getDescription().getVersion().equalsIgnoreCase(version)) {
+                Bukkit.getLogger().info("[Islands] You are up to date.");
+            } else {
+                Bukkit.getLogger().info("[Islands] There's a new update available!");
+            }
+        });
 
         getConfig().options().copyDefaults(true);
         saveConfig();
