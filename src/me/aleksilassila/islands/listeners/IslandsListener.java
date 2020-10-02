@@ -73,6 +73,7 @@ public class IslandsListener extends ChatUtils implements Listener {
 
     @EventHandler
     public void onBlockFromTo(BlockFromToEvent event) {
+        if (!event.getBlock().getWorld().equals(plugin.islandsWorld)) return;
         boolean canFlow = plugin.islands.grid.isBlockInIslandSphere(event.getBlock().getX(), event.getBlock().getY(), event.getBlock().getZ());
 
         if(!canFlow) {

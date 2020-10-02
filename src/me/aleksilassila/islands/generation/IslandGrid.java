@@ -286,9 +286,9 @@ public class IslandGrid {
         return getIslandsConfig().getStringList("islands." + islandId + ".trusted");
     }
 
-    public void setSpawnPoint(String islandId, int x, int y) {
+    public void setSpawnPoint(String islandId, int x, int z) {
         getIslandsConfig().set("islands." + islandId + ".spawnPoint.x", x);
-        getIslandsConfig().set("islands." + islandId + ".spawnPoint.y", y);
+        getIslandsConfig().set("islands." + islandId + ".spawnPoint.z", z);
     }
 
     public int getNewHomeId(UUID uuid) {

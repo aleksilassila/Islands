@@ -4,6 +4,8 @@ Optimized for survival gamemode. **This is not a skyblock plugin!**
 Jumping down from an island teleports player to survival "wilderness", 
 that can be reset often without losing players' progress.
 
+If you want to see the plugin in action, you can visit 46.101.169.26 (1.16.2)
+
 ## Features
 - Solves griefing and map resetting entirely.
 - Create islands with any overworld biome
