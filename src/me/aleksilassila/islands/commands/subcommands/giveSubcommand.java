@@ -81,10 +81,6 @@ public class giveSubcommand extends Subcommand {
 
     @Override
     public List<String> onTabComplete(Player player, String[] args) {
-        if (args.length == 1) {
-            return new ArrayList<String>(Arrays.asList("<name>"));
-        }
-
         return null;
     }
 
