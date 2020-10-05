@@ -21,3 +21,5 @@ tpCooldownTime: 10                      # /home and /visit cooldown after damage
 # Blocked island names.
 illegalIslandNames:
 # - spawn
+islandsWorldName: world
+wildernessWorldName: wilderness

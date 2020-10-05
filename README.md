@@ -7,13 +7,27 @@ that can be reset often without losing players' progress.
 If you want to see the plugin in action, you can visit 46.101.169.26 (1.16.2)
 
 ## Features
-- Solves griefing and map resetting entirely.
-- Create islands with any overworld biome
-- Customizable island sizes
-- Island protection
-- Visiting other people's islands
-  * Tip for admins: `/island name spawn` for accessing spawn via `/vi spawn`
-- Customizable generation settings and speed, optimize for any hardware
+"Okay cool, islands. What's the point?" Here are some problems that this plugin solves.
+
+**Griefing.**
+Every island is protected by default.
+The owner can `/trust` other players so that they can also interact with blocks and entities. 
+
+**"Base managment."**
+Want to start a new base? Just create a new island. Tired of creating a new world
+multiple times to find the biome of your liking? Well, this plugin lets you chooose that too.
+Personally I just like the idea of placing individual creations of mine on their own islands.
+It also makes saving them in a schematic file a lot easier. (Also I might add this as a feature later)
+
+**Resources.**
+Everyone hates monuments that are already raided by another player.
+This plugin allows resetting the survival world whenever you feel like it without losing your progress.
+Your islands and inventory are saved in a separate world. 
+
+**Community.** Players can easily visit each other's islands with `/visit` command.
+*Tip for admins: `/island name spawn` for accessing spawn via `/vi spawn`*
+
+The plugin has customizable generation settings, so the plugin can be optimized for any hardware
 
 ### Commands
 
@@ -82,55 +96,58 @@ worlds:
     generator: VoidGenerator:PLAINS
 ```
 
-Replace `<Islands World Name>` with `leve-name` from `server.properties`.
-For the sake of clarity you may want to set the `level-name` to something like `islands`.
+Replace `<Islands World Name>` with `islandsWorldName` from `plugins/Islands/config.yml`.
+You may want to also set `level-name` in `server.properties` as `islandsWorldName`.
+This is because the world specified in `level-name` holds player inventory data. If you set up automatical
+`wilderness` (see below) wipes, make sure you are not using the world specified in `level-name` as wilderness. 
 
-Should you skip the step above, your islands will spawn in normal world instead of an empty one.
+**Should you not set the world generator for `islands` world, your islands will spawn in normal world instead of an empty one.**
+
+### Optional
 
 You can set a specific island as default spawn island for new players.
 To do so, set `isSpawn: true` for the target island in `islands.yml`.
 
 The plugin will generate `wilderness` world for you, which is where players will spawn when they jump off their island.
-Deleting this world should be safe and players' inventories should not be reset. 
-Deletion of the world specified in `level-name` will however, empty player inventories.
+You can change the world name with `wildernessWorldName` in the plugin config.
+*Unless `wildernessWorldName` is the same as `level-name`, deleting this world should not wipe players' inventories.*
 
 To further customize the plugin, check `plugins/islands/config.yml`.
 
 ## Permissions
 
-| Permission              | Affect                            |
-|-------------------------|-----------------------------------|
-| `islands`               | Use /islands command              |
-| `islands.create`        | Create island                     |
-| `islands.create.small`  | Create / regenerate small island  |
-| `islands.create.normal` | Create / regenerate normal island |
-| `islands.create.big`    | Create / regenerate big island    |
-| `islands.create.custom` | Create / regenerate custom sized island    |
-| `islands.regenerate`    | Regenerate island                 |
-| `islands.delete`        | Delete island                     |
-| `islands.give`          | Give island                       |
-| `islands.name`          | Name island                       |
-| `islands.unname`        | Unname island                     |
-| `islands.home`          | Use /home command                 |
-| `islands.home.list`     | Use /homes command                |
-| `islands.turst`         | Trust person                      |
-| `islands.turst.list`    | List island's trusted players     |
-| `islands.untrust`       | Untrust person                    |
-| `islands.visit`         | Visit island                      |
+| Permission              | Affect                                  |
+|-------------------------|-----------------------------------------|
+| `islands`               | Use /islands command                    |
+| `islands.create`        | Create island                           |
+| `islands.create.small`  | Create / regenerate small island        |
+| `islands.create.normal` | Create / regenerate normal island       |
+| `islands.create.big`    | Create / regenerate big island          |
+| `islands.create.custom` | Create / regenerate custom sized island |
+| `islands.regenerate`    | Regenerate island                       |
+| `islands.delete`        | Delete island                           |
+| `islands.give`          | Give island                             |
+| `islands.name`          | Name island                             |
+| `islands.unname`        | Unname island                           |
+| `islands.home`          | Use /home command                       |
+| `islands.home.list`     | Use /homes command                      |
+| `islands.turst`         | Trust person                            |
+| `islands.turst.list`    | List island's trusted players           |
+| `islands.untrust`       | Untrust person                          |
+| `islands.visit`         | Visit island                            |
 
 Bypasses
 
-| Permission                   | Affect                                                                   |
-|------------------------------|--------------------------------------------------------------------------|
-| `islands.bypass.islandLimit` | Ignore island create limit                                               |
-| `islands.bypass.regenerate`  | Regenerate anyone's island                                               |
-| `islands.bypass.delete`      | Delete anyone's island                                                   |
-| `islands.bypass.give`        | Transfer any island's ownership / remove owner if no arguments provided  |
-| `islands.bypass.name`        | Name anyone's island                                                     |
-| `islands.bypass.unname`      | Unname anyone's island                                                   |
-| `islands.bypass.trust`       | Add trusted person to anyone's island                                    |
-| `islands.bypass.trust.list`  | List any island's trusted players                                        |
-| `islands.bypass.untrust`     | Remove trusted person from anyone's island                               |
-| `islands.bypass.protection`  | Interact with anyone's island                                            |
-| `islands.bypass.home`        | Use /home from anywhere                                                  |
-
+| Permission                   | Affect                                                                  |
+|------------------------------|-------------------------------------------------------------------------|
+| `islands.bypass.islandLimit` | Ignore island create limit                                              |
+| `islands.bypass.regenerate`  | Regenerate anyone's island                                              |
+| `islands.bypass.delete`      | Delete anyone's island                                                  |
+| `islands.bypass.give`        | Transfer any island's ownership / remove owner if no arguments provided |
+| `islands.bypass.name`        | Name anyone's island                                                    |
+| `islands.bypass.unname`      | Unname anyone's island                                                  |
+| `islands.bypass.trust`       | Add trusted person to anyone's island                                   |
+| `islands.bypass.trust.list`  | List any island's trusted players                                       |
+| `islands.bypass.untrust`     | Remove trusted person from anyone's island                              |
+| `islands.bypass.protection`  | Interact with anyone's island                                           |
+| `islands.bypass.home`        | Use /home from anywhere                                                 |

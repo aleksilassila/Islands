@@ -40,6 +40,7 @@ public class IslandsListener extends ChatUtils implements Listener {
     public void onPlayerJoin(PlayerJoinEvent event) {
         if (!event.getPlayer().hasPlayedBefore()) {
             String spawnIsland = plugin.islands.grid.getSpawnIsland();
+
             if (spawnIsland != null) {
                 event.getPlayer().teleport(plugin.islands.grid.getIslandSpawn(spawnIsland));
             }

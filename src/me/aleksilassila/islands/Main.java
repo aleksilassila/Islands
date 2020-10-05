@@ -3,7 +3,6 @@ package me.aleksilassila.islands;
 import me.aleksilassila.islands.commands.IslandCommands;
 import me.aleksilassila.islands.commands.IslandManagmentCommands;
 import me.aleksilassila.islands.commands.TrustCommands;
-import me.aleksilassila.islands.generation.EmptyWorldGenerator;
 import me.aleksilassila.islands.listeners.IslandsListener;
 import me.aleksilassila.islands.utils.UpdateChecker;
 import net.milkbowl.vault.permission.Permission;
@@ -35,16 +34,16 @@ public class Main extends JavaPlugin {
     @Override
     public void onEnable() {
         if (!setupPermissions()) {
-            Bukkit.getLogger().severe("No Vault found. Some permissions disabled.");
+            getLogger().severe("No Vault found. Some permissions disabled.");
             getServer().getPluginManager().disablePlugin(this);
             return;
         }
 
         new UpdateChecker(this, 84303).getVersion(version -> {
             if (this.getDescription().getVersion().equalsIgnoreCase(version)) {
-                Bukkit.getLogger().info("[Islands] You are up to date.");
+                getLogger().info("You are up to date.");
             } else {
-                Bukkit.getLogger().info("[Islands] There's a new update available!");
+                getLogger().info("There's a new update available!");
             }
         });
 
@@ -54,7 +53,7 @@ public class Main extends JavaPlugin {
         initIslandsConfig();
         initBiomesConfig();
 
-        islandsWorld = Bukkit.getWorlds().get(0);
+        islandsWorld = getIslandsWorld();
         islandsSourceWorld = getSourceWorld();
         wildernessWorld = getWilderness();
 
@@ -154,9 +153,45 @@ public class Main extends JavaPlugin {
         }
     }
 
-    World getSourceWorld() {
-        Bukkit.getServer().getLogger().info("Creating islands source world...");
+    World getIslandsWorld() {
+        String name = getConfig().getString("islandsWorldName") == null
+                ? "world" : getConfig().getString("islandsWorldName");
 
+        for (World world : Bukkit.getWorlds()) {
+            if (world.getName().equals(name)) {
+                getLogger().info("Islands world set to " + name);
+                return world;
+            }
+        }
+
+        getLogger().info("No islands world found. Creating one called " + name + "...");
+
+        World world = new WorldCreator(name).createWorld();
+        world.setDifficulty(Difficulty.NORMAL);
+
+        return world;
+    }
+
+    World getWilderness() {
+        String name = getConfig().getString("wildernessWorldName") == null
+                ? "wilderness" : getConfig().getString("wildernessWorldName");
+
+        for (World world : Bukkit.getWorlds()) {
+            if (world.getName().equals(name)) {
+                getLogger().info("Wilderness world set to " + name);
+                return world;
+            }
+        }
+
+        getLogger().info("No wilderness found. Creating one called " + name + "...");
+
+        World world = new WorldCreator(name).createWorld();
+        world.setDifficulty(Difficulty.HARD);
+
+        return world;
+    }
+
+    World getSourceWorld() {
         WorldCreator wc = new WorldCreator("islandsSource");
 
         wc.environment(World.Environment.NORMAL);
@@ -167,37 +202,7 @@ public class Main extends JavaPlugin {
 
         world.setDifficulty(Difficulty.PEACEFUL);
 
-        return world;
-    }
-
-    World getWilderness() {
-        Bukkit.getServer().getLogger().info("Creating wilderness...");
-
-        WorldCreator wc = new WorldCreator("wilderness");
-
-        wc.environment(World.Environment.NORMAL);
-        wc.type(WorldType.NORMAL);
-
-        World world = wc.createWorld();
-
-        world.setDifficulty(Difficulty.HARD);
-
-        return world;
-    }
-
-
-    World createIslandsWorldIfNecessary() {
-        Bukkit.getServer().getLogger().info("Creating islands world...");
-
-        WorldCreator wc = new WorldCreator("islands");
-
-        wc.environment(World.Environment.NORMAL);
-        wc.type(WorldType.FLAT);
-        wc.generator(new EmptyWorldGenerator());
-
-        World world = wc.createWorld();
-
-        world.setDifficulty(Difficulty.PEACEFUL);
+        getLogger().info("Islands source world set to islandsSource");
 
         return world;
     }
