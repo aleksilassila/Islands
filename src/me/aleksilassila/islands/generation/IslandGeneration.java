@@ -135,7 +135,7 @@ public class IslandGeneration {
 
             loop:
             for (int count = 0; count < rowsBuiltPerDelay; count++) {
-                for (int y = startY + islandSize; y >= startY; y--) {
+                for (int y = startY; y < startY + islandSize; y++) {
                     int relativeX = index / islandSize;
                     int relativeZ = index - relativeX * islandSize;
 
