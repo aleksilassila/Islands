@@ -116,25 +116,26 @@ To further customize the plugin, check `plugins/islands/config.yml`.
 
 ## Permissions
 
-| Permission              | Affect                                  |
-|-------------------------|-----------------------------------------|
-| `islands`               | Use /islands command                    |
-| `islands.create`        | Create island                           |
-| `islands.create.small`  | Create / regenerate small island        |
-| `islands.create.normal` | Create / regenerate normal island       |
-| `islands.create.big`    | Create / regenerate big island          |
-| `islands.create.custom` | Create / regenerate custom sized island |
-| `islands.regenerate`    | Regenerate island                       |
-| `islands.delete`        | Delete island                           |
-| `islands.give`          | Give island                             |
-| `islands.name`          | Name island                             |
-| `islands.unname`        | Unname island                           |
-| `islands.home`          | Use /home command                       |
-| `islands.home.list`     | Use /homes command                      |
-| `islands.turst`         | Trust person                            |
-| `islands.turst.list`    | List island's trusted players           |
-| `islands.untrust`       | Untrust person                          |
-| `islands.visit`         | Visit island                            |
+| Permission                      | Affect                                  |
+|---------------------------------|-----------------------------------------|
+| `islands.command`               | Use /islands command                    |
+| `islands.command.create`        | Create island                           |
+| `islands.command.create.small`  | Create / regenerate small island        |
+| `islands.command.create.normal` | Create / regenerate normal island       |
+| `islands.command.create.big`    | Create / regenerate big island          |
+| `islands.command.create.custom` | Create / regenerate custom sized island |
+| `islands.command.regenerate`    | Regenerate island                       |
+| `islands.command.delete`        | Delete island                           |
+| `islands.command.give`          | Give island                             |
+| `islands.command.name`          | Name island                             |
+| `islands.command.unname`        | Unname island                           |
+| `islands.command.home`          | Use /home command                       |
+| `islands.command.home.list`     | Use /homes command                      |
+| `islands.command.turst`         | Trust person                            |
+| `islands.command.turst.list`    | List island's trusted players           |
+| `islands.command.untrust`       | Untrust person                          |
+| `islands.command.visit`         | Visit island                            |
+
 
 Bypasses
 

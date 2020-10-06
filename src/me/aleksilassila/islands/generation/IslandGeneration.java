@@ -141,11 +141,6 @@ public class IslandGeneration {
 
                     Block sourceBlock = islands.sourceWorld.getBlockAt(startX + relativeX, y, startZ + relativeZ);
 
-                    //WIP
-                    //            if (Math.random() < - ((8 * (y - sourceY)) / (double) islandSize) + 2) {
-                    //                continue;
-                    //            }
-
                     Block target = islands.plugin.islandsWorld.getBlockAt(targetX + relativeX, targetY + (y - startY), targetZ + relativeZ);
                     if (isBlockInIslandShape(relativeX, y - startY, relativeZ, islandSize)) {
                         target.setBlockData(sourceBlock.getBlockData());
