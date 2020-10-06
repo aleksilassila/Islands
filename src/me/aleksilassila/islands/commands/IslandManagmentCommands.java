@@ -72,6 +72,7 @@ public class IslandManagmentCommands extends ChatUtils implements TabExecutor {
 
             if (target == null) {
                 player.sendMessage(Messages.error.SUBCOMMAND_NOT_FOUND);
+                sendHelp(player);
                 return true;
             }
             try {
@@ -83,7 +84,7 @@ public class IslandManagmentCommands extends ChatUtils implements TabExecutor {
             }
         }
 
-        sendHelp(player);
+        player.sendMessage(Messages.info.VERSION_INFO(plugin.getDescription().getVersion()));
 
         return true;
     }

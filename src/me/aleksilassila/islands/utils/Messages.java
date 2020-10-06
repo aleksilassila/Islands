@@ -88,6 +88,10 @@ public class Messages extends ChatUtils {
             public static String CLEARING_STATUS(int status) {
                 return info("Clearing event " + status + "% completed.");
             }
+
+            public static String VERSION_INFO(String version) {
+                return info("Islands " + version);
+            }
         }
 
         public static class help {
