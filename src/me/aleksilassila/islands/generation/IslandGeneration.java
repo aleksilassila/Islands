@@ -100,7 +100,7 @@ public class IslandGeneration {
         public void run() {
             if (clearingArea) {
                 for (int count = 0; count < rowsBuiltPerDelay; count++) {
-                    for (int y = startY; y < startY + islands.grid.islandSpacing; y++) {
+                    for (int y = startY + islands.grid.islandSpacing; y >= startY; y--) {
                         int relativeX = clearingIndex / islands.grid.islandSpacing;
                         int relativeZ = clearingIndex - relativeX * islands.grid.islandSpacing;
 
@@ -135,7 +135,7 @@ public class IslandGeneration {
 
             loop:
             for (int count = 0; count < rowsBuiltPerDelay; count++) {
-                for (int y = startY; y < startY + islandSize; y++) {
+                for (int y = startY + islandSize; y >= startY; y--) {
                     int relativeX = index / islandSize;
                     int relativeZ = index - relativeX * islandSize;
 
