@@ -39,20 +39,20 @@ public class IslandsListener extends ChatUtils implements Listener {
     @EventHandler(priority = EventPriority.LOWEST)
     public void onPlayerJoin(PlayerJoinEvent event) {
         if (!event.getPlayer().hasPlayedBefore()) {
-            String spawnIsland = plugin.islands.grid.getSpawnIsland();
+            String spawnIsland = plugin.islands.layout.getSpawnIsland();
 
             if (spawnIsland != null) {
-                event.getPlayer().teleport(plugin.islands.grid.getIslandSpawn(spawnIsland));
+                event.getPlayer().teleport(plugin.islands.layout.getIslandSpawn(spawnIsland));
             }
         }
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void onPlayerRespawn(PlayerRespawnEvent event) {
-        String spawnIsland = plugin.islands.grid.getSpawnIsland();
+        String spawnIsland = plugin.islands.layout.getSpawnIsland();
 
         if (spawnIsland != null) {
-            event.setRespawnLocation(plugin.islands.grid.getIslandSpawn(spawnIsland));
+            event.setRespawnLocation(plugin.islands.layout.getIslandSpawn(spawnIsland));
         }
     }
 
@@ -75,7 +75,7 @@ public class IslandsListener extends ChatUtils implements Listener {
     @EventHandler
     public void onBlockFromTo(BlockFromToEvent event) {
         if (!event.getBlock().getWorld().equals(plugin.islandsWorld)) return;
-        boolean canFlow = plugin.islands.grid.isBlockInIslandSphere(event.getBlock().getX(), event.getBlock().getY(), event.getBlock().getZ());
+        boolean canFlow = plugin.islands.layout.isBlockInIslandSphere(event.getBlock().getX(), event.getBlock().getY(), event.getBlock().getZ());
 
         if(!canFlow) {
             event.setCancelled(true);
@@ -123,9 +123,9 @@ public class IslandsListener extends ChatUtils implements Listener {
              int x = e.getEntity().getLocation().getBlockX();
              int z = e.getEntity().getLocation().getBlockZ();
 
-             String ownerUUID = plugin.islands.grid.getBlockOwnerUUID(x, z);
+             String ownerUUID = plugin.islands.layout.getBlockOwnerUUID(x, z);
              if (ownerUUID != null && !ownerUUID.equals(e.getDamager().getUniqueId().toString())) {
-                 if (plugin.islands.grid.getTrusted(plugin.islands.grid.getIslandId(x, z)).contains(e.getDamager().getUniqueId().toString())) {
+                 if (plugin.islands.layout.getTrusted(plugin.islands.layout.getIslandId(x, z)).contains(e.getDamager().getUniqueId().toString())) {
                      return;
                  }
 
@@ -145,10 +145,10 @@ public class IslandsListener extends ChatUtils implements Listener {
             int x = e.getClickedBlock().getX();
             int z = e.getClickedBlock().getZ();
 
-            String ownerUUID = plugin.islands.grid.getBlockOwnerUUID(x, z);
+            String ownerUUID = plugin.islands.layout.getBlockOwnerUUID(x, z);
 
             if (ownerUUID == null || !ownerUUID.equals(e.getPlayer().getUniqueId().toString())) {
-                if (plugin.islands.grid.getTrusted(plugin.islands.grid.getIslandId(x, z)).contains(e.getPlayer().getUniqueId().toString())) {
+                if (plugin.islands.layout.getTrusted(plugin.islands.layout.getIslandId(x, z)).contains(e.getPlayer().getUniqueId().toString())) {
                     return;
                 }
 
@@ -169,10 +169,10 @@ public class IslandsListener extends ChatUtils implements Listener {
             int x = e.getBlock().getX();
             int z = e.getBlock().getZ();
 
-            String ownerUUID = plugin.islands.grid.getBlockOwnerUUID(x, z);
+            String ownerUUID = plugin.islands.layout.getBlockOwnerUUID(x, z);
 
             if (ownerUUID == null || !ownerUUID.equals(e.getPlayer().getUniqueId().toString())) {
-                if (plugin.islands.grid.getTrusted(plugin.islands.grid.getIslandId(x, z)).contains(e.getPlayer().getUniqueId().toString())) {
+                if (plugin.islands.layout.getTrusted(plugin.islands.layout.getIslandId(x, z)).contains(e.getPlayer().getUniqueId().toString())) {
                     return;
                 }
 

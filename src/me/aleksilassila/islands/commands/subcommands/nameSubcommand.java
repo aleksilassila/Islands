@@ -1,10 +1,10 @@
 package me.aleksilassila.islands.commands.subcommands;
 
+import me.aleksilassila.islands.IslandLayout;
 import me.aleksilassila.islands.Main;
-import me.aleksilassila.islands.utils.Permissions;
 import me.aleksilassila.islands.commands.Subcommand;
-import me.aleksilassila.islands.generation.IslandGrid;
 import me.aleksilassila.islands.utils.Messages;
+import me.aleksilassila.islands.utils.Permissions;
 import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
@@ -12,12 +12,12 @@ import java.util.Arrays;
 import java.util.List;
 
 public class nameSubcommand extends Subcommand {
-    private Main plugin;
-    private IslandGrid grid;
+    private final Main plugin;
+    private final IslandLayout layout;
 
     public nameSubcommand(Main plugin) {
         this.plugin = plugin;
-        this.grid = plugin.islands.grid;
+        this.layout = plugin.islands.layout;
     }
 
     @Override
@@ -37,16 +37,16 @@ public class nameSubcommand extends Subcommand {
             return;
         }
 
-        String islandId = grid.getIslandId(player.getLocation().getBlockX(), player.getLocation().getBlockZ());
+        String islandId = layout.getIslandId(player.getLocation().getBlockX(), player.getLocation().getBlockZ());
 
         if (islandId == null) {
             player.sendMessage(Messages.error.UNAUTHORIZED);
             return;
         }
 
-        if (plugin.getIslandsConfig().getString("islands." + islandId + ".UUID").equals(player.getUniqueId().toString())
+        if (plugin.getIslandsConfig().getString(islandId + ".UUID").equals(player.getUniqueId().toString())
                 || Permissions.checkPermission(player, Permissions.bypass.name)) {
-            if (grid.getPublicIsland(args[0]) != null) {
+            if (layout.getIslandByName(args[0]) != null) {
                 player.sendMessage(Messages.error.NAME_TAKEN);
                 return;
             }
@@ -56,7 +56,7 @@ public class nameSubcommand extends Subcommand {
                 return;
             }
 
-            grid.nameIsland(islandId, args[0]);
+            layout.nameIsland(islandId, args[0]);
 
             player.sendMessage(Messages.success.NAME_CHANGED(args[0]));
         } else {

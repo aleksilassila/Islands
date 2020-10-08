@@ -1,12 +1,12 @@
 package me.aleksilassila.islands.commands.subcommands;
 
+import me.aleksilassila.islands.IslandLayout;
 import me.aleksilassila.islands.Islands;
 import me.aleksilassila.islands.Main;
-import me.aleksilassila.islands.utils.Permissions;
 import me.aleksilassila.islands.commands.IslandManagmentCommands;
 import me.aleksilassila.islands.commands.Subcommand;
-import me.aleksilassila.islands.generation.IslandGrid;
 import me.aleksilassila.islands.utils.Messages;
+import me.aleksilassila.islands.utils.Permissions;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.block.Biome;
@@ -18,18 +18,18 @@ import java.util.HashMap;
 import java.util.List;
 
 public class regenerateSubcommand extends Subcommand {
-    private Main plugin;
-    private IslandGrid grid;
+    private final Main plugin;
+    private final IslandLayout layout;
 
-    private IslandManagmentCommands.Utils utils = new IslandManagmentCommands.Utils();
+    private final IslandManagmentCommands.Utils utils = new IslandManagmentCommands.Utils();
 
     public regenerateSubcommand(Main plugin) {
         this.plugin = plugin;
-        this.grid = plugin.islands.grid;
+        this.layout = plugin.islands.layout;
     }
 
     private boolean isSmallerThanOldIsland(int newSize, String islandId) {
-        return newSize < plugin.getIslandsConfig().getInt("islands." + islandId + ".size");
+        return newSize < plugin.getIslandsConfig().getInt(islandId + ".size");
     }
 
     @Override
@@ -62,7 +62,7 @@ public class regenerateSubcommand extends Subcommand {
             return;
         }
 
-        if (islandSize < Islands.IslandSize.SMALL.getSize() || islandSize + 4 >= grid.islandSpacing) {
+        if (islandSize < Islands.IslandSize.SMALL.getSize() || islandSize + 4 >= layout.islandSpacing) {
             player.sendMessage(Messages.error.INVALID_ISLAND_SIZE);
             return;
         }
@@ -85,10 +85,10 @@ public class regenerateSubcommand extends Subcommand {
             return;
         }
 
-        islandId = grid.getIslandId(player.getLocation().getBlockX(), player.getLocation().getBlockZ());
+        islandId = layout.getIslandId(player.getLocation().getBlockX(), player.getLocation().getBlockZ());
 
         if (islandId == null ||
-                (!plugin.getIslandsConfig().getString("islands." + islandId + ".UUID").equals(player.getUniqueId().toString())
+                (!plugin.getIslandsConfig().getString(islandId + ".UUID").equals(player.getUniqueId().toString())
                 && !Permissions.checkPermission(player, Permissions.bypass.regenerate))) {
             player.sendMessage(Messages.error.UNAUTHORIZED);
             return;

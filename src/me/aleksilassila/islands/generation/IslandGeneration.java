@@ -2,9 +2,7 @@ package me.aleksilassila.islands.generation;
 
 import com.sun.istack.internal.Nullable;
 import me.aleksilassila.islands.Islands;
-import me.aleksilassila.islands.utils.ChatUtils;
 import me.aleksilassila.islands.utils.Messages;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Biome;
@@ -100,30 +98,30 @@ public class IslandGeneration {
         public void run() {
             if (clearingArea) {
                 for (int count = 0; count < rowsBuiltPerDelay; count++) {
-                    for (int y = startY + islands.grid.islandSpacing; y >= startY; y--) {
-                        int relativeX = clearingIndex / islands.grid.islandSpacing;
-                        int relativeZ = clearingIndex - relativeX * islands.grid.islandSpacing;
+                    for (int y = startY + islands.layout.islandSpacing; y >= startY; y--) {
+                        int relativeX = clearingIndex / islands.layout.islandSpacing;
+                        int relativeZ = clearingIndex - relativeX * islands.layout.islandSpacing;
 
                         Block target = islands.plugin.islandsWorld.getBlockAt(
-                                xIndex * islands.grid.islandSpacing + relativeX,
+                                xIndex * islands.layout.islandSpacing + relativeX,
                                 targetY + (y - startY),
-                                zIndex * islands.grid.islandSpacing + relativeZ
+                                zIndex * islands.layout.islandSpacing + relativeZ
                         );
 
                         target.setType(Material.AIR);
                         target.setBiome(Biome.PLAINS);
                     }
 
-                    if (clearingIndex >= islands.grid.islandSpacing * islands.grid.islandSpacing) {
+                    if (clearingIndex >= islands.layout.islandSpacing * islands.layout.islandSpacing) {
                         player.sendMessage(Messages.success.CLEARING_DONE);
 
                         clearingArea = false;
                         break;
-                    } else if (clearingIndex == islands.grid.islandSpacing * islands.grid.islandSpacing / 4) {
+                    } else if (clearingIndex == islands.layout.islandSpacing * islands.layout.islandSpacing / 4) {
                         player.sendMessage(Messages.info.CLEARING_STATUS(25));
-                    } else if (clearingIndex == islands.grid.islandSpacing * islands.grid.islandSpacing / 2) {
+                    } else if (clearingIndex == islands.layout.islandSpacing * islands.layout.islandSpacing / 2) {
                         player.sendMessage(Messages.info.CLEARING_STATUS(50));
-                    } else if (clearingIndex == islands.grid.islandSpacing * islands.grid.islandSpacing / 4 * 3) {
+                    } else if (clearingIndex == islands.layout.islandSpacing * islands.layout.islandSpacing / 4 * 3) {
                         player.sendMessage(Messages.info.CLEARING_STATUS(75));
                     }
 

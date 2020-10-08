@@ -1,12 +1,12 @@
 package me.aleksilassila.islands.commands.subcommands;
 
+import me.aleksilassila.islands.IslandLayout;
 import me.aleksilassila.islands.Islands;
 import me.aleksilassila.islands.Main;
-import me.aleksilassila.islands.utils.Permissions;
 import me.aleksilassila.islands.commands.IslandManagmentCommands;
 import me.aleksilassila.islands.commands.Subcommand;
-import me.aleksilassila.islands.generation.IslandGrid;
 import me.aleksilassila.islands.utils.Messages;
+import me.aleksilassila.islands.utils.Permissions;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.block.Biome;
@@ -19,14 +19,14 @@ import java.util.HashMap;
 import java.util.List;
 
 public class createSubcommand extends Subcommand {
-    private Main plugin;
-    private IslandGrid grid;
-    private IslandManagmentCommands.Utils utils = new IslandManagmentCommands.Utils();
+    private final Main plugin;
+    private final IslandLayout layout;
+    private final IslandManagmentCommands.Utils utils = new IslandManagmentCommands.Utils();
 
     public createSubcommand(Main plugin) {
         this.plugin = plugin;
 
-        this.grid = plugin.islands.grid;
+        this.layout = plugin.islands.layout;
     }
 
     @Override
@@ -55,7 +55,7 @@ public class createSubcommand extends Subcommand {
             return;
         }
 
-        if (islandSize < Islands.IslandSize.SMALL.getSize() || islandSize + 4 >= grid.islandSpacing) {
+        if (islandSize < Islands.IslandSize.SMALL.getSize() || islandSize + 4 >= layout.islandSpacing) {
             player.sendMessage(Messages.error.INVALID_ISLAND_SIZE);
             return;
         }
@@ -76,7 +76,7 @@ public class createSubcommand extends Subcommand {
         }
 
 
-        int previousIslands = grid.getAllIslandIds(player.getUniqueId()).size();
+        int previousIslands = layout.getAllIslandIds(player.getUniqueId()).size();
 
         int islandsLimit = plugin.getConfig().getInt("defaultIslandLimit");
 

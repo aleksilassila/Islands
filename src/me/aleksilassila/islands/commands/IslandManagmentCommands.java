@@ -6,7 +6,7 @@ import me.aleksilassila.islands.Islands;
 import me.aleksilassila.islands.Main;
 import me.aleksilassila.islands.utils.Permissions;
 import me.aleksilassila.islands.commands.subcommands.*;
-import me.aleksilassila.islands.generation.IslandGrid;
+import me.aleksilassila.islands.IslandLayout;
 import me.aleksilassila.islands.utils.ChatUtils;
 import me.aleksilassila.islands.utils.ConfirmItem;
 import me.aleksilassila.islands.utils.Messages;
@@ -20,12 +20,10 @@ import java.util.*;
 
 public class IslandManagmentCommands extends ChatUtils implements TabExecutor {
     private final Main plugin;
-    private final IslandGrid grid;
-    private Set<Subcommand> subcommands;
+    private final Set<Subcommand> subcommands;
 
     public IslandManagmentCommands(Main plugin) {
         this.plugin = plugin;
-        this.grid = plugin.islands.grid;
 
         plugin.getCommand("island").setExecutor(this);
 

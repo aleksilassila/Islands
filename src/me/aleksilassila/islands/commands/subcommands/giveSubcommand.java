@@ -1,25 +1,23 @@
 package me.aleksilassila.islands.commands.subcommands;
 
+import me.aleksilassila.islands.IslandLayout;
 import me.aleksilassila.islands.Main;
-import me.aleksilassila.islands.utils.Permissions;
 import me.aleksilassila.islands.commands.Subcommand;
-import me.aleksilassila.islands.generation.IslandGrid;
 import me.aleksilassila.islands.utils.Messages;
+import me.aleksilassila.islands.utils.Permissions;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class giveSubcommand extends Subcommand {
     private final Main plugin;
-    private final IslandGrid grid;
+    private final IslandLayout layout;
 
     public giveSubcommand(Main plugin) {
         this.plugin = plugin;
-        this.grid = plugin.islands.grid;
+        this.layout = plugin.islands.layout;
     }
 
     @Override
@@ -40,16 +38,16 @@ public class giveSubcommand extends Subcommand {
             return;
         }
 
-        String islandId = grid.getIslandId(player.getLocation().getBlockX(), player.getLocation().getBlockZ());
+        String islandId = layout.getIslandId(player.getLocation().getBlockX(), player.getLocation().getBlockZ());
 
         if (islandId == null) {
             player.sendMessage(Messages.error.UNAUTHORIZED);
             return;
         }
-        ConfigurationSection section = plugin.getIslandsConfig().getConfigurationSection("islands." + islandId + ".UUID");
-        if ((section != null && plugin.getIslandsConfig().getString("islands." + islandId + ".UUID").equals(player.getUniqueId().toString()))
+        ConfigurationSection section = plugin.getIslandsConfig().getConfigurationSection(islandId + ".UUID");
+        if ((section != null && plugin.getIslandsConfig().getString(islandId + ".UUID").equals(player.getUniqueId().toString()))
                 || Permissions.checkPermission(player, Permissions.bypass.give)) {
-            if (plugin.getIslandsConfig().getInt("islands." + islandId + ".public") == 1) {
+            if (plugin.getIslandsConfig().getInt(islandId + ".public") == 1) {
                 if (!confirmed) {
                     player.sendMessage(Messages.info.CONFIRM);
                     return;
@@ -63,11 +61,11 @@ public class giveSubcommand extends Subcommand {
                         return;
                     }
 
-                    grid.giveIsland(islandId, targetPlayer);
+                    layout.giveIsland(islandId, targetPlayer);
                     player.sendMessage(Messages.success.OWNER_CHANGED(args[0]));
                     targetPlayer.sendMessage(Messages.success.ISLAND_RECEIVED(targetPlayer.getName(), args[0]));
                 } else {
-                    grid.giveIsland(islandId);
+                    layout.giveIsland(islandId);
                     player.sendMessage(Messages.success.OWNER_REMOVED);
                 }
             } else {

@@ -49,8 +49,8 @@ public class TrustCommands {
                 return true;
             }
 
-            String ownerUUID = plugin.islands.grid.getBlockOwnerUUID(player.getLocation().getBlockX(), player.getLocation().getBlockZ());
-            String islandId = plugin.islands.grid.getIslandId(player.getLocation().getBlockX(), player.getLocation().getBlockZ());
+            String ownerUUID = plugin.islands.layout.getBlockOwnerUUID(player.getLocation().getBlockX(), player.getLocation().getBlockZ());
+            String islandId = plugin.islands.layout.getIslandId(player.getLocation().getBlockX(), player.getLocation().getBlockZ());
 
             if (ownerUUID == null || islandId == null) {
                 player.sendMessage(Messages.error.NOT_ON_ISLAND);
@@ -69,7 +69,7 @@ public class TrustCommands {
                 return true;
             }
 
-            plugin.islands.grid.removeTrusted(islandId, targetPlayer.getUniqueId().toString());
+            plugin.islands.layout.removeTrusted(islandId, targetPlayer.getUniqueId().toString());
 
             player.sendMessage(Messages.success.UNTRUSTED);
 
@@ -100,8 +100,8 @@ public class TrustCommands {
                 return true;
             }
 
-            String ownerUUID = plugin.islands.grid.getBlockOwnerUUID(player.getLocation().getBlockX(), player.getLocation().getBlockZ());
-            String islandId = plugin.islands.grid.getIslandId(player.getLocation().getBlockX(), player.getLocation().getBlockZ());
+            String ownerUUID = plugin.islands.layout.getBlockOwnerUUID(player.getLocation().getBlockX(), player.getLocation().getBlockZ());
+            String islandId = plugin.islands.layout.getIslandId(player.getLocation().getBlockX(), player.getLocation().getBlockZ());
 
             if (ownerUUID == null || islandId == null) {
                 player.sendMessage(Messages.error.NOT_ON_ISLAND);
@@ -120,7 +120,7 @@ public class TrustCommands {
                 return true;
             }
 
-            plugin.islands.grid.addTrusted(islandId, targetPlayer.getUniqueId().toString());
+            plugin.islands.layout.addTrusted(islandId, targetPlayer.getUniqueId().toString());
 
             player.sendMessage(Messages.success.TRUSTED);
 
@@ -146,8 +146,8 @@ public class TrustCommands {
                 return true;
             }
 
-            String ownerUUID = plugin.islands.grid.getBlockOwnerUUID(player.getLocation().getBlockX(), player.getLocation().getBlockZ());
-            String islandId = plugin.islands.grid.getIslandId(player.getLocation().getBlockX(), player.getLocation().getBlockZ());
+            String ownerUUID = plugin.islands.layout.getBlockOwnerUUID(player.getLocation().getBlockX(), player.getLocation().getBlockZ());
+            String islandId = plugin.islands.layout.getIslandId(player.getLocation().getBlockX(), player.getLocation().getBlockZ());
 
             if (ownerUUID == null || islandId == null) {
                 player.sendMessage(Messages.error.NOT_ON_ISLAND);
@@ -159,7 +159,7 @@ public class TrustCommands {
                 return true;
             }
 
-            List<String> trustedList = plugin.islands.grid.getTrusted(islandId);
+            List<String> trustedList = plugin.islands.layout.getTrusted(islandId);
 
             player.sendMessage(Messages.info.TRUSTED_INFO(trustedList.size()));
             for (String uuid : trustedList) {

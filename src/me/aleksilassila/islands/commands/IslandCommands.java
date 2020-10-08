@@ -1,11 +1,9 @@
 package me.aleksilassila.islands.commands;
 
-import me.aleksilassila.islands.Islands;
 import me.aleksilassila.islands.Main;
 import me.aleksilassila.islands.utils.Messages;
 import me.aleksilassila.islands.utils.Permissions;
-import me.aleksilassila.islands.generation.IslandGrid;
-import me.aleksilassila.islands.utils.ChatUtils;
+import me.aleksilassila.islands.IslandLayout;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -18,14 +16,12 @@ import java.util.Date;
 import java.util.List;
 
 public class IslandCommands {
-    private Main plugin;
-    private Islands islands;
-    private IslandGrid grid;
+    private final Main plugin;
+    private final IslandLayout layout;
 
     public IslandCommands(Main plugin) {
         this.plugin = plugin;
-        this.islands = plugin.islands;
-        this.grid = plugin.islands.grid;
+        this.layout = plugin.islands.layout;
     }
 
     public class VisitCommand implements CommandExecutor {
@@ -60,10 +56,10 @@ public class IslandCommands {
                 return true;
             }
 
-            String islandId = plugin.islands.grid.getPublicIsland(args[0]);
+            String islandId = plugin.islands.layout.getIslandByName(args[0]);
 
             if (islandId != null) {
-                player.teleport(plugin.islands.grid.getIslandSpawn(islandId));
+                player.teleport(plugin.islands.layout.getIslandSpawn(islandId));
             } else {
                 player.sendMessage(Messages.error.HOME_NOT_FOUND);
             }
@@ -95,12 +91,12 @@ public class IslandCommands {
                     return true;
                 }
 
-                List<String> ids = plugin.islands.grid.getAllIslandIds(player.getUniqueId());
+                List<String> ids = plugin.islands.layout.getAllIslandIds(player.getUniqueId());
 
                 player.sendMessage(Messages.success.HOMES_FOUND(ids.size()));
                 for (String islandId : ids) {
-                    String name = plugin.getIslandsConfig().getString("islands." + islandId + ".name");
-                    String homeNumber = plugin.getIslandsConfig().getString("islands." + islandId + ".home");
+                    String name = plugin.getIslandsConfig().getString(islandId + ".name");
+                    String homeNumber = plugin.getIslandsConfig().getString(islandId + ".home");
                     player.sendMessage(ChatColor.AQUA + " - " + name + " (" + homeNumber + ")");
                 }
 
@@ -152,7 +148,7 @@ public class IslandCommands {
                 homeId = 1;
             }
 
-            Location location = grid.getIslandSpawn(grid.getHomeIsland(player.getUniqueId(), homeId));
+            Location location = layout.getIslandSpawn(layout.getHomeIsland(player.getUniqueId(), homeId));
 
             if (location != null) {
                 player.teleport(location);
