@@ -35,8 +35,6 @@ public class Main extends JavaPlugin {
     public void onEnable() {
         if (!setupPermissions()) {
             getLogger().severe("No Vault found. Some permissions disabled.");
-            getServer().getPluginManager().disablePlugin(this);
-            return;
         }
 
         new UpdateChecker(this, 84303).getVersion(version -> {
@@ -81,6 +79,7 @@ public class Main extends JavaPlugin {
     }
 
     private boolean setupPermissions() {
+        if (getServer().getPluginManager().getPlugin("vault") == null) return false;
         RegisteredServiceProvider<Permission> rsp = getServer().getServicesManager().getRegistration(Permission.class);
         if (rsp != null) {
             perms = rsp.getProvider();
