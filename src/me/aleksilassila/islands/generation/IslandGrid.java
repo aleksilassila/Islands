@@ -309,6 +309,28 @@ public class IslandGrid {
         return home;
     }
 
+    static class placement {
+        static int getLayer(int index) {
+            return (int) Math.floor(Math.sqrt(index));
+        }
+
+        static int getLayerSize(int layer) {
+            return 2 * layer + 1;
+        }
+
+        static int firstOfLayer(int layer) {
+            return layer * layer;
+        }
+
+        static String getIslandId(int index) {
+            int layer = getLayer(index);
+
+            int x = Math.min(index - firstOfLayer(layer), layer);
+            int y = (index - firstOfLayer(layer) < layer + 1) ? layer : firstOfLayer(layer) + getLayerSize(layer) - 1 - index;
+
+            return x + "x" + y;
+        }
+    }
     // deleteIsland
     // moveIsland
 }

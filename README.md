@@ -38,6 +38,8 @@ Island Managment:
 - `/island give <player>`, transfers island ownership
 - `/island name <name>`, allows other players to `/vi <name>`
 - `/island unname`, sets island to private
+- `/island setspawn`, set island spawnpoint
+
 
 Other
 - `/home (<id>)`
