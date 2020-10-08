@@ -14,14 +14,12 @@ import java.util.UUID;
 public class IslandLayout {
     private final Islands islands;
 
-    public final int islandsInARow;
     public final int islandSpacing;
     public final int verticalSpacing;
 
     public IslandLayout(Islands instance) {
         this.islands = instance;
 
-        this.islandsInARow = instance.plugin.getConfig().getInt("generation.islandsInARow");
         this.islandSpacing = instance.plugin.getConfig().getInt("generation.islandSpacing");
         this.verticalSpacing = islands.plugin.getConfig().getInt("generation.islandVerticalSpacing");
     }
@@ -203,8 +201,7 @@ public class IslandLayout {
     // UTILS
 
     private int getIslandY(int xIndex, int zIndex) {
-        int islandIndex = (xIndex * islandsInARow + zIndex);
-        return 10 + ((islandIndex + xIndex) % 3) * verticalSpacing;
+        return 10 + ((xIndex + zIndex) % 3) * verticalSpacing;
     }
 
     public int getNumberOfIslands(UUID uuid) {

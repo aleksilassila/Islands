@@ -81,9 +81,9 @@ public class Islands {
                     player,
                     biome,
                     islandSize,
-                    plugin.getIslandsConfig().getInt("islands." + islandId + ".x"),
-                    plugin.getIslandsConfig().getInt("islands." + islandId + ".y"),
-                    plugin.getIslandsConfig().getInt("islands." + islandId + ".z"),
+                    plugin.getIslandsConfig().getInt(islandId + ".x"),
+                    plugin.getIslandsConfig().getInt(islandId + ".y"),
+                    plugin.getIslandsConfig().getInt(islandId + ".z"),
                     false,
                     0,
                     0
@@ -110,12 +110,12 @@ public class Islands {
                     player,
                     biome,
                     islandSize,
-                    plugin.getIslandsConfig().getInt("islands." + islandId + ".x"),
-                    plugin.getIslandsConfig().getInt("islands." + islandId + ".y"),
-                    plugin.getIslandsConfig().getInt("islands." + islandId + ".z"),
+                    plugin.getIslandsConfig().getInt(islandId + ".x"),
+                    plugin.getIslandsConfig().getInt(islandId + ".y"),
+                    plugin.getIslandsConfig().getInt(islandId + ".z"),
                     shouldClearArea,
-                    plugin.getIslandsConfig().getInt("islands." + islandId + ".xIndex"),
-                    plugin.getIslandsConfig().getInt("islands." + islandId + ".zIndex")
+                    plugin.getIslandsConfig().getInt(islandId + ".xIndex"),
+                    plugin.getIslandsConfig().getInt(islandId + ".zIndex")
             );
 
             return success;
