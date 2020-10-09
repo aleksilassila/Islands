@@ -105,6 +105,11 @@ This is because the world specified in `level-name` holds player inventory data.
 
 **Should you not set the world generator for `islands` world, your islands will spawn in normal world instead of an empty one.**
 
+Also it is recommended to allocate > 2GB of memory to the server, 
+since the plugin needs 2 additional worlds to be active (wilderness and islandSource worlds).
+If you experience server freezes when creating an island (like my demo server), 
+it's probably because your server can't handle generating the needed chunks for the new island. 
+
 ### Optional
 
 You can set a specific island as default spawn island for new players.
