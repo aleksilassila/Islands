@@ -7,6 +7,7 @@ import me.aleksilassila.islands.commands.IslandManagmentCommands;
 import me.aleksilassila.islands.commands.Subcommand;
 import me.aleksilassila.islands.utils.Messages;
 import me.aleksilassila.islands.utils.Permissions;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.block.Biome;
@@ -76,7 +77,7 @@ public class createSubcommand extends Subcommand {
         }
 
 
-        int previousIslands = layout.getAllIslandIds(player.getUniqueId()).size();
+        int previousIslands = layout.getIslandIds(player.getUniqueId()).size();
 
         int islandsLimit = plugin.getConfig().getInt("defaultIslandLimit");
 

@@ -3,7 +3,9 @@ package me.aleksilassila.islands;
 import com.sun.istack.internal.NotNull;
 import com.sun.istack.internal.Nullable;
 import me.aleksilassila.islands.generation.IslandGeneration;
+import me.aleksilassila.islands.listeners.IslandVisitGuiHandler;
 import me.aleksilassila.islands.utils.ConfirmItem;
+import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.block.Biome;
 import org.bukkit.entity.Player;
@@ -25,6 +27,8 @@ public class Islands {
     public Set<Player> playersWithNoFall = new HashSet<>();
     public final HashMap<String, ConfirmItem> confirmations;
     public Map<String, Long> teleportCooldowns;
+
+    public final IslandVisitGuiHandler visitGui;
 
     public enum IslandSize {
         SMALL(32), // 32*32
@@ -51,6 +55,7 @@ public class Islands {
         this.islandGeneration = new IslandGeneration(this);
         this.layout = new IslandLayout(this);
 
+        this.visitGui = new IslandVisitGuiHandler(plugin);
     }
 
     public static class IslandsException extends java.lang.Exception {

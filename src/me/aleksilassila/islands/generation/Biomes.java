@@ -15,7 +15,7 @@ public class Biomes {
 
     private World world;
     public HashMap<Biome, List<Location>> availableLocations;
-    private int biggestIslandSize = 80;
+    private int biggestIslandSize;
 
     int biomeSearchJumpBlocks;
     int biomeSearchSize;

@@ -2,14 +2,12 @@ package me.aleksilassila.islands;
 
 import com.sun.istack.internal.NotNull;
 import com.sun.istack.internal.Nullable;
-import me.aleksilassila.islands.Islands;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 public class IslandLayout {
     private final Islands islands;
@@ -66,7 +64,7 @@ public class IslandLayout {
         getIslandsConfig().set(islandId + ".name", name);
         getIslandsConfig().set(islandId + ".home", home);
         getIslandsConfig().set(islandId + ".size", islandSize);
-        getIslandsConfig().set(islandId + ".public", 0);
+        getIslandsConfig().set(islandId + ".public", false);
 
         islands.plugin.saveIslandsConfig();
 
@@ -87,7 +85,7 @@ public class IslandLayout {
     }
 
     @NotNull
-    public List<String> getAllIslandIds(UUID uuid) {
+    public List<String> getIslandIds(UUID uuid) {
         List<String> islands = new ArrayList<>();
 
         for (String islandId : getIslandsConfig().getKeys(false)) {
@@ -100,10 +98,32 @@ public class IslandLayout {
         return islands;
     }
 
+    @NotNull
+    public Map<String, Map<String, String>> getPublicIslands() {
+        Map<String, Map<String, String>> islands = new HashMap<String, Map<String, String>>();
+
+        for (String islandId : getIslandsConfig().getKeys(false)) {
+            if (getIslandsConfig().getBoolean(islandId + ".public")) {
+                String name = getIslandsConfig().getString(islandId + ".name");
+                String ownerUUID = getIslandsConfig().getString(islandId + ".UUID");
+
+                if (name == null || ownerUUID == null) continue;
+
+                Map<String, String> values = new HashMap<>();
+                values.put("name", name);
+                values.put("owner", ownerUUID);
+
+                islands.put(islandId, values);
+            }
+        }
+
+        return islands;
+    }
+
     @Nullable
     public String getIslandByName(String name) {
         for (String islandId : getIslandsConfig().getKeys(false)) {
-            if (getIslandsConfig().getString(islandId + ".name").equalsIgnoreCase(name) && getIslandsConfig().getInt(islandId + ".public") == 1) {
+            if (getIslandsConfig().getString(islandId + ".name").equalsIgnoreCase(name) && getIslandsConfig().getBoolean(islandId + ".public")) {
                 return islandId;
             }
         }
@@ -113,7 +133,7 @@ public class IslandLayout {
 
     @Nullable
     public String getHomeIsland(UUID uuid, int homeId) {
-        List<String> allIslands = getAllIslandIds(uuid);
+        List<String> allIslands = getIslandIds(uuid);
 
         for (String islandId : allIslands) {
             if (getIslandsConfig().getInt(islandId + ".home") == homeId) {
@@ -181,7 +201,7 @@ public class IslandLayout {
     }
 
     public int getNewHomeId(UUID uuid) {
-        List<String> ids = getAllIslandIds(uuid);
+        List<String> ids = getIslandIds(uuid);
         List<Integer> homeIds = new ArrayList<>();
 
         for (String islandId : ids) {
@@ -205,7 +225,7 @@ public class IslandLayout {
     }
 
     public int getNumberOfIslands(UUID uuid) {
-        return getAllIslandIds(uuid).size();
+        return getIslandIds(uuid).size();
     }
 
     @NotNull
@@ -260,14 +280,14 @@ public class IslandLayout {
         int homeId = getIslandsConfig().getInt(islandId + ".home");
 
         getIslandsConfig().set(islandId + ".name", String.valueOf(homeId));
-        getIslandsConfig().set(islandId + ".public", 0);
+        getIslandsConfig().set(islandId + ".public", false);
 
         islands.plugin.saveIslandsConfig();
     }
 
     public void nameIsland(String islandId, String name){
             getIslandsConfig().set(islandId + ".name", name);
-            getIslandsConfig().set(islandId + ".public", 1);
+            getIslandsConfig().set(islandId + ".public", true);
 
             islands.plugin.saveIslandsConfig();
     }
