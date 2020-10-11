@@ -6,6 +6,15 @@ that can be reset often without losing players' progress.
 
 If you want to see the plugin in action, you can visit 46.101.169.26 (1.16.2)
 
+## Table Of Contents
+- [Features](#features)
+- [Commands](#commands)
+- [Screenshots](#screenshots)
+- [Setting up](#setting-up)
+- [Permissions](#permissions)
+- [How does it work?](#how-does-it-work)
+
+
 ## Features
 "Okay cool, islands. What's the point?" Here are some problems that this plugin solves.
 
@@ -119,7 +128,7 @@ The plugin will generate `wilderness` world for you, which is where players will
 You can change the world name with `wildernessWorldName` in the plugin config.
 *Unless `wildernessWorldName` is the same as `level-name`, deleting this world should not wipe players' inventories.*
 
-To further customize the plugin, check `plugins/islands/config.yml`.
+To further customize the plugin, check [plugins/islands/config.yml example](src/config.yml) and [How does it work?](#how-does-it-work).
 
 ## Permissions
 
@@ -159,3 +168,30 @@ Bypasses
 | `islands.bypass.untrust`     | Remove trusted person from anyone's island                              |
 | `islands.bypass.protection`  | Interact with anyone's island                                           |
 | `islands.bypass.home`        | Use /home from anywhere                                                 |
+
+## How does it work?
+
+The plugin searches `islandsSource` world for biomes that are big enough for an island.
+Once it finds one, it saves the location of that biome in `plugins/Islands/biomeCache.yml`.
+When a player creates island with that specific biome, 
+it fetches the biome location from that file and copies the correct blocks in island shape from
+`islandsSource` world to `islands` world.
+
+So `biomeCache.yml` holds a list of biome coordinates. Each coordinate points to corresponding biome in `islandsSource` world.
+This file gets overwritten whenever new `islandsSource` world gets generated (=the source seed changes).
+
+You can change the biome search area in `config.yml` to increase the variety of available biomes.
+To combat increasing server start time, you can lower `generation.maxVariationsPerBiome` and 
+*blacklist unwanted biomes (not implemented)*.
+
+`islands.yml` contains all the information about islands: their name, status, position etc.
+Islands are generated in square grid layout (example below). Each island has its unique islandId that points
+its location in the grid. Ids follow simple formula: grid x + "x" + grid y. For example: 0x0, 2x4, 12x1.
+
+Layout:
+```
+0 3 8
+1 2 7
+4 5 6
+9 ...
+```
