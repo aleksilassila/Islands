@@ -1,14 +1,13 @@
 package me.aleksilassila.islands.commands.subcommands;
 
-import me.aleksilassila.islands.Main;
-import me.aleksilassila.islands.utils.Permissions;
-import me.aleksilassila.islands.commands.Subcommand;
 import me.aleksilassila.islands.IslandLayout;
+import me.aleksilassila.islands.Main;
+import me.aleksilassila.islands.commands.Subcommand;
 import me.aleksilassila.islands.utils.Messages;
+import me.aleksilassila.islands.utils.Permissions;
 import org.bukkit.entity.Player;
 
 import java.util.List;
-import java.util.Optional;
 
 public class setSpawnSubcommand extends Subcommand {
     private final Main plugin;
@@ -38,7 +37,7 @@ public class setSpawnSubcommand extends Subcommand {
             return;
         }
 
-        if (Optional.ofNullable(plugin.getIslandsConfig().getString(islandId + ".UUID")).orElse("").equals(player.getUniqueId().toString())
+        if (layout.getUUID(islandId).equals(player.getUniqueId().toString())
                 || Permissions.checkPermission(player, Permissions.bypass.setSpawn)) {
             layout.setSpawnPoint(islandId, player.getLocation().getBlockX(), player.getLocation().getBlockZ());
 

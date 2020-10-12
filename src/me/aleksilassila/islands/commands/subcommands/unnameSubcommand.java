@@ -48,7 +48,7 @@ public class unnameSubcommand extends Subcommand {
             return;
         }
 
-        if (plugin.getIslandsConfig().getString(islandId + ".UUID").equals(player.getUniqueId().toString())
+        if (layout.getUUID(islandId).equals(player.getUniqueId().toString())
                 || Permissions.checkPermission(player, Permissions.bypass.unname)) {
             layout.unnameIsland(islandId);
 

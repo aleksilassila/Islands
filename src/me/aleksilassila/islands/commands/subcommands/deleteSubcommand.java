@@ -37,7 +37,7 @@ public class deleteSubcommand extends Subcommand {
             return;
         }
 
-        if (!plugin.getIslandsConfig().getString(islandId + ".UUID").equals(player.getUniqueId().toString())
+        if (!layout.getUUID(islandId).equals(player.getUniqueId().toString())
                 && !Permissions.checkPermission(player, Permissions.bypass.delete)) {
             player.sendMessage(Messages.error.UNAUTHORIZED);
             return;

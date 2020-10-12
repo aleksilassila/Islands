@@ -247,6 +247,11 @@ public class IslandLayout {
         return xIndex + "x" + zIndex;
     }
 
+    @NotNull
+    public String getUUID(String islandId) {
+        return Optional.ofNullable(getIslandsConfig().getString(islandId + ".UUID")).orElse("");
+    }
+
     // MANAGMENT
 
     public void updateIsland(String islandId, int islandSize, Biome biome) {

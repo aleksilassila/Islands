@@ -45,7 +45,7 @@ public class giveSubcommand extends Subcommand {
             return;
         }
         ConfigurationSection section = plugin.getIslandsConfig().getConfigurationSection(islandId + ".UUID");
-        if ((section != null && plugin.getIslandsConfig().getString(islandId + ".UUID").equals(player.getUniqueId().toString()))
+        if ((section != null && layout.getUUID(islandId).equals(player.getUniqueId().toString()))
                 || Permissions.checkPermission(player, Permissions.bypass.give)) {
             if (plugin.getIslandsConfig().getBoolean(islandId + ".public")) {
                 if (!confirmed) {

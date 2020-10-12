@@ -88,7 +88,7 @@ public class regenerateSubcommand extends Subcommand {
         islandId = layout.getIslandId(player.getLocation().getBlockX(), player.getLocation().getBlockZ());
 
         if (islandId == null ||
-                (!plugin.getIslandsConfig().getString(islandId + ".UUID").equals(player.getUniqueId().toString())
+                (!layout.getUUID(islandId).equals(player.getUniqueId().toString())
                 && !Permissions.checkPermission(player, Permissions.bypass.regenerate))) {
             player.sendMessage(Messages.error.UNAUTHORIZED);
             return;
