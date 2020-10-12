@@ -6,9 +6,11 @@ import me.aleksilassila.islands.utils.BiomeMaterials;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryView;
+import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
@@ -17,12 +19,16 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class VisitGui implements IVisitGui {
-    private Inventory inventory;
     private final Main plugin;
 
-    private final int inventorySize = 9 * 6;
-    private final int whiteSpace = 0;
-    private final int islandsOnPage = inventorySize - whiteSpace - 9;
+    private final int INVENTORY_SIZE = 9 * 2;
+    private final int WHITESPACE = 0;
+    private final int ISLANDS_ON_PAGE = INVENTORY_SIZE - WHITESPACE - 9;
+
+    private final Material TOOLBAR_FILL_MATERIAL = Material.GRAY_STAINED_GLASS_PANE;
+
+    private final int PREVIOUS_PAGE_PADDING = 3;
+    private final int NEXT_PAGE_PADDING = 5;
 
     private int page = 0;
     private int sort = 0;
@@ -38,74 +44,90 @@ public class VisitGui implements IVisitGui {
 
     @Override
     public void onInventoryClick(Player player, int slot, ItemStack clickedItem, InventoryView inventoryView) {
-        if(clickedItem == null || clickedItem.getType().equals(Material.AIR))
+        if(clickedItem == null || clickedItem.getType().equals(Material.AIR) || clickedItem.getType().equals(TOOLBAR_FILL_MATERIAL))
             return;
 
-        if (slot < islandsOnPage) {
+        if (slot < ISLANDS_ON_PAGE) {
             player.closeInventory();
             player.performCommand("visit " +  ChatColor.stripColor(clickedItem.getItemMeta().getDisplayName()));
-        } else if (slot - islandsOnPage - whiteSpace == 0) {
+        } else if (slot - ISLANDS_ON_PAGE - WHITESPACE == PREVIOUS_PAGE_PADDING) {
             player.openInventory(this.setPage(parsePage(inventoryView.getTitle()) - 1).getInventory());
-        } else if (slot - islandsOnPage - whiteSpace == 8) {
+        } else if (slot - ISLANDS_ON_PAGE - WHITESPACE == NEXT_PAGE_PADDING) {
             player.openInventory(this.setPage(parsePage(inventoryView.getTitle()) + 1).getInventory());
-        } else if (slot - islandsOnPage - whiteSpace == 4) {
+        } else if (slot - ISLANDS_ON_PAGE - WHITESPACE == 4) {
             int i = parseSort(inventoryView.getTitle());
             player.openInventory(this.setPage(parsePage(inventoryView.getTitle())).setSort(i == 0 ? 1 : 0).getInventory());
         }
     }
 
     private Inventory getInventoryPage() {
-        Inventory inv = Bukkit.createInventory(this, inventorySize, "Visit Island - By " + parseSort(sort) + " - [" + page + "]");
+        Inventory inv = Bukkit.createInventory(this, INVENTORY_SIZE, "Visit Island - By " + parseSort(sort) + " - [" + page + "]");
         Map<String, Map<String, String>> publicIslands = plugin.islands.layout.getPublicIslands();
 
         List<String> sortedSet = new ArrayList<>(publicIslands.keySet());
 
         // Sort islands
         if (sort == 1) { // Sort by date, oldest first
-            sortedSet.sort(Comparator.comparingInt(a -> IslandLayout.placement.getIslandIndex(new int[]{Integer.parseInt(a.split("x")[0]), Integer.parseInt(a.split("x")[1])})));
+            sortedSet.sort(Comparator.comparingInt(a ->
+                    IslandLayout.placement.getIslandIndex(new int[]{Integer.parseInt(a.split("x")[0]), Integer.parseInt(a.split("x")[1])})));
         } else { // Sort by name
             sortedSet.sort(Comparator.comparingInt(a -> publicIslands.get(a).get("name").charAt(0)));
         }
 
 
+
+
         // Add islands to inventory
         int index = 0;
-        int startIndex = islandsOnPage * page;
+        int startIndex = ISLANDS_ON_PAGE * page;
         for (String islandId : sortedSet) {
-            if (index < startIndex || index >= startIndex + islandsOnPage) {
+            if (index < startIndex || index >= startIndex + ISLANDS_ON_PAGE) {
                 index++;
                 continue;
             }
 
-            Player player = Bukkit.getPlayer(UUID.fromString(publicIslands.get(islandId).get("owner")));
+            boolean byServer = publicIslands.get(islandId).get("owner") == null;
+
             inv.addItem(createGuiItem(BiomeMaterials.valueOf(publicIslands.get(islandId).get("material")).getMaterial(),
                     ChatColor.GOLD + publicIslands.get(islandId).get("name"),
-                    ChatColor.GRAY + "By " + (player != null ? player.getDisplayName() : "unknown")));
+                    byServer,
+                    ChatColor.GRAY + "By " + (byServer ? "Server" : Bukkit.getPlayer(
+                            UUID.fromString(publicIslands.get(islandId).get("owner"))
+                    ))));
             index++;
         }
 
         // Add toolbar
-        if ((page + 1) * islandsOnPage < publicIslands.size()) {
-            inv.setItem(islandsOnPage + whiteSpace + 8, createGuiItem(Material.ARROW, ChatColor.GOLD + "Go to page " + (page + 1)));
+        if ((page + 1) * ISLANDS_ON_PAGE < publicIslands.size()) {
+            inv.setItem(ISLANDS_ON_PAGE + WHITESPACE + NEXT_PAGE_PADDING,
+                    createGuiItem(Material.ARROW, ChatColor.GOLD + "Next page", false));
         }
 
         if (page > 0) {
-            inv.setItem(islandsOnPage + whiteSpace, createGuiItem(Material.ARROW, ChatColor.GOLD + "Go to page " + (page - 1)));
+            inv.setItem(ISLANDS_ON_PAGE + WHITESPACE + PREVIOUS_PAGE_PADDING,
+                    createGuiItem(Material.ARROW, ChatColor.GOLD + "Previous page", false));
         }
 
-        inv.setItem(islandsOnPage + whiteSpace + 4, createGuiItem(Material.REDSTONE, ChatColor.GOLD + "Sort by " + parseSort(sort == 1 ? 0 : 1)));
+        inv.setItem(ISLANDS_ON_PAGE + WHITESPACE + 4,
+                createGuiItem(Material.REDSTONE, ChatColor.GOLD + "Sort by " + parseSort(sort == 1 ? 0 : 1), false));
 
         // Fill empty toolbar slots
         for (int toolbarIndex = 0; toolbarIndex < 9; toolbarIndex++) {
-            if (inv.getItem(inventorySize - 9 + toolbarIndex) == null) inv.setItem(inventorySize - 9 + toolbarIndex, createGuiItem(Material.GRAY_STAINED_GLASS_PANE, ""));
+            if (inv.getItem(INVENTORY_SIZE - 9 + toolbarIndex) == null)
+                inv.setItem(INVENTORY_SIZE - 9 + toolbarIndex, createGuiItem(TOOLBAR_FILL_MATERIAL, "", false));
         }
 
         return inv;
     }
 
-    protected ItemStack createGuiItem(final Material material, final String name, final String... lore) {
+    protected ItemStack createGuiItem(final Material material, final String name, boolean shiny, final String... lore) {
         final ItemStack item = new ItemStack(material, 1);
         final ItemMeta meta = item.getItemMeta();
+
+        if (shiny) {
+            meta.addEnchant(Enchantment.DURABILITY, 1, true);
+            meta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
+        }
 
         meta.setDisplayName(name);
 

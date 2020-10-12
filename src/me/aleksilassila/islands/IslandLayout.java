@@ -110,7 +110,7 @@ public class IslandLayout {
                 String name = getIslandsConfig().getString(islandId + ".name");
                 String ownerUUID = getIslandsConfig().getString(islandId + ".UUID");
 
-                if (name == null || ownerUUID == null) continue;
+                if (name == null) continue;
 
                 Map<String, String> values = new HashMap<>();
                 values.put("name", name);
