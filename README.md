@@ -73,6 +73,10 @@ Players can trust other players to play together.
 
 ![Island Protection](screenshots/functionality/protection.png?raw=true)
 
+Comes with a handy gui that players can use to visit other public islands!
+
+![Island Protection](screenshots/functionality/visiting_gui.png?raw=true)
+
 ### Example Islands
 
 ![biome](screenshots/islandTypes/badlands.png?raw=true)
