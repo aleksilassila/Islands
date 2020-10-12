@@ -2,8 +2,10 @@ package me.aleksilassila.islands;
 
 import com.sun.istack.internal.NotNull;
 import com.sun.istack.internal.Nullable;
+import me.aleksilassila.islands.utils.BiomeMaterials;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.block.Biome;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 
@@ -26,14 +28,14 @@ public class IslandLayout {
         return islands.plugin.getIslandsConfig();
     }
 
-    public String createIsland(UUID uuid, int islandSize) {
+    public String createIsland(UUID uuid, int islandSize, Biome biome) {
         int index = 0;
 
         while (true) {
             int[] pos = placement.getIslandPos(index);
 
             if (!getIslandsConfig().getKeys(false).contains(posToIslandId(pos[0], pos[1]))) {
-                return addIslandToConfig(pos[0], pos[1], islandSize, uuid, String.valueOf(getNewHomeId(uuid)));
+                return addIslandToConfig(pos[0], pos[1], islandSize, uuid, String.valueOf(getNewHomeId(uuid)), biome);
             }
 
             index++;
@@ -41,7 +43,7 @@ public class IslandLayout {
     }
 
     @NotNull
-    private String addIslandToConfig(int xIndex, int zIndex, int islandSize, UUID uuid, String name) {
+    private String addIslandToConfig(int xIndex, int zIndex, int islandSize, UUID uuid, String name, Biome biome) {
         int realX = xIndex * islandSpacing + islandSpacing / 2 - islandSize / 2;
         int realY = getIslandY(xIndex, zIndex);
         int realZ = zIndex * islandSpacing + islandSpacing / 2 - islandSize / 2;
@@ -65,6 +67,7 @@ public class IslandLayout {
         getIslandsConfig().set(islandId + ".home", home);
         getIslandsConfig().set(islandId + ".size", islandSize);
         getIslandsConfig().set(islandId + ".public", false);
+        getIslandsConfig().set(islandId + ".biome", biome.name());
 
         islands.plugin.saveIslandsConfig();
 
@@ -112,6 +115,13 @@ public class IslandLayout {
                 Map<String, String> values = new HashMap<>();
                 values.put("name", name);
                 values.put("owner", ownerUUID);
+
+                try {
+                    String biome = getIslandsConfig().getString(islandId + ".biome");
+                    values.put("material", BiomeMaterials.valueOf(biome).name());
+                } catch (Exception e) {
+                    values.put("material", BiomeMaterials.DEFAULT.name());
+                }
 
                 islands.put(islandId, values);
             }
@@ -239,7 +249,7 @@ public class IslandLayout {
 
     // MANAGMENT
 
-    public void updateIslandSize(String islandId, int islandSize) {
+    public void updateIsland(String islandId, int islandSize, Biome biome) {
         int xIndex = getIslandsConfig().getInt(islandId + ".xIndex");
         int zIndex = getIslandsConfig().getInt(islandId + ".zIndex");
 
@@ -250,6 +260,7 @@ public class IslandLayout {
         getIslandsConfig().set(islandId + ".z", realZ);
 
         getIslandsConfig().set(islandId + ".size", islandSize);
+        getIslandsConfig().set(islandId + ".biome", biome.name());
 
         islands.plugin.saveIslandsConfig();
     }

@@ -2,6 +2,7 @@ package me.aleksilassila.islands.commands.GUIs;
 
 import me.aleksilassila.islands.IslandLayout;
 import me.aleksilassila.islands.Main;
+import me.aleksilassila.islands.utils.BiomeMaterials;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -19,7 +20,7 @@ public class VisitGui implements IVisitGui {
     private Inventory inventory;
     private final Main plugin;
 
-    private final int inventorySize = 9 * 2;
+    private final int inventorySize = 9 * 6;
     private final int whiteSpace = 0;
     private final int islandsOnPage = inventorySize - whiteSpace - 9;
 
@@ -43,11 +44,11 @@ public class VisitGui implements IVisitGui {
         if (slot < islandsOnPage) {
             player.closeInventory();
             player.performCommand("visit " +  ChatColor.stripColor(clickedItem.getItemMeta().getDisplayName()));
-        } else if (slot - 9 - whiteSpace == 0) {
+        } else if (slot - islandsOnPage - whiteSpace == 0) {
             player.openInventory(this.setPage(parsePage(inventoryView.getTitle()) - 1).getInventory());
-        } else if (slot - 9 - whiteSpace == 8) {
+        } else if (slot - islandsOnPage - whiteSpace == 8) {
             player.openInventory(this.setPage(parsePage(inventoryView.getTitle()) + 1).getInventory());
-        } else if (slot - 9 - whiteSpace == 4) {
+        } else if (slot - islandsOnPage - whiteSpace == 4) {
             int i = parseSort(inventoryView.getTitle());
             player.openInventory(this.setPage(parsePage(inventoryView.getTitle())).setSort(i == 0 ? 1 : 0).getInventory());
         }
@@ -59,12 +60,15 @@ public class VisitGui implements IVisitGui {
 
         List<String> sortedSet = new ArrayList<>(publicIslands.keySet());
 
+        // Sort islands
         if (sort == 1) { // Sort by date, oldest first
             sortedSet.sort(Comparator.comparingInt(a -> IslandLayout.placement.getIslandIndex(new int[]{Integer.parseInt(a.split("x")[0]), Integer.parseInt(a.split("x")[1])})));
         } else { // Sort by name
             sortedSet.sort(Comparator.comparingInt(a -> publicIslands.get(a).get("name").charAt(0)));
         }
 
+
+        // Add islands to inventory
         int index = 0;
         int startIndex = islandsOnPage * page;
         for (String islandId : sortedSet) {
@@ -74,31 +78,37 @@ public class VisitGui implements IVisitGui {
             }
 
             Player player = Bukkit.getPlayer(UUID.fromString(publicIslands.get(islandId).get("owner")));
-            inv.addItem(createGuiItem(Material.GRASS_BLOCK, ChatColor.GOLD + publicIslands.get(islandId).get("name"), ChatColor.GRAY + "By " + (player != null ? player.getDisplayName() : "unknown")));
+            inv.addItem(createGuiItem(BiomeMaterials.valueOf(publicIslands.get(islandId).get("material")).getMaterial(),
+                    ChatColor.GOLD + publicIslands.get(islandId).get("name"),
+                    ChatColor.GRAY + "By " + (player != null ? player.getDisplayName() : "unknown")));
             index++;
         }
+
+        // Add toolbar
         if ((page + 1) * islandsOnPage < publicIslands.size()) {
-            inv.setItem(islandsOnPage + whiteSpace + 8, createGuiItem(Material.BOOK, ChatColor.GOLD + "Go to page " + (page + 1)));
+            inv.setItem(islandsOnPage + whiteSpace + 8, createGuiItem(Material.ARROW, ChatColor.GOLD + "Go to page " + (page + 1)));
         }
 
         if (page > 0) {
-            inv.setItem(islandsOnPage + whiteSpace, createGuiItem(Material.BOOK, ChatColor.GOLD + "Go to page " + (page - 1)));
+            inv.setItem(islandsOnPage + whiteSpace, createGuiItem(Material.ARROW, ChatColor.GOLD + "Go to page " + (page - 1)));
         }
 
-        inv.setItem(islandsOnPage + whiteSpace + 4, createGuiItem(Material.CLOCK, ChatColor.GOLD + "Sort by " + parseSort(sort == 1 ? 0 : 1)));
+        inv.setItem(islandsOnPage + whiteSpace + 4, createGuiItem(Material.REDSTONE, ChatColor.GOLD + "Sort by " + parseSort(sort == 1 ? 0 : 1)));
+
+        // Fill empty toolbar slots
+        for (int toolbarIndex = 0; toolbarIndex < 9; toolbarIndex++) {
+            if (inv.getItem(inventorySize - 9 + toolbarIndex) == null) inv.setItem(inventorySize - 9 + toolbarIndex, createGuiItem(Material.GRAY_STAINED_GLASS_PANE, ""));
+        }
 
         return inv;
     }
 
-    // Nice little method to create a gui item with a custom name, and description
     protected ItemStack createGuiItem(final Material material, final String name, final String... lore) {
         final ItemStack item = new ItemStack(material, 1);
         final ItemMeta meta = item.getItemMeta();
 
-        // Set the name of the item
         meta.setDisplayName(name);
 
-        // Set the lore of the item
         meta.setLore(Arrays.asList(lore));
 
         item.setItemMeta(meta);
@@ -113,12 +123,12 @@ public class VisitGui implements IVisitGui {
     }
 
     private int parseSort(String text) {
-        if (text.contains("age")) return 1;
+        if (text.contains("date")) return 1;
         else return 0;
     }
 
     private String parseSort(int i) {
-        if (i == 1) return "age";
+        if (i == 1) return "date";
         else return "name";
     }
 
