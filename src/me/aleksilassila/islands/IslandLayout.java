@@ -2,14 +2,14 @@ package me.aleksilassila.islands;
 
 import com.sun.istack.internal.NotNull;
 import com.sun.istack.internal.Nullable;
-import me.aleksilassila.islands.Islands;
+import me.aleksilassila.islands.utils.BiomeMaterials;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.block.Biome;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 public class IslandLayout {
     private final Islands islands;
@@ -28,14 +28,14 @@ public class IslandLayout {
         return islands.plugin.getIslandsConfig();
     }
 
-    public String createIsland(UUID uuid, int islandSize) {
+    public String createIsland(UUID uuid, int islandSize, Biome biome) {
         int index = 0;
 
         while (true) {
             int[] pos = placement.getIslandPos(index);
 
             if (!getIslandsConfig().getKeys(false).contains(posToIslandId(pos[0], pos[1]))) {
-                return addIslandToConfig(pos[0], pos[1], islandSize, uuid, String.valueOf(getNewHomeId(uuid)));
+                return addIslandToConfig(pos[0], pos[1], islandSize, uuid, String.valueOf(getNewHomeId(uuid)), biome);
             }
 
             index++;
@@ -43,7 +43,7 @@ public class IslandLayout {
     }
 
     @NotNull
-    private String addIslandToConfig(int xIndex, int zIndex, int islandSize, UUID uuid, String name) {
+    private String addIslandToConfig(int xIndex, int zIndex, int islandSize, UUID uuid, String name, Biome biome) {
         int realX = xIndex * islandSpacing + islandSpacing / 2 - islandSize / 2;
         int realY = getIslandY(xIndex, zIndex);
         int realZ = zIndex * islandSpacing + islandSpacing / 2 - islandSize / 2;
@@ -66,7 +66,8 @@ public class IslandLayout {
         getIslandsConfig().set(islandId + ".name", name);
         getIslandsConfig().set(islandId + ".home", home);
         getIslandsConfig().set(islandId + ".size", islandSize);
-        getIslandsConfig().set(islandId + ".public", 0);
+        getIslandsConfig().set(islandId + ".public", false);
+        getIslandsConfig().set(islandId + ".biome", biome.name());
 
         islands.plugin.saveIslandsConfig();
 
@@ -87,7 +88,7 @@ public class IslandLayout {
     }
 
     @NotNull
-    public List<String> getAllIslandIds(UUID uuid) {
+    public List<String> getIslandIds(UUID uuid) {
         List<String> islands = new ArrayList<>();
 
         for (String islandId : getIslandsConfig().getKeys(false)) {
@@ -100,10 +101,39 @@ public class IslandLayout {
         return islands;
     }
 
+    @NotNull
+    public Map<String, Map<String, String>> getPublicIslands() {
+        Map<String, Map<String, String>> islands = new HashMap<String, Map<String, String>>();
+
+        for (String islandId : getIslandsConfig().getKeys(false)) {
+            if (getIslandsConfig().getBoolean(islandId + ".public")) {
+                String name = getIslandsConfig().getString(islandId + ".name");
+                String ownerUUID = getIslandsConfig().getString(islandId + ".UUID");
+
+                if (name == null) continue;
+
+                Map<String, String> values = new HashMap<>();
+                values.put("name", name);
+                values.put("owner", ownerUUID);
+
+                try {
+                    String biome = getIslandsConfig().getString(islandId + ".biome");
+                    values.put("material", BiomeMaterials.valueOf(biome).name());
+                } catch (Exception e) {
+                    values.put("material", BiomeMaterials.DEFAULT.name());
+                }
+
+                islands.put(islandId, values);
+            }
+        }
+
+        return islands;
+    }
+
     @Nullable
     public String getIslandByName(String name) {
         for (String islandId : getIslandsConfig().getKeys(false)) {
-            if (getIslandsConfig().getString(islandId + ".name").equalsIgnoreCase(name) && getIslandsConfig().getInt(islandId + ".public") == 1) {
+            if (getIslandsConfig().getString(islandId + ".name").equalsIgnoreCase(name) && getIslandsConfig().getBoolean(islandId + ".public")) {
                 return islandId;
             }
         }
@@ -113,7 +143,7 @@ public class IslandLayout {
 
     @Nullable
     public String getHomeIsland(UUID uuid, int homeId) {
-        List<String> allIslands = getAllIslandIds(uuid);
+        List<String> allIslands = getIslandIds(uuid);
 
         for (String islandId : allIslands) {
             if (getIslandsConfig().getInt(islandId + ".home") == homeId) {
@@ -181,7 +211,7 @@ public class IslandLayout {
     }
 
     public int getNewHomeId(UUID uuid) {
-        List<String> ids = getAllIslandIds(uuid);
+        List<String> ids = getIslandIds(uuid);
         List<Integer> homeIds = new ArrayList<>();
 
         for (String islandId : ids) {
@@ -205,7 +235,7 @@ public class IslandLayout {
     }
 
     public int getNumberOfIslands(UUID uuid) {
-        return getAllIslandIds(uuid).size();
+        return getIslandIds(uuid).size();
     }
 
     @NotNull
@@ -219,7 +249,7 @@ public class IslandLayout {
 
     // MANAGMENT
 
-    public void updateIslandSize(String islandId, int islandSize) {
+    public void updateIsland(String islandId, int islandSize, Biome biome) {
         int xIndex = getIslandsConfig().getInt(islandId + ".xIndex");
         int zIndex = getIslandsConfig().getInt(islandId + ".zIndex");
 
@@ -230,6 +260,7 @@ public class IslandLayout {
         getIslandsConfig().set(islandId + ".z", realZ);
 
         getIslandsConfig().set(islandId + ".size", islandSize);
+        getIslandsConfig().set(islandId + ".biome", biome.name());
 
         islands.plugin.saveIslandsConfig();
     }
@@ -260,14 +291,14 @@ public class IslandLayout {
         int homeId = getIslandsConfig().getInt(islandId + ".home");
 
         getIslandsConfig().set(islandId + ".name", String.valueOf(homeId));
-        getIslandsConfig().set(islandId + ".public", 0);
+        getIslandsConfig().set(islandId + ".public", false);
 
         islands.plugin.saveIslandsConfig();
     }
 
     public void nameIsland(String islandId, String name){
             getIslandsConfig().set(islandId + ".name", name);
-            getIslandsConfig().set(islandId + ".public", 1);
+            getIslandsConfig().set(islandId + ".public", true);
 
             islands.plugin.saveIslandsConfig();
     }
@@ -292,26 +323,36 @@ public class IslandLayout {
         islands.plugin.saveIslandsConfig();
     }
 
-    static class placement {
-        static int getLayer(int index) {
+    public static class placement {
+        public static int getLayer(int index) {
             return (int) Math.floor(Math.sqrt(index));
         }
 
-        static int getLayerSize(int layer) {
+        public static int getLayerSize(int layer) {
             return 2 * layer + 1;
         }
 
-        static int firstOfLayer(int layer) {
+        public static int firstOfLayer(int layer) {
             return layer * layer;
         }
 
-        static int[] getIslandPos(int index) {
+        public static int[] getIslandPos(int index) {
             int layer = getLayer(index);
 
             int x = Math.min(index - firstOfLayer(layer), layer);
             int z = (index - firstOfLayer(layer) < layer + 1) ? layer : firstOfLayer(layer) + getLayerSize(layer) - 1 - index;
 
             return new int[]{x, z};
+        }
+
+        // TODO: Optimize
+        public static int getIslandIndex(int[] pos) {
+            int index = 0;
+            while (!Arrays.equals(getIslandPos(index), pos)) {
+                index++;
+            }
+
+            return index;
         }
     }
 }

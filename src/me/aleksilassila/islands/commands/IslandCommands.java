@@ -1,6 +1,7 @@
 package me.aleksilassila.islands.commands;
 
 import me.aleksilassila.islands.Main;
+import me.aleksilassila.islands.commands.GUIs.VisitGui;
 import me.aleksilassila.islands.utils.Messages;
 import me.aleksilassila.islands.utils.Permissions;
 import me.aleksilassila.islands.IslandLayout;
@@ -47,7 +48,8 @@ public class IslandCommands {
             }
 
             if (args.length != 1) {
-                player.sendMessage(Messages.help.VISIT);
+//                player.sendMessage(Messages.help.VISIT);
+                player.openInventory(plugin.islands.visitGui.getDefaultInventory());
                 return true;
             }
 
@@ -61,7 +63,7 @@ public class IslandCommands {
             if (islandId != null) {
                 player.teleport(plugin.islands.layout.getIslandSpawn(islandId));
             } else {
-                player.sendMessage(Messages.error.HOME_NOT_FOUND);
+                player.sendMessage(Messages.error.ISLAND_NOT_FOUND);
             }
 
             return true;
@@ -91,7 +93,7 @@ public class IslandCommands {
                     return true;
                 }
 
-                List<String> ids = plugin.islands.layout.getAllIslandIds(player.getUniqueId());
+                List<String> ids = plugin.islands.layout.getIslandIds(player.getUniqueId());
 
                 player.sendMessage(Messages.success.HOMES_FOUND(ids.size()));
                 for (String islandId : ids) {
@@ -153,7 +155,7 @@ public class IslandCommands {
             if (location != null) {
                 player.teleport(location);
             } else {
-                player.sendMessage(Messages.error.ISLAND_NOT_FOUND);
+                player.sendMessage(Messages.error.HOME_NOT_FOUND);
             }
 
             return true;

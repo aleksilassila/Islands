@@ -8,6 +8,7 @@ import me.aleksilassila.islands.utils.Messages;
 import org.bukkit.entity.Player;
 
 import java.util.List;
+import java.util.Optional;
 
 public class setSpawnSubcommand extends Subcommand {
     private final Main plugin;
@@ -37,7 +38,7 @@ public class setSpawnSubcommand extends Subcommand {
             return;
         }
 
-        if (plugin.getIslandsConfig().getString(islandId + ".UUID").equals(player.getUniqueId().toString())
+        if (Optional.ofNullable(plugin.getIslandsConfig().getString(islandId + ".UUID")).orElse("").equals(player.getUniqueId().toString())
                 || Permissions.checkPermission(player, Permissions.bypass.setSpawn)) {
             layout.setSpawnPoint(islandId, player.getLocation().getBlockX(), player.getLocation().getBlockZ());
 

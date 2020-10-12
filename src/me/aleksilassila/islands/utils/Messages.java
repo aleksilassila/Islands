@@ -21,7 +21,7 @@ public class Messages extends ChatUtils {
             public static final String ISLAND_NO_OWNER = error("To make an island private, it must have an owner.");
             public static final String NO_BIOME_FOUND = error("Biome not found.");
             public static final String NO_LOCATIONS_FOR_BIOME = error("No available locations for specified biome.");
-            public static final String ISLAND_NOT_FOUND = error("404 - Home not found.");
+            public static final String ISLAND_NOT_FOUND = error("404 - Island not found.");
             public static final String HOME_NOT_FOUND = error("404 - Home not found :(");
             public static final String NOT_TRUSTED = error("You need owner's permission to interact here.");
             public static final String INVALID_ISLAND_SIZE = error("Island size exceeds limits.");

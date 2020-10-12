@@ -2,6 +2,7 @@ package me.aleksilassila.islands;
 
 import com.sun.istack.internal.NotNull;
 import com.sun.istack.internal.Nullable;
+import me.aleksilassila.islands.commands.GUIs.VisitGui;
 import me.aleksilassila.islands.generation.IslandGeneration;
 import me.aleksilassila.islands.utils.ConfirmItem;
 import org.bukkit.World;
@@ -25,6 +26,8 @@ public class Islands {
     public Set<Player> playersWithNoFall = new HashSet<>();
     public final HashMap<String, ConfirmItem> confirmations;
     public Map<String, Long> teleportCooldowns;
+
+    public final VisitGui visitGui;
 
     public enum IslandSize {
         SMALL(32), // 32*32
@@ -51,6 +54,7 @@ public class Islands {
         this.islandGeneration = new IslandGeneration(this);
         this.layout = new IslandLayout(this);
 
+        this.visitGui = new VisitGui(plugin);
     }
 
     public static class IslandsException extends java.lang.Exception {
@@ -75,7 +79,7 @@ public class Islands {
 
     @Nullable
     public String createNewIsland(Biome biome, int islandSize, Player player) throws IllegalArgumentException {
-        String islandId = layout.createIsland(player.getUniqueId(), islandSize);
+        String islandId = layout.createIsland(player.getUniqueId(), islandSize, biome);
         try {
             boolean success = islandGeneration.copyIsland(
                     player,
@@ -103,7 +107,7 @@ public class Islands {
     }
 
     public boolean regenerateIsland(String islandId, Biome biome, int islandSize, Player player, boolean shouldClearArea) throws IllegalArgumentException {
-        layout.updateIslandSize(islandId, islandSize);
+        layout.updateIsland(islandId, islandSize, biome);
 
         try {
             boolean success = islandGeneration.copyIsland(

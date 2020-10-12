@@ -3,6 +3,7 @@ package me.aleksilassila.islands.generation;
 import com.sun.istack.internal.Nullable;
 import me.aleksilassila.islands.Islands;
 import me.aleksilassila.islands.utils.Messages;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Biome;
