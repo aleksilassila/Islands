@@ -312,26 +312,36 @@ public class IslandLayout {
         islands.plugin.saveIslandsConfig();
     }
 
-    static class placement {
-        static int getLayer(int index) {
+    public static class placement {
+        public static int getLayer(int index) {
             return (int) Math.floor(Math.sqrt(index));
         }
 
-        static int getLayerSize(int layer) {
+        public static int getLayerSize(int layer) {
             return 2 * layer + 1;
         }
 
-        static int firstOfLayer(int layer) {
+        public static int firstOfLayer(int layer) {
             return layer * layer;
         }
 
-        static int[] getIslandPos(int index) {
+        public static int[] getIslandPos(int index) {
             int layer = getLayer(index);
 
             int x = Math.min(index - firstOfLayer(layer), layer);
             int z = (index - firstOfLayer(layer) < layer + 1) ? layer : firstOfLayer(layer) + getLayerSize(layer) - 1 - index;
 
             return new int[]{x, z};
+        }
+
+        // TODO: Optimize
+        public static int getIslandIndex(int[] pos) {
+            int index = 0;
+            while (!Arrays.equals(getIslandPos(index), pos)) {
+                index++;
+            }
+
+            return index;
         }
     }
 }

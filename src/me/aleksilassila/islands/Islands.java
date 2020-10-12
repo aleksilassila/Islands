@@ -2,6 +2,7 @@ package me.aleksilassila.islands;
 
 import com.sun.istack.internal.NotNull;
 import com.sun.istack.internal.Nullable;
+import me.aleksilassila.islands.commands.GUIs.VisitGui;
 import me.aleksilassila.islands.generation.IslandGeneration;
 import me.aleksilassila.islands.listeners.IslandVisitGuiHandler;
 import me.aleksilassila.islands.utils.ConfirmItem;
@@ -28,7 +29,7 @@ public class Islands {
     public final HashMap<String, ConfirmItem> confirmations;
     public Map<String, Long> teleportCooldowns;
 
-    public final IslandVisitGuiHandler visitGui;
+    public final VisitGui visitGui;
 
     public enum IslandSize {
         SMALL(32), // 32*32
@@ -55,7 +56,7 @@ public class Islands {
         this.islandGeneration = new IslandGeneration(this);
         this.layout = new IslandLayout(this);
 
-        this.visitGui = new IslandVisitGuiHandler(plugin);
+        this.visitGui = new VisitGui(plugin);
     }
 
     public static class IslandsException extends java.lang.Exception {

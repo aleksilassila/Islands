@@ -11,18 +11,21 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.*;
 
 public class IslandVisitGuiHandler implements Listener {
-    private Inventory inv;
+    private final Map<Integer, Inventory> inventories = new HashMap<>();
     private List<String> islandIds;
     private final Main plugin;
     private Map<String, Map<String, String>> publicIslands;
 
-    private final int inventorySize = 9 * 6;
+    private final int inventorySize = 9 * 3;
+    private final int whiteSpace = 9;
+    private final int islandsOnPage = inventorySize - whiteSpace - 9;
 
     public IslandVisitGuiHandler(Main plugin) {
         this.plugin = plugin;
@@ -31,19 +34,30 @@ public class IslandVisitGuiHandler implements Listener {
     }
 
     // You can call this whenever you want to put the items in
-    private void initializeItems() {
-        // Create a new inventory, with no owner (as this isn't a real inventory), a size of nine, called example
-        inv = Bukkit.createInventory(null, 9 * 6, "Visit Island");
+    private void updatePage(int page) {
+        Inventory inv = Bukkit.createInventory(null, inventorySize, "Visit Island");
         islandIds = new ArrayList<>();
         publicIslands = plugin.islands.layout.getPublicIslands();
 
+        islandIds.addAll(publicIslands.keySet());
 
+        int index = 0;
+        int startIndex = islandsOnPage * page;
         for (String islandId : publicIslands.keySet()) {
-            if (islandIds.size() >= inventorySize) break;
+            if (index < startIndex || index >= startIndex + islandsOnPage) {
+                index++;
+                continue;
+            }
+
             Player player = Bukkit.getPlayer(UUID.fromString(publicIslands.get(islandId).get("owner")));
             inv.addItem(createGuiItem(Material.GRASS_BLOCK, ChatColor.GOLD + publicIslands.get(islandId).get("name"), ChatColor.GRAY + "By " + (player != null ? player.getDisplayName() : "unknown")));
-            islandIds.add(islandId);
+            index++;
         }
+
+        inv.setItem(islandsOnPage + whiteSpace + 7, createGuiItem(Material.BOOK, ChatColor.GOLD + "Next page"));
+        inv.setItem(islandsOnPage + whiteSpace + 1, createGuiItem(Material.BOOK, ChatColor.GOLD + "Previous page"));
+
+        inventories.put(page, inv);
     }
 
     // Nice little method to create a gui item with a custom name, and description
@@ -63,15 +77,19 @@ public class IslandVisitGuiHandler implements Listener {
     }
 
     // You can open the inventory with this
-    public void openVisitGui(final HumanEntity ent) {
-        initializeItems();
-        ent.openInventory(inv);
+    public void openVisitGui(final HumanEntity ent, int page) {
+        updatePage(page);
+        ent.openInventory(inventories.get(page));
     }
 
     // Check for clicks on items
     @EventHandler
     public void onInventoryClick(final InventoryClickEvent event) {
-        if (event.getInventory() != inv) return;
+        if (event.getInventory().getHolder() instanceof Holder) {
+            Bukkit.getLogger().info("IS INSTANCE");
+        }
+
+        if (!inventories.containsValue(event.getInventory())) return;
 
         event.setCancelled(true);
 
@@ -81,16 +99,50 @@ public class IslandVisitGuiHandler implements Listener {
         if (clickedItem == null || clickedItem.getType() == Material.AIR) return;
         if (publicIslands == null) return;
 
-        final Player p = (Player) event.getWhoClicked();
+        final Player player = (Player) event.getWhoClicked();
 
-        p.performCommand("visit " + publicIslands.get(islandIds.get(event.getRawSlot())).get("name"));
+        if (event.getRawSlot() < islandsOnPage) {
+            player.performCommand("visit " + publicIslands.get(islandIds.get(event.getRawSlot())).get("name"));
+        } else {
+            int currentInventory = 0;
+
+            for (Integer index : inventories.keySet()) {
+                if (inventories.get(index).equals(event.getInventory())) {
+                    currentInventory = index;
+                    break;
+                }
+            }
+
+            if (event.getRawSlot() - 9 - whiteSpace == 1 && currentInventory - 1 >= 0) {
+                openVisitGui(player, currentInventory - 1);
+            } else if (event.getRawSlot() - 9 - whiteSpace == 7) {
+                openVisitGui(player, currentInventory + 1);
+            }
+        }
+
     }
 
     // Cancel dragging in our inventory
     @EventHandler
-    public void onInventoryClick(final InventoryDragEvent e) {
-        if (e.getInventory() == inv) {
-          e.setCancelled(true);
+    public void onInventoryClick(final InventoryDragEvent event) {
+        if (inventories.containsValue(event.getInventory())) {
+          event.setCancelled(true);
         }
     }
+
+    abstract class Holder implements InventoryHolder {
+        Inventory inventory;
+
+        public Holder() {
+            inventory = Bukkit.createInventory(null, inventorySize, "Visit Island");
+        }
+
+        @Override
+        public Inventory getInventory() {
+            return inventory;
+        }
+
+    }
+
+    interface IHolder extends InventoryHolder {}
 }
