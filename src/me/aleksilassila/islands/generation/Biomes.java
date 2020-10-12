@@ -11,15 +11,16 @@ import org.bukkit.block.Biome;
 import java.util.*;
 
 public class Biomes {
-    private Main plugin;
+    private final Main plugin;
 
-    private World world;
+    private final World world;
     public HashMap<Biome, List<Location>> availableLocations;
-    private int biggestIslandSize;
+    private final int biggestIslandSize;
 
-    int biomeSearchJumpBlocks;
-    int biomeSearchSize;
-    int maxLocationsPerBiome;
+    final int biomeSearchJumpBlocks;
+    final int biomeSearchSize;
+    final int maxLocationsPerBiome;
+    final List<String> biomeBlacklist;
 
     public Biomes(World world, Main plugin) {
         this.world = world;
@@ -29,6 +30,7 @@ public class Biomes {
         this.biomeSearchJumpBlocks = plugin.getConfig().getInt("generation.searchJump");
         this.biomeSearchSize = plugin.getConfig().getInt("generation.searchArea");
         this.maxLocationsPerBiome = plugin.getConfig().getInt("generation.maxVariationsPerBiome");
+        this.biomeBlacklist = plugin.getConfig().getStringList("biomeBlacklist");
 
         this.availableLocations = new HashMap<>();
 
@@ -123,19 +125,30 @@ public class Biomes {
 
     private Set<Biome> getAllBiomes() {
         Set<Biome> biomes = new HashSet<Biome>();
+        List<String> biomesToLog = new ArrayList<>();
 
         for (int x = 0; x < biomeSearchSize; x = x + (biomeSearchJumpBlocks * 4)) {
             for (int z = 0; z < biomeSearchSize; z = z + (biomeSearchJumpBlocks * 4)) {
                 Biome currentBiome = getBiome(x, z);
 
-                if (!biomes.contains(currentBiome)) {
-                    Bukkit.getLogger().info("Biome available: " + currentBiome.name());
+                if (!biomes.contains(currentBiome) && !isBlacklisted(currentBiome)) {
+                    biomesToLog.add(currentBiome.name());
                     biomes.add(currentBiome);
                 }
             }
         }
 
+        Bukkit.getLogger().info("Available biomes: " + String.join(", ", biomesToLog));
+
         return biomes;
+    }
+
+    private boolean isBlacklisted(Biome biome) {
+        for (String biomeName : biomeBlacklist) {
+            if (biomeName.equalsIgnoreCase(biome.name())) return true;
+        }
+
+        return false;
     }
 
     @NotNull

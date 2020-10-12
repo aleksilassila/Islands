@@ -17,8 +17,18 @@ generation:
 
 disableMobsOnIslands: true
 tpCooldownTime: 10                      # /home and /visit cooldown after damage.
-# Blocked island names.
-illegalIslandNames:
-# - spawn
+illegalIslandNames:                     # Blocked island names.
+#  - spawn
+biomeBlacklist:                         # These biomes do not get picked up by island generator
+  - DEEP_OCEAN
+  - DEEP_WARM_OCEAN
+  - DEEP_LUKEWARM_OCEAN
+  - DEEP_COLD_OCEAN
+  - DEEP_FROZEN_OCEAN
+  - SHATTERED_SAVANNA
+  - SHATTERED_SAVANNA_PLATEAU
+  - MOUNTAINS
+  - GRAVELLY_MOUNTAINS
+  - MODIFIED_GRAVELLY_MOUNTAINS
 islandsWorldName: world
 wildernessWorldName: wilderness

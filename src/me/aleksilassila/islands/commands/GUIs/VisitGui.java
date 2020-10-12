@@ -74,9 +74,6 @@ public class VisitGui implements IVisitGui {
             sortedSet.sort(Comparator.comparingInt(a -> publicIslands.get(a).get("name").charAt(0)));
         }
 
-
-
-
         // Add islands to inventory
         int index = 0;
         int startIndex = ISLANDS_ON_PAGE * page;
@@ -86,14 +83,18 @@ public class VisitGui implements IVisitGui {
                 continue;
             }
 
-            boolean byServer = publicIslands.get(islandId).get("owner") == null;
+            String displayName;
+
+            try {
+                displayName = Bukkit.getPlayer(UUID.fromString(publicIslands.get(islandId).get("owner"))).getDisplayName();
+            } catch (Exception e) {
+                displayName = "Server";
+            }
 
             inv.addItem(createGuiItem(BiomeMaterials.valueOf(publicIslands.get(islandId).get("material")).getMaterial(),
                     ChatColor.GOLD + publicIslands.get(islandId).get("name"),
-                    byServer,
-                    ChatColor.GRAY + "By " + (byServer ? "Server" : Bukkit.getPlayer(
-                            UUID.fromString(publicIslands.get(islandId).get("owner"))
-                    ))));
+                    displayName.equals("Server"),
+                    ChatColor.GRAY + "By " + displayName));
             index++;
         }
 
