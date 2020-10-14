@@ -73,7 +73,7 @@ public class Biomes {
 
     private void generateAndSaveBiomes() {
         plugin.clearBiomesConfig();
-        this.availableLocations = getAllAvailableIslandLocations();
+        this.availableLocations = generateIslandLocations(biggestIslandSize);
 
         plugin.getBiomesConfig().set("seed", String.valueOf(plugin.islandsSourceWorld.getSeed()));
 
@@ -110,39 +110,6 @@ public class Biomes {
          return targetBiome;
     }
 
-    public HashMap<Biome, List<Location>> getAllAvailableIslandLocations() {
-        Set<Biome> availableBiomes = getAllBiomes();
-        HashMap<Biome, List<Location>> availableLocations = new HashMap<Biome, List<Location>>();
-
-        for (Biome biome : availableBiomes) {
-            Bukkit.getLogger().info("Generating island positions for " + biome.name());
-            List<Location> potentialLocations = getPossibleIslandLocations(biome, biggestIslandSize);
-            if (potentialLocations.size() > 0) availableLocations.put(biome, potentialLocations);
-        }
-
-        return availableLocations;
-    }
-
-    private Set<Biome> getAllBiomes() {
-        Set<Biome> biomes = new HashSet<Biome>();
-        List<String> biomesToLog = new ArrayList<>();
-
-        for (int x = 0; x < biomeSearchSize; x = x + (biomeSearchJumpBlocks * 4)) {
-            for (int z = 0; z < biomeSearchSize; z = z + (biomeSearchJumpBlocks * 4)) {
-                Biome currentBiome = getBiome(x, z);
-
-                if (!biomes.contains(currentBiome) && !isBlacklisted(currentBiome)) {
-                    biomesToLog.add(currentBiome.name());
-                    biomes.add(currentBiome);
-                }
-            }
-        }
-
-        Bukkit.getLogger().info("Available biomes: " + String.join(", ", biomesToLog));
-
-        return biomes;
-    }
-
     private boolean isBlacklisted(Biome biome) {
         for (String biomeName : biomeBlacklist) {
             if (biomeName.equalsIgnoreCase(biome.name())) return true;
@@ -152,36 +119,53 @@ public class Biomes {
     }
 
     @NotNull
-    public List<Location> getPossibleIslandLocations(Biome biome, int islandSize) {
-        List<Location> locations = new ArrayList<Location>();
-        List<int[]> jumpInThesePositions = new ArrayList<int[]>();
+    public HashMap<Biome, List<Location>> generateIslandLocations(int maxIslandSize) {
+        HashMap<Biome, List<Location>> locations = new HashMap<>();
+        List<int[]> usedPositions = new ArrayList<int[]>();
 
-        loop:
-        for (int x = 0; x < biomeSearchSize - islandSize; x += biomeSearchJumpBlocks) {
-            for (int z = 0; z < biomeSearchSize - islandSize; z += biomeSearchJumpBlocks) {
-                boolean jump = false;
+        plugin.getLogger().info("Generating biomes...");
 
-                for (int[] pos : jumpInThesePositions) {
-                    if (pos[0] <= x && x <= pos[0] + islandSize && pos[1] <= z && z <= pos[1] + islandSize) {
-                        z += islandSize;
-                        jump = true;
-                        break;
+        for (int x = 0; x < biomeSearchSize - maxIslandSize; x += biomeSearchJumpBlocks) {
+            zLoop: for (int z = 0; z < biomeSearchSize - maxIslandSize; z += biomeSearchJumpBlocks) {
+                for (int[] pos : usedPositions) {
+                    if (pos[0] <= x && x <= pos[0] + maxIslandSize && pos[1] <= z && z <= pos[1] + maxIslandSize) {
+                        z += maxIslandSize;
+                        continue zLoop;
                     }
                 }
 
-                if (jump) { continue; }
+                Biome biome = getBiome(x, z);
 
-                if (isRectInsideBiome(x, z, islandSize, biome)) {
-                    locations.add(new Location(world, x, 180, z));
-                    jumpInThesePositions.add(new int[]{x, z});
-                    z += islandSize;
-
-                    if (locations.size() >= maxLocationsPerBiome) {
-                        break loop;
-                    }
+                if (isBlacklisted(biome)
+                        || (locations.containsKey(biome) && locations.get(biome).size() >= maxLocationsPerBiome)) {
+                    continue;
                 }
+
+                if (isSuitableLocation(x, z, maxIslandSize, biome)) {
+                    Location location = new Location(world, x, 0, z);
+
+                    if (locations.containsKey(biome)) {
+                        locations.get(biome).add(location);
+                    } else {
+                        List<Location> list = new ArrayList<>();
+                        list.add(location);
+                        locations.put(biome, list);
+                    }
+
+                    usedPositions.add(new int[]{x, z});
+                    z += maxIslandSize;
+                }
+
             }
         }
+
+        Set<String> biomes = new HashSet<>();
+
+        for (Biome biome : locations.keySet()) {
+            biomes.add(biome.name());
+        }
+
+        plugin.getLogger().info("Locations generated for " + locations.size() + " biomes: " + String.join(", ", biomes));
 
         return locations;
     }
@@ -190,9 +174,9 @@ public class Biomes {
         return world.getBiome(x, 180, z);
     }
 
-    boolean isRectInsideBiome(int xCorner, int zCorner, int rectSize, Biome biome) {
-        for (int x = 0; x < rectSize; x++) {
-            for (int z = 0; z < rectSize; z++) {
+    boolean isSuitableLocation(int xCorner, int zCorner, int rectSize, Biome biome) {
+        for (int x = 0; x < rectSize; x += biomeSearchJumpBlocks) {
+            for (int z = 0; z < rectSize; z += biomeSearchJumpBlocks) {
                 if (getBiome(xCorner + x, zCorner + z) != biome) {
                     return false;
                 }

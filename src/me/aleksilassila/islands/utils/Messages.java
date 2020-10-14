@@ -52,11 +52,11 @@ public class Messages extends ChatUtils {
             }
 
             public static String ISLAND_RECEIVED(String playerName, String islandName) {
-                return success("You are now the owner of " + playerName + "'s island " + islandName + ".");
+                return success("You are now the owner of " + islandName + " island, previously owned by " + playerName + ".");
             }
 
             public static String HOMES_FOUND(int amount) {
-                return success("Found " + amount + " home(s).");
+                return success("Found " + amount + " home" + (amount == 1 ? "" : "s") + ".");
             }
         }
 
