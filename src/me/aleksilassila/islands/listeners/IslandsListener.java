@@ -85,7 +85,7 @@ public class IslandsListener extends ChatUtils implements Listener {
         }
     }
 
-    @EventHandler // Player teleportation in void, damage restrictions
+    @EventHandler(priority = EventPriority.HIGHEST) // Player teleportation in void, damage restrictions
     public void onDamageEvent(EntityDamageEvent e) {
         if (e.getEntity() instanceof Player) {
             Player player = (Player) e.getEntity();
@@ -96,8 +96,11 @@ public class IslandsListener extends ChatUtils implements Listener {
                 Location location = player.getLocation();
                 location.setWorld(targetWorld);
 
-                location.setX(location.getBlockX() * 4);
-                location.setZ(location.getBlockZ() * 4);
+                int teleportMultiplier = plugin.getConfig().getInt("wildernessCoordinateMultiplier") <= 0
+                        ? 4 : plugin.getConfig().getInt("wildernessCoordinateMultiplier");
+
+                location.setX(location.getBlockX() * teleportMultiplier);
+                location.setZ(location.getBlockZ() * teleportMultiplier);
                 location.setY(targetWorld.getHighestBlockYAt(location) + 40);
 
                 player.teleport(location);

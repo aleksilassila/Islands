@@ -34,8 +34,8 @@ public class Messages extends ChatUtils {
         public static class success {
             public static final String DELETED = success("Island deleted successfully. It will be overwritten when someone creates a new island.");
             public static final String UNNAMED = success("Island unnamed and made private.");
-            public static final String ISLAND_GEN_TITLE = ChatColor.GOLD + "Island generation event added to queue.";
-            public static final String ISLAND_GEN_SUBTITLE = ChatColor.GOLD + "Your island is being generated. Use /home to access your island.";
+            public static final String ISLAND_GEN_TITLE = ChatColor.GOLD + "Island generation event queued!";
+            public static final String ISLAND_GEN_SUBTITLE = ChatColor.GOLD + "Use /home to access your island.";
             public static final String UNTRUSTED = success("Player untrusted!");
             public static final String TRUSTED = success("Player trusted!");
             public static final String SPAWNPOINT_CHANGED = success("Island spawn point changed.");

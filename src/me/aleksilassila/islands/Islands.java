@@ -127,4 +127,12 @@ public class Islands {
             throw new IllegalArgumentException();
         }
     }
+
+    // TODO:
+    //  - Custom island shapes
+    //  - Island generation in custom locations outside of the grid. Bigger sizes.
+    //  - Generation cooldown
+    //  - /ContainerTrust etc.
+    //  - Fix giant trees cutting off from top.
+    //  - Maybe try this with custom terrain generation?
 }

@@ -13,7 +13,7 @@ generation:
   islandSpacing: 100                    # At least the size of island.BIG + 4
   islandVerticalSpacing: 50
   generationDelayInTicks: 1             # 2 Will generate 1 row per 2 ticks, 0.5 will generate 2 rows per 1 tick
-  maxVariationsPerBiome: 3
+  maxVariationsPerBiome: 3              # Max locations generated for each biome, lower the value to speed up server startup.
 
 disableMobsOnIslands: true
 tpCooldownTime: 10                      # /home and /visit cooldown after damage.
@@ -30,5 +30,6 @@ biomeBlacklist:                         # These biomes do not get picked up by i
   - MOUNTAINS
   - GRAVELLY_MOUNTAINS
   - MODIFIED_GRAVELLY_MOUNTAINS
+wildernessCoordinateMultiplier: 4       # Player's x and z coordinates gets multiplied with this value when they jump to wilderness.
 islandsWorldName: world
 wildernessWorldName: wilderness

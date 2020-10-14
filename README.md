@@ -36,7 +36,11 @@ Your islands and inventory are saved in a separate world.
 **Community.** Players can easily visit each other's islands with `/visit` command.
 *Tip for admins: `/island name spawn` for accessing spawn via `/vi spawn`*
 
-The plugin has customizable generation settings, so the plugin can be optimized for any hardware
+The plugin has customizable generation settings, so the plugin can be optimized for any hardware.
+
+I'd recommend admins to set up daily or weekly reset of wilderness world and possibly nether and end too. 
+This ensures that players have fresh resources available at all times and encourages players to build on islands as intended.
+You can google more about how to schedule reboots and resets.
 
 ### Commands
 
@@ -186,7 +190,7 @@ This file gets overwritten whenever new `islandsSource` world gets generated (=t
 
 You can change the biome search area in `config.yml` to increase the variety of available biomes.
 To combat increasing server start time, you can lower `generation.maxVariationsPerBiome` and 
-*blacklist unwanted biomes (not implemented)*.
+blacklist unwanted biomes.
 
 `islands.yml` contains all the information about islands: their name, status, position etc.
 Islands are generated in square grid layout (example below). Each island has its unique islandId that points
