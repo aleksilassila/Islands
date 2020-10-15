@@ -115,7 +115,7 @@ worlds:
     generator: VoidGenerator:PLAINS
 ```
 
-Replace `<Islands World Name>` with `islandsWorldName` from `plugins/Islands/config.yml`.
+Replace `<Islands World Name>` with the **value of** `islandsWorldName` from `plugins/Islands/config.yml`.
 You may want to also set `level-name` in `server.properties` as `islandsWorldName`.
 This is because the world specified in `level-name` holds player inventory data. If you set up automatical
 `wilderness` (see below) wipes, make sure you are not using the world specified in `level-name` as wilderness. 
