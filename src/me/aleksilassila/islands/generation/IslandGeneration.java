@@ -223,17 +223,17 @@ public class IslandGeneration {
         return true;
     }
 
-    public boolean isBlockInIslandShape(int x, int y, int z, int islandSize) {
+    public static boolean isBlockInIslandShape(int x, int y, int z, int islandSize) {
         return (Math.pow(x - islandSize / 2.0, 2) + (islandSize / Math.pow(y, 2) + 1.3) * Math.pow(y - islandSize / 2.0, 2) + Math.pow(z - islandSize / 2.0, 2))
                 <= Math.pow(islandSize / 2.0, 2);
     }
 
-    public boolean isBlockInIslandSphere(int x, int y, int z, int islandSize) {
+    public static boolean isBlockInIslandSphere(int x, int y, int z, int islandSize) {
         return (Math.pow(x - islandSize / 2.0, 2) + Math.pow(y - islandSize / 2.0, 2) + Math.pow(z - islandSize / 2.0, 2))
                 <= Math.pow(islandSize / 2.0, 2);
     }
 
-    public boolean isBlockInIslandCylinder(int relativeX, int relativeZ, int islandSize) {
+    public static boolean isBlockInIslandCylinder(int relativeX, int relativeZ, int islandSize) {
         return (Math.pow(relativeX - islandSize / 2.0, 2) + Math.pow(relativeZ - islandSize / 2.0, 2))
                 <= Math.pow(islandSize / 2.0, 2);
     }
