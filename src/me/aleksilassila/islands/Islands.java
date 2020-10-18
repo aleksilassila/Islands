@@ -164,7 +164,7 @@ public class Islands {
 
         Map<Integer, Shape> shapes = new HashMap<>();
 
-        if (configIslandShapes == null) return shapes;
+        if (configIslandShapes == null || plugin.worldEdit == null) return shapes;
 
         for (String key : configIslandShapes.getKeys(false)) {
             String fileName = plugin.getConfig().getString("islandShapes." + key);

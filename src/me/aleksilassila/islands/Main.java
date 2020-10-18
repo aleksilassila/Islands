@@ -17,6 +17,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Optional;
 
 public class Main extends JavaPlugin {
 
@@ -80,7 +81,7 @@ public class Main extends JavaPlugin {
 
         new IslandsListener(this);
 
-        int pluginId = 8974; // <-- Replace with the id of your plugin!
+        int pluginId = 8974;
         Metrics metrics = new Metrics(this, pluginId);
 
         getLogger().info("Islands enabled!");
@@ -169,8 +170,7 @@ public class Main extends JavaPlugin {
     }
 
     World getIslandsWorld() {
-        String name = getConfig().getString("islandsWorldName") == null
-                ? "world" : getConfig().getString("islandsWorldName");
+        String name = Optional.ofNullable(getConfig().getString("islandsWorldName")).orElse("world");
 
         for (World world : Bukkit.getWorlds()) {
             if (world.getName().equals(name)) {
@@ -188,8 +188,7 @@ public class Main extends JavaPlugin {
     }
 
     World getWilderness() {
-        String name = getConfig().getString("wildernessWorldName") == null
-                ? "wilderness" : getConfig().getString("wildernessWorldName");
+        String name = Optional.ofNullable(getConfig().getString("wildernessWorldName")).orElse("wilderness");
 
         for (World world : Bukkit.getWorlds()) {
             if (world.getName().equals(name)) {
@@ -207,6 +206,13 @@ public class Main extends JavaPlugin {
     }
 
     World getSourceWorld() {
+        for (World world : Bukkit.getServer().getWorlds()) {
+            if (world.getName().equals("islandsSource")) {
+                getLogger().info("Islands source world set to islandsSource");
+                return world;
+            }
+        }
+
         WorldCreator wc = new WorldCreator("islandsSource");
 
         wc.environment(World.Environment.NORMAL);
