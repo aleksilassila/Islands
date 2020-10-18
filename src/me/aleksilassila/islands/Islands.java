@@ -12,7 +12,10 @@ import org.bukkit.block.Biome;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 public class Islands {
     public Main plugin;
@@ -31,16 +34,16 @@ public class Islands {
     public final Map<String, Integer> definedIslandSizes;
     public Map<Integer, Shape> definedIslandShapes;
 
-    public Islands(World sourceWorld, Main plugin) {
+    public Islands(Main plugin) {
         this.plugin = plugin;
-        this.sourceWorld = sourceWorld;
+        this.sourceWorld = plugin.islandsSourceWorld;
         this.teleportCooldowns = new HashMap<>();
         this.confirmations = new HashMap<>();
 
         this.definedIslandSizes = setupSizes();
         this.definedIslandShapes = setupShapes();
 
-        this.islandGeneration = new IslandGeneration(this);
+        this.islandGeneration = new IslandGeneration(plugin, this);
         this.layout = new IslandLayout(this);
 
         this.visitGui = new VisitGui(plugin);
@@ -144,7 +147,6 @@ public class Islands {
             return sizes;
         }
 
-
         for (String size : configIslandSizes.getKeys(false)) {
             int parsedSize = plugin.getConfig().getInt("islandSizes." + size);
 
@@ -182,9 +184,11 @@ public class Islands {
     }
 
     // TODO:
-    //  - Custom island shapes
     //  - Island generation in custom locations outside of the grid. Bigger sizes.
     //  - Generation cooldown
     //  - /ContainerTrust etc.
     //  - Fix giant trees cutting off from top.
+    //  - Maybe merge Main and Islands
+    //  - Remember to inform about config changes
+    //  - API ??
 }

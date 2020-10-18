@@ -4,8 +4,8 @@ import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import me.aleksilassila.islands.commands.IslandCommands;
 import me.aleksilassila.islands.commands.IslandManagmentCommands;
 import me.aleksilassila.islands.commands.TrustCommands;
-import me.aleksilassila.islands.listeners.IslandsListener;
 import me.aleksilassila.islands.generation.ShapesLoader;
+import me.aleksilassila.islands.listeners.IslandsListener;
 import me.aleksilassila.islands.utils.UpdateChecker;
 import net.milkbowl.vault.permission.Permission;
 import org.bukkit.*;
@@ -64,7 +64,7 @@ public class Main extends JavaPlugin {
         islandsSourceWorld = getSourceWorld();
         wildernessWorld = getWilderness();
 
-        islands = new Islands(islandsSourceWorld, this);
+        islands = new Islands(this);
 
         new IslandManagmentCommands(this);
 
