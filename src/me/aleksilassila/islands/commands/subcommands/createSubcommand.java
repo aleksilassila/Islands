@@ -37,26 +37,16 @@ public class createSubcommand extends Subcommand {
             return;
         }
 
-        int islandSize = args.length == 2 ? utils.parseIslandSize(args[1]) : utils.parseIslandSize(String.valueOf(Islands.IslandSize.NORMAL.getSize()));
+        int islandSize = args.length == 2 ? plugin.islands.parseIslandSize(args[1]) : plugin.islands.parseIslandSize("");
 
-        String permissionRequired;
-
-        if (islandSize == Islands.IslandSize.BIG.getSize()) {
-            permissionRequired = Permissions.command.createBig;
-        } else if (islandSize == Islands.IslandSize.SMALL.getSize()) {
-            permissionRequired = Permissions.command.createSmall;
-        } else if (islandSize == Islands.IslandSize.NORMAL.getSize()) {
-            permissionRequired = Permissions.command.createNormal;
-        } else {
-            permissionRequired = Permissions.command.createCustom;
-        }
+        String permissionRequired = plugin.islands.getCreatePermission(islandSize);
 
         if (!Permissions.checkPermission(player, permissionRequired)) {
             player.sendMessage(Messages.error.NO_PERMISSION);
             return;
         }
 
-        if (islandSize < Islands.IslandSize.SMALL.getSize() || islandSize + 4 >= layout.islandSpacing) {
+        if (islandSize < plugin.islands.getSmallestIslandSize() || islandSize + 4 >= layout.islandSpacing) {
             player.sendMessage(Messages.error.INVALID_ISLAND_SIZE);
             return;
         }
@@ -128,20 +118,19 @@ public class createSubcommand extends Subcommand {
 
     @Override
     public List<String> onTabComplete(Player player, String[] args) {
+        List<String> availableArgs = new ArrayList<>();
+
         if (args.length == 1) {
             HashMap<Biome, List<Location>> availableLocations = plugin.islands.islandGeneration.biomes.availableLocations;
-            List<String> availableArgs = new ArrayList<>();
 
             for (Biome biome : availableLocations.keySet()) {
                 availableArgs.add(biome.name());
             }
-
-            return availableArgs;
         } else if (args.length == 2) {
-            return new ArrayList<>(Arrays.asList("BIG", "NORMAL", "SMALL"));
+            availableArgs.addAll(plugin.islands.definedIslandSizes.keySet());
         }
 
-        return null;
+        return availableArgs;
     }
 
     @Override

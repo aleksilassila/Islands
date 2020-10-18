@@ -2,6 +2,7 @@ package me.aleksilassila.islands;
 
 import com.sun.istack.internal.NotNull;
 import com.sun.istack.internal.Nullable;
+import me.aleksilassila.islands.generation.IslandGeneration;
 import me.aleksilassila.islands.utils.BiomeMaterials;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -190,7 +191,7 @@ public class IslandLayout {
         int relativeZ = z - (zIndex * islandSpacing + islandSpacing / 2 - islandSize / 2);
         int relativeY = y - islandLowY;
 
-        return islands.islandGeneration.isBlockInIslandSphere(relativeX, relativeY, relativeZ, islandSize);
+        return IslandGeneration.isBlockInIslandSphere(relativeX, relativeY, relativeZ, islandSize);
     }
 
     @Nullable
@@ -203,7 +204,7 @@ public class IslandLayout {
         int relativeX = x - (xIndex * islandSpacing + islandSpacing / 2 - islandSize / 2);
         int relativeZ = z - (zIndex * islandSpacing + islandSpacing / 2 - islandSize / 2);
 
-        boolean isInside = islands.islandGeneration.isBlockInIslandCylinder(relativeX + 2, relativeZ + 2, islandSize + 4);
+        boolean isInside = IslandGeneration.isBlockInIslandCylinder(relativeX + 2, relativeZ + 2, islandSize + 4);
 
         if (!isInside) return null;
 

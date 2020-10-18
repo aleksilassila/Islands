@@ -2,8 +2,8 @@ defaultIslandLimit: 2
 groupLimits:                  # Requires vault to work, all limits can be bypassed with islands.bypass.islandLimit
   staff: 5
 
-island:                       # Island sizing
-  BIG: 80
+islandSizes:                            # Island sizing. You can add as many sizes as you want.
+  BIG: 80                               # NORMAL is the fallback size. At least 1 size has to be defined.
   NORMAL: 64
   SMALL: 32
 

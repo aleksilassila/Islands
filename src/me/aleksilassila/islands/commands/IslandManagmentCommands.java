@@ -130,22 +130,6 @@ public class IslandManagmentCommands extends ChatUtils implements TabExecutor {
     }
 
     public static class Utils {
-        @NotNull
-        public int parseIslandSize(String size) {
-            try {
-                return Integer.valueOf(size);
-            } catch (NumberFormatException e) {
-                for (Islands.IslandSize targetSize : Islands.IslandSize.values()) {
-                    if (targetSize.name().equalsIgnoreCase(size)) {
-                        return targetSize.getSize();
-                    }
-                }
-
-                return Islands.IslandSize.NORMAL.getSize();
-            }
-
-        }
-
         @Nullable
         public Biome getTargetBiome(String biome) {
              Biome targetBiome = null;

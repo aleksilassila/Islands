@@ -5,15 +5,13 @@ import com.sun.istack.internal.Nullable;
 import me.aleksilassila.islands.commands.GUIs.VisitGui;
 import me.aleksilassila.islands.generation.IslandGeneration;
 import me.aleksilassila.islands.utils.ConfirmItem;
+import me.aleksilassila.islands.utils.Permissions;
 import org.bukkit.World;
 import org.bukkit.block.Biome;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-
+import java.util.*;
 
 public class Islands {
     public Main plugin;
@@ -29,21 +27,7 @@ public class Islands {
 
     public final VisitGui visitGui;
 
-    public enum IslandSize {
-        SMALL(32), // 32*32
-        NORMAL(64), // 64*64
-        BIG(80); // 80*80
-
-        private final int size;
-
-        public int getSize() {
-            return size;
-        }
-
-        IslandSize(int size) {
-            this.size = size;
-        }
-    }
+    public final Map<String, Integer> definedIslandSizes;
 
     public Islands(World world, World sourceWorld, Main plugin) {
         this.plugin = plugin;
@@ -51,30 +35,30 @@ public class Islands {
         this.teleportCooldowns = new HashMap<>();
         this.confirmations = new HashMap<>();
 
+        ConfigurationSection configIslandSizes = plugin.getConfig().getConfigurationSection("islandSizes");
+
+        if (configIslandSizes == null) {
+            plugin.getLogger().severe("PLEASE DEFINE AT LEAST 1 ISLAND SIZE IN config.yml UNDER islandSizes:");
+            plugin.getPluginLoader().disablePlugin(plugin);
+        }
+
+        this.definedIslandSizes = new HashMap<>();
+
+        for (String size : configIslandSizes.getKeys(false)) {
+            int parsedSize = plugin.getConfig().getInt("islandSizes." + size);
+
+            if (parsedSize <= 0) {
+                plugin.getLogger().severe("Island size " + size + " has to be an integer and bigger than 0. Ignoring " + size + ".");
+                continue;
+            }
+
+            this.definedIslandSizes.put(size.toUpperCase(), parsedSize);
+        }
+
         this.islandGeneration = new IslandGeneration(this);
         this.layout = new IslandLayout(this);
 
         this.visitGui = new VisitGui(plugin);
-    }
-
-    public static class IslandsException extends java.lang.Exception {
-        public IslandsException(String message) {
-            super(message);
-        }
-    }
-
-    @NotNull
-    public int parseIslandSize(IslandSize size) {
-        switch (size) {
-            case SMALL:
-                return plugin.getConfig().getInt("island.SMALL");
-            case BIG:
-                return plugin.getConfig().getInt("island.BIG");
-            case NORMAL:
-            default:
-                return plugin.getConfig().getInt("island.NORMAL");
-
-        }
     }
 
     @Nullable
@@ -110,7 +94,8 @@ public class Islands {
         layout.updateIsland(islandId, islandSize, biome);
 
         try {
-            boolean success = islandGeneration.copyIsland(
+
+            return islandGeneration.copyIsland(
                     player,
                     biome,
                     islandSize,
@@ -121,11 +106,45 @@ public class Islands {
                     plugin.getIslandsConfig().getInt(islandId + ".xIndex"),
                     plugin.getIslandsConfig().getInt(islandId + ".zIndex")
             );
-
-            return success;
         } catch (IllegalArgumentException e) {
             throw new IllegalArgumentException();
         }
+    }
+
+    @NotNull
+    public int parseIslandSize(String size) {
+        for (String definedSize : definedIslandSizes.keySet()) {
+            if (definedSize.equalsIgnoreCase(size)) return definedIslandSizes.get(definedSize);
+        }
+
+        try {
+            return Integer.parseInt(size);
+        } catch (NumberFormatException e) {
+            return definedIslandSizes.containsKey("NORMAL") ? definedIslandSizes.get("NORMAL") : definedIslandSizes.get(definedIslandSizes.keySet().iterator().next());
+        }
+    }
+
+    @NotNull
+    public int getSmallestIslandSize() {
+        int smallestSize = layout.islandSpacing;
+
+        for (String definedSize : definedIslandSizes.keySet()) {
+            if (definedIslandSizes.get(definedSize) < smallestSize)
+                smallestSize = definedIslandSizes.get(definedSize);
+        }
+
+        return smallestSize;
+    }
+
+    @NotNull
+    public String getCreatePermission(int islandSize) {
+        // FIXME: Explain in wiki
+
+        for (String definedSize : definedIslandSizes.keySet()) {
+            if (definedIslandSizes.get(definedSize) == islandSize) return Permissions.command.create + "." + definedSize;
+        }
+
+        return Permissions.command.createCustom;
     }
 
     // TODO:
@@ -134,5 +153,4 @@ public class Islands {
     //  - Generation cooldown
     //  - /ContainerTrust etc.
     //  - Fix giant trees cutting off from top.
-    //  - Maybe try this with custom terrain generation?
 }
