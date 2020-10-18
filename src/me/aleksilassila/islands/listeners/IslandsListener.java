@@ -124,7 +124,7 @@ public class IslandsListener extends ChatUtils implements Listener {
     @EventHandler
     public void onEntityDamageEvent(EntityDamageByEntityEvent e) {
          if (e.getEntity().getWorld().equals(plugin.islandsWorld) && e.getDamager() instanceof Player) {
-             if (e.getDamager().hasPermission(Permissions.bypass.interactEverywhere)) return;
+             if (Permissions.checkPermission((Player) e.getDamager(), Permissions.bypass.interactEverywhere)) return;
 
              int x = e.getEntity().getLocation().getBlockX();
              int z = e.getEntity().getLocation().getBlockZ();
@@ -143,48 +143,48 @@ public class IslandsListener extends ChatUtils implements Listener {
     }
 
     @EventHandler // Player interact restriction
-    public void onPlayerInteract(PlayerInteractEvent e) {
-        if (e.getClickedBlock() == null) return;
-        if (e.getPlayer().hasPermission(Permissions.bypass.interactEverywhere)) return;
+    public void onPlayerInteract(PlayerInteractEvent event) {
+        if (event.getClickedBlock() == null) return;
+        if (Permissions.checkPermission(event.getPlayer(), Permissions.bypass.interactEverywhere)) return;
 
-        if (e.getPlayer().getWorld().equals(plugin.islandsWorld)) {
-            int x = e.getClickedBlock().getX();
-            int z = e.getClickedBlock().getZ();
+        if (event.getPlayer().getWorld().equals(plugin.islandsWorld)) {
+            int x = event.getClickedBlock().getX();
+            int z = event.getClickedBlock().getZ();
 
             String ownerUUID = plugin.islands.layout.getBlockOwnerUUID(x, z);
 
-            if (ownerUUID == null || !ownerUUID.equals(e.getPlayer().getUniqueId().toString())) {
-                if (plugin.islands.layout.getTrusted(plugin.islands.layout.getIslandId(x, z)).contains(e.getPlayer().getUniqueId().toString())) {
+            if (ownerUUID == null || !ownerUUID.equals(event.getPlayer().getUniqueId().toString())) {
+                if (plugin.islands.layout.getTrusted(plugin.islands.layout.getIslandId(x, z)).contains(event.getPlayer().getUniqueId().toString())) {
                     return;
                 }
 
-                e.setCancelled(true);
+                event.setCancelled(true);
 
-                e.getPlayer().sendMessage(Messages.error.NOT_TRUSTED);
+                event.getPlayer().sendMessage(Messages.error.NOT_TRUSTED);
             }
         }
     }
 
     // Above only checks if  the block clicked is in build radius, allowing block placement in restricted areas.
     @EventHandler
-    private void onBlockPlace(BlockPlaceEvent e) {
-        if (e.isCancelled()) return;
-        if (e.getPlayer().hasPermission(Permissions.bypass.interactEverywhere)) return;
+    private void onBlockPlace(BlockPlaceEvent event) {
+        if (event.isCancelled()) return;
+        if (Permissions.checkPermission(event.getPlayer(), Permissions.bypass.interactEverywhere)) return;
 
-        if (e.getBlock().getWorld().equals(plugin.islandsWorld)) {
-            int x = e.getBlock().getX();
-            int z = e.getBlock().getZ();
+        if (event.getBlock().getWorld().equals(plugin.islandsWorld)) {
+            int x = event.getBlock().getX();
+            int z = event.getBlock().getZ();
 
             String ownerUUID = plugin.islands.layout.getBlockOwnerUUID(x, z);
 
-            if (ownerUUID == null || !ownerUUID.equals(e.getPlayer().getUniqueId().toString())) {
-                if (plugin.islands.layout.getTrusted(plugin.islands.layout.getIslandId(x, z)).contains(e.getPlayer().getUniqueId().toString())) {
+            if (ownerUUID == null || !ownerUUID.equals(event.getPlayer().getUniqueId().toString())) {
+                if (plugin.islands.layout.getTrusted(plugin.islands.layout.getIslandId(x, z)).contains(event.getPlayer().getUniqueId().toString())) {
                     return;
                 }
 
-                e.setCancelled(true);
+                event.setCancelled(true);
 
-                if (ownerUUID != null) e.getPlayer().sendMessage(Messages.error.NOT_TRUSTED);
+                if (ownerUUID != null) event.getPlayer().sendMessage(Messages.error.NOT_TRUSTED);
             }
 
         }

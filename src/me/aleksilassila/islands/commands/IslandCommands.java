@@ -53,7 +53,7 @@ public class IslandCommands {
                 return true;
             }
 
-            if (!canTeleport(player) && !player.hasPermission(Permissions.bypass.home)) {
+            if (!canTeleport(player) && !Permissions.checkPermission(player, Permissions.bypass.home)) {
                 player.sendMessage(Messages.error.COOLDOWN(teleportCooldown(player)));
                 return true;
             }
@@ -109,7 +109,7 @@ public class IslandCommands {
                     return true;
                 }
 
-                if (!canTeleport(player) && !player.hasPermission(Permissions.bypass.home)) {
+                if (!canTeleport(player) && !Permissions.checkPermission(player, Permissions.bypass.home)) {
                     player.sendMessage(Messages.error.COOLDOWN(teleportCooldown(player)));
                     return true;
                 }

@@ -4,6 +4,7 @@ import com.sun.istack.internal.NotNull;
 import com.sun.istack.internal.Nullable;
 import me.aleksilassila.islands.commands.GUIs.VisitGui;
 import me.aleksilassila.islands.generation.IslandGeneration;
+import me.aleksilassila.islands.generation.Shape;
 import me.aleksilassila.islands.utils.ConfirmItem;
 import me.aleksilassila.islands.utils.Permissions;
 import org.bukkit.World;
@@ -28,32 +29,16 @@ public class Islands {
     public final VisitGui visitGui;
 
     public final Map<String, Integer> definedIslandSizes;
+    public Map<Integer, Shape> definedIslandShapes;
 
-    public Islands(World world, World sourceWorld, Main plugin) {
+    public Islands(World sourceWorld, Main plugin) {
         this.plugin = plugin;
         this.sourceWorld = sourceWorld;
         this.teleportCooldowns = new HashMap<>();
         this.confirmations = new HashMap<>();
 
-        ConfigurationSection configIslandSizes = plugin.getConfig().getConfigurationSection("islandSizes");
-
-        if (configIslandSizes == null) {
-            plugin.getLogger().severe("PLEASE DEFINE AT LEAST 1 ISLAND SIZE IN config.yml UNDER islandSizes:");
-            plugin.getPluginLoader().disablePlugin(plugin);
-        }
-
-        this.definedIslandSizes = new HashMap<>();
-
-        for (String size : configIslandSizes.getKeys(false)) {
-            int parsedSize = plugin.getConfig().getInt("islandSizes." + size);
-
-            if (parsedSize <= 0) {
-                plugin.getLogger().severe("Island size " + size + " has to be an integer and bigger than 0. Ignoring " + size + ".");
-                continue;
-            }
-
-            this.definedIslandSizes.put(size.toUpperCase(), parsedSize);
-        }
+        this.definedIslandSizes = setupSizes();
+        this.definedIslandShapes = setupShapes();
 
         this.islandGeneration = new IslandGeneration(this);
         this.layout = new IslandLayout(this);
@@ -74,7 +59,8 @@ public class Islands {
                     plugin.getIslandsConfig().getInt(islandId + ".z"),
                     false,
                     0,
-                    0
+                    0,
+                    definedIslandShapes.getOrDefault(islandSize, null)
             );
 
             if (!success) {
@@ -104,7 +90,8 @@ public class Islands {
                     plugin.getIslandsConfig().getInt(islandId + ".z"),
                     shouldClearArea,
                     plugin.getIslandsConfig().getInt(islandId + ".xIndex"),
-                    plugin.getIslandsConfig().getInt(islandId + ".zIndex")
+                    plugin.getIslandsConfig().getInt(islandId + ".zIndex"),
+                    definedIslandShapes.getOrDefault(islandSize, null)
             );
         } catch (IllegalArgumentException e) {
             throw new IllegalArgumentException();
@@ -145,6 +132,53 @@ public class Islands {
         }
 
         return Permissions.command.createCustom;
+    }
+
+    private Map<String, Integer> setupSizes() {
+        ConfigurationSection configIslandSizes = plugin.getConfig().getConfigurationSection("islandSizes");
+        Map<String, Integer> sizes = new HashMap<>();
+
+        if (configIslandSizes == null) {
+            plugin.getLogger().severe("PLEASE DEFINE AT LEAST 1 ISLAND SIZE IN config.yml UNDER islandSizes:");
+            plugin.getPluginLoader().disablePlugin(plugin);
+            return sizes;
+        }
+
+
+        for (String size : configIslandSizes.getKeys(false)) {
+            int parsedSize = plugin.getConfig().getInt("islandSizes." + size);
+
+            if (parsedSize <= 0) {
+                plugin.getLogger().severe("Island size " + size + " has to be an integer and bigger than 0. Ignoring " + size + ".");
+                continue;
+            }
+
+            sizes.put(size.toUpperCase(), parsedSize);
+        }
+
+        return sizes;
+    }
+
+    private Map<Integer, Shape> setupShapes() {
+        ConfigurationSection configIslandShapes = plugin.getConfig().getConfigurationSection("islandShapes");
+
+        Map<Integer, Shape> shapes = new HashMap<>();
+
+        if (configIslandShapes == null) return shapes;
+
+        for (String key : configIslandShapes.getKeys(false)) {
+            String fileName = plugin.getConfig().getString("islandShapes." + key);
+
+            Shape shape = plugin.shapesLoader.loadFromFile(fileName);
+
+            if (shape != null) {
+                shapes.put(shape.getWidth(), shape);
+                plugin.getLogger().info("Added shape " + shape.file.getName() + " for islandSize " + shape.getWidth() + ".");
+            }
+
+        }
+
+        return shapes;
     }
 
     // TODO:

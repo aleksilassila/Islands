@@ -1,9 +1,11 @@
 package me.aleksilassila.islands;
 
+import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import me.aleksilassila.islands.commands.IslandCommands;
 import me.aleksilassila.islands.commands.IslandManagmentCommands;
 import me.aleksilassila.islands.commands.TrustCommands;
 import me.aleksilassila.islands.listeners.IslandsListener;
+import me.aleksilassila.islands.generation.ShapesLoader;
 import me.aleksilassila.islands.utils.UpdateChecker;
 import net.milkbowl.vault.permission.Permission;
 import org.bukkit.*;
@@ -30,11 +32,17 @@ public class Main extends JavaPlugin {
     public Islands islands;
 
     public Permission perms = null;
+    public WorldEditPlugin worldEdit = null;
+    public ShapesLoader shapesLoader = null;
 
     @Override
     public void onEnable() {
         if (!setupPermissions()) {
             getLogger().severe("No Vault found. Some permissions disabled.");
+        }
+
+        if (!setupWorldedit()) {
+            getLogger().severe("No WorldEdit found. Island molds disabled.");
         }
 
         new UpdateChecker(this, 84303).getVersion(version -> {
@@ -55,7 +63,7 @@ public class Main extends JavaPlugin {
         islandsSourceWorld = getSourceWorld();
         wildernessWorld = getWilderness();
 
-        islands = new Islands(islandsWorld, islandsSourceWorld, this);
+        islands = new Islands(islandsSourceWorld, this);
 
         new IslandManagmentCommands(this);
 
@@ -86,6 +94,14 @@ public class Main extends JavaPlugin {
             return true;
         }
         return false;
+    }
+
+    private boolean setupWorldedit() {
+        worldEdit = (WorldEditPlugin) Bukkit.getPluginManager().getPlugin("WorldEdit");
+        if (worldEdit instanceof WorldEditPlugin) {
+            shapesLoader = new ShapesLoader(this);
+            return true;
+        } else return false;
     }
 
     @Override

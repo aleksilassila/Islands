@@ -32,8 +32,8 @@ public class giveSubcommand extends Subcommand {
             return;
         }
 
-        if ((args.length != 1 && !player.hasPermission(Permissions.bypass.give))
-                || (player.hasPermission(Permissions.bypass.give) && args.length > 1)) {
+        if ((args.length != 1 && !Permissions.checkPermission(player, Permissions.bypass.give))
+                || (Permissions.checkPermission(player, Permissions.bypass.give) && args.length > 1)) {
             player.sendMessage(Messages.help.GIVE);
             return;
         }

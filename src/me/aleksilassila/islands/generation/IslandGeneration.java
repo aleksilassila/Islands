@@ -3,7 +3,6 @@ package me.aleksilassila.islands.generation;
 import com.sun.istack.internal.Nullable;
 import me.aleksilassila.islands.Islands;
 import me.aleksilassila.islands.utils.Messages;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Biome;
@@ -12,6 +11,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 
@@ -61,13 +61,16 @@ public class IslandGeneration {
 
     class CopyTask extends BukkitRunnable {
         private final Player player;
+
         private final int startX;
         private final int startY;
         private final int startZ;
         private final int targetX;
         private final int targetY;
         private final int targetZ;
+
         private final int islandSize;
+        private final int islandHeight;
 
         private int index;
 
@@ -77,20 +80,29 @@ public class IslandGeneration {
         private final int xIndex;
         private final int zIndex;
 
+        private final Shape shape;
 
-        public CopyTask(Player player, int startX, int startY, int startZ, int targetX, int targetY, int targetZ, int islandSize, boolean shouldClearArea, int xIndex, int zIndex) {
+        public CopyTask(Player player, int startX, int startY, int startZ, int targetX, int targetY, int targetZ, int islandSize, boolean shouldClearArea, int xIndex, int zIndex, Shape shape) {
             this.startX = startX;
-            this.startY = startY;
+
+            this.startY = shape != null ? startY - (shape.getHeight() - islandSize / 2) : startY;
+
             this.startZ = startZ;
             this.targetX = targetX;
             this.targetY = targetY;
             this.targetZ = targetZ;
+
             this.islandSize = islandSize;
+            this.islandHeight = shape != null ? shape.getHeight() + islandSize / 2 : islandSize;
+
             this.player = player;
+
             this.clearingArea = shouldClearArea;
             this.clearingIndex = 0;
             this.xIndex = xIndex;
             this.zIndex = zIndex;
+
+            this.shape = shape;
 
             this.index = 0;
         }
@@ -132,19 +144,35 @@ public class IslandGeneration {
                 return;
             }
 
-            loop:
             for (int count = 0; count < rowsBuiltPerDelay; count++) {
-                for (int y = startY; y < startY + islandSize; y++) {
+                for (int y = startY; y < startY + islandHeight; y++) {
                     int relativeX = index / islandSize;
                     int relativeZ = index - relativeX * islandSize;
 
                     Block sourceBlock = islands.sourceWorld.getBlockAt(startX + relativeX, y, startZ + relativeZ);
 
                     Block target = islands.plugin.islandsWorld.getBlockAt(targetX + relativeX, targetY + (y - startY), targetZ + relativeZ);
-                    if (isBlockInIslandShape(relativeX, y - startY, relativeZ, islandSize)) {
-                        target.setBlockData(sourceBlock.getBlockData());
+
+                    if (shape == null) {
+                        if (isBlockInIslandShape(relativeX, y - startY, relativeZ, islandSize)) {
+                            target.setBlockData(sourceBlock.getBlockData());
+                        } else {
+                            target.setType(Material.AIR);
+                        }
                     } else {
-                        target.setType(Material.AIR);
+                        if (y - startY > shape.getHeight() - 1) {
+                            if (isBlockInIslandShape(relativeX, y - startY - (islandHeight - islandSize), relativeZ, islandSize)) {
+                                target.setBlockData(sourceBlock.getBlockData());
+                            } else {
+                                target.setType(Material.AIR);
+                            }
+                        } else {
+                            if (!shape.isBlockAir(relativeX, y - startY, relativeZ)) {
+                                target.setBlockData(sourceBlock.getBlockData());
+                            } else {
+                                target.setType(Material.AIR);
+                            }
+                        }
                     }
 
                     target.setBiome(sourceBlock.getBiome());
@@ -164,7 +192,7 @@ public class IslandGeneration {
                     }
 
                     this.cancel();
-                    break loop;
+                    break;
                 } else if (index == islandSize * islandSize / 4) {
                     player.sendMessage(Messages.info.GENERATION_STATUS(25));
                 } else if (index == islandSize * islandSize / 2) {
@@ -178,7 +206,7 @@ public class IslandGeneration {
         }
     }
 
-    public boolean copyIsland(Player player, Biome biome, int islandSize, int targetX, int targetY, int targetZ, boolean shouldClearArea, int xIndex, int zIndex) throws IllegalArgumentException {
+    public boolean copyIsland(Player player, Biome biome, int islandSize, int targetX, int targetY, int targetZ, boolean shouldClearArea, int xIndex, int zIndex, Shape shape) throws IllegalArgumentException {
         if (queue.size() > 0 && queue.get(0).player.getUniqueId().toString().equals(player.getUniqueId().toString())) {
             return false;
         }
@@ -201,7 +229,9 @@ public class IslandGeneration {
             int centerZ = (int) (sourceLocation.getBlockZ() + ((double) islandSize) / 2.0);
 
             Material material = islands.sourceWorld.getBlockAt(centerX, centerY, centerZ).getBlockData().getMaterial();
-            if (material == Material.STONE || material == Material.SANDSTONE || material == Material.WATER) {
+            if (shape != null && !material.isAir() && !material.isBurnable()) {
+                break;
+            } else if (Arrays.asList(Material.WATER, Material.SANDSTONE, Material.STONE).contains(material)) {
                 break;
             }
 
@@ -212,7 +242,7 @@ public class IslandGeneration {
         int startY = centerY - islandSize / 2;
         int startZ = sourceLocation.getBlockZ();
 
-        CopyTask task = new CopyTask(player, startX, startY, startZ, targetX, targetY, targetZ, islandSize, shouldClearArea, xIndex, zIndex);
+        CopyTask task = new CopyTask(player, startX, startY, startZ, targetX, targetY, targetZ, islandSize, shouldClearArea, xIndex, zIndex, shape);
 
         if (queue.size() == 0) {
             task.runTaskTimer(islands.plugin, 0, buildDelay);
