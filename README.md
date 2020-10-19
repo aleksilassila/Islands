@@ -38,44 +38,45 @@ This ensures that players have fresh resources available at all times and encour
 You can google more about how to schedule reboots and resets.
 
 ## Screenshots
+
+![Jungle](screenshots/islandTypes/jungle_big.png?raw=true)
+
 ### Functionality
 Available biomes are fetched from `islandsSource` world. 
 The search are can be adjusted to match server performance.
 Supports all overworld biomes.
+
+Islands are also protected by default. No more "I forgot to protect my base and got griefed".
+Players can trust other players to play together.
 
 ![Biomes](screenshots/functionality/biomes.png?raw=true)
 
 Queue system ensures that generating islands does not cause lag.
 Generation speed can also be adjusted.
 
-![Queue](screenshots/functionality/queue2.png?raw=true)
+![Queue](screenshots/functionality/queue.png?raw=true)
+
+![Generation](screenshots/functionality/generation.png?raw=true)
 
 Jumping down from an island teleport player to survival "wilderness",
 where damage is enabled. Wilderness can be reset often without resetting players' progression.
 
 ![Wilderness](screenshots/functionality/wilderness.png?raw=true)
 
-![Wilderness](screenshots/functionality/wilderness2.png?raw=true)
-
-Islands are protected by default. No more "I forgot to protect my base and got griefed".
-Players can trust other players to play together.
-
-![Island Protection](screenshots/functionality/protection.png?raw=true)
-
 Comes with a handy gui that players can use to visit other public islands!
+Shiny islands are "official" islands owned by the server.
 
-![Island Protection](screenshots/functionality/visiting_gui.png?raw=true)
+![Island Protection](screenshots/functionality/visit_gui.png?raw=true)
+
+Custom island shapes can be created to enhance the look of your islands!
+
+![Island Shapes](screenshots/functionality/shapes.png?raw=true)
+
 
 ### Example Islands
 
-![biome](screenshots/islandTypes/badlands.png?raw=true)
+![Big Badlands Island](screenshots/islandTypes/badlands_big.png?raw=true)
 
-![biome](screenshots/islandTypes/desert_small.png?raw=true)
+![Small Bamboo Island](screenshots/islandTypes/bamboo_small.png?raw=true)
 
-![biome](screenshots/islandTypes/jungle.png?raw=true)
-
-![biome](screenshots/islandTypes/taiga.png?raw=true)
-
-![biome](screenshots/islandTypes/dark_woods_hills.png?raw=true)
-
-![biome](screenshots/islandTypes/desert_night.png?raw=true)
+![Landscape](screenshots/islandTypes/landscape.png?raw=true)

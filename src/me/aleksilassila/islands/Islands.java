@@ -191,4 +191,5 @@ public class Islands {
     //  - Maybe merge Main and Islands
     //  - Remember to inform about config changes
     //  - API ??
+    //  - Save island as schematic
 }
