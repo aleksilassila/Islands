@@ -41,7 +41,7 @@ public class IslandCommands {
 
             plugin.confirmations.remove(player.getUniqueId().toString());
 
-            if (!Permissions.checkPermission(player, Permissions.command.visit)) {
+            if (!player.hasPermission(Permissions.command.visit)) {
                 player.sendMessage(Messages.error.NO_PERMISSION);
                 return true;
             }
@@ -52,7 +52,7 @@ public class IslandCommands {
                 return true;
             }
 
-            if (!canTeleport(player) && !Permissions.checkPermission(player, Permissions.bypass.home)) {
+            if (!canTeleport(player) && !player.hasPermission(Permissions.bypass.home)) {
                 player.sendMessage(Messages.error.COOLDOWN(teleportCooldown(player)));
                 return true;
             }
@@ -87,7 +87,7 @@ public class IslandCommands {
             plugin.confirmations.remove(player.getUniqueId().toString());
 
             if (args.length == 1 && args[0].equalsIgnoreCase("list") || label.equalsIgnoreCase("homes")) {
-                if (!Permissions.checkPermission(player, Permissions.command.listHomes)) {
+                if (!player.hasPermission(Permissions.command.listHomes)) {
                     player.sendMessage(Messages.error.NO_PERMISSION);
                     return true;
                 }
@@ -103,12 +103,12 @@ public class IslandCommands {
 
                 return true;
             } else {
-                if (!Permissions.checkPermission(player, Permissions.command.home)) {
+                if (!player.hasPermission(Permissions.command.home)) {
                     player.sendMessage(Messages.error.NO_PERMISSION);
                     return true;
                 }
 
-                if (!canTeleport(player) && !Permissions.checkPermission(player, Permissions.bypass.home)) {
+                if (!canTeleport(player) && !player.hasPermission(Permissions.bypass.home)) {
                     player.sendMessage(Messages.error.COOLDOWN(teleportCooldown(player)));
                     return true;
                 }
@@ -123,12 +123,12 @@ public class IslandCommands {
                 }
             }
 
-            if (player.getWorld().getName().equals("world_nether") && !Permissions.checkPermission(player, Permissions.bypass.home)) {
+            if (player.getWorld().getName().equals("world_nether") && !player.hasPermission(Permissions.bypass.home)) {
                 player.sendMessage(Messages.info.IN_OVERWORLD);
                 return true;
             }
 
-            if (player.getWorld().getName().equals("world") && !Permissions.checkPermission(player, Permissions.bypass.home)) {
+            if (player.getWorld().getName().equals("world") && !player.hasPermission(Permissions.bypass.home)) {
                 // Check if is on surface
                 Location playerLocation = player.getLocation();
 

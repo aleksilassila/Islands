@@ -20,7 +20,7 @@ public class unnameSubcommand extends Subcommand {
 
     @Override
     public void onCommand(Player player, String[] args, boolean confirmed) {
-        if (!Permissions.checkPermission(player, Permissions.command.unname)) {
+        if (!player.hasPermission(Permissions.command.unname)) {
             player.sendMessage(Messages.error.NO_PERMISSION);
             return;
         }
@@ -49,7 +49,7 @@ public class unnameSubcommand extends Subcommand {
         }
 
         if (layout.getUUID(islandId).equals(player.getUniqueId().toString())
-                || Permissions.checkPermission(player, Permissions.bypass.unname)) {
+                || player.hasPermission(Permissions.bypass.unname)) {
             layout.unnameIsland(islandId);
 
             player.sendMessage(Messages.success.UNNAMED);

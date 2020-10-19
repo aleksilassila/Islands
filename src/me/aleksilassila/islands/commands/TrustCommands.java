@@ -32,7 +32,7 @@ public class TrustCommands {
 
             plugin.confirmations.remove(player.getUniqueId().toString());
 
-            if (!Permissions.checkPermission(player, Permissions.command.untrust)) {
+            if (!player.hasPermission(Permissions.command.untrust)) {
                 player.sendMessage(Messages.error.NO_PERMISSION);
                 return true;
             }
@@ -57,7 +57,7 @@ public class TrustCommands {
                 return true;
             }
 
-            if (!ownerUUID.equals(player.getUniqueId().toString()) && !Permissions.checkPermission(player, Permissions.bypass.untrust)) {
+            if (!ownerUUID.equals(player.getUniqueId().toString()) && !player.hasPermission(Permissions.bypass.untrust)) {
                 player.sendMessage(Messages.error.NOT_OWNED);
                 return true;
             }
@@ -90,7 +90,7 @@ public class TrustCommands {
 
             plugin.confirmations.remove(player.getUniqueId().toString());
 
-            if (!Permissions.checkPermission(player, Permissions.command.trust)) {
+            if (!player.hasPermission(Permissions.command.trust)) {
                 player.sendMessage(Messages.error.NO_PERMISSION);
                 return true;
             }
@@ -108,7 +108,7 @@ public class TrustCommands {
                 return true;
             }
 
-            if (!ownerUUID.equals(player.getUniqueId().toString()) && !Permissions.checkPermission(player, Permissions.bypass.trust)) {
+            if (!ownerUUID.equals(player.getUniqueId().toString()) && !player.hasPermission(Permissions.bypass.trust)) {
                 player.sendMessage(Messages.error.NOT_OWNED);
                 return true;
             }
@@ -141,7 +141,7 @@ public class TrustCommands {
 
             plugin.confirmations.remove(player.getUniqueId().toString());
 
-            if (!Permissions.checkPermission(player, Permissions.command.listTrusted)) {
+            if (!player.hasPermission(Permissions.command.listTrusted)) {
                 player.sendMessage(Messages.error.NO_PERMISSION);
                 return true;
             }
@@ -154,7 +154,7 @@ public class TrustCommands {
                 return true;
             }
 
-            if (!ownerUUID.equals(player.getUniqueId().toString()) && !Permissions.checkPermission(player, Permissions.bypass.listTrusted)) {
+            if (!ownerUUID.equals(player.getUniqueId().toString()) && !player.hasPermission(Permissions.bypass.listTrusted)) {
                 player.sendMessage(Messages.error.NOT_OWNED);
                 return true;
             }

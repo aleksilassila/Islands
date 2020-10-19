@@ -29,7 +29,7 @@ public class createSubcommand extends Subcommand {
 
     @Override
     public void onCommand(Player player, String[] args, boolean confirmed) {
-        if (!Permissions.checkPermission(player, Permissions.command.create)) {
+        if (!player.hasPermission(Permissions.command.create)) {
             player.sendMessage(Messages.error.NO_PERMISSION);
             return;
         }
@@ -38,7 +38,7 @@ public class createSubcommand extends Subcommand {
 
         String permissionRequired = plugin.getCreatePermission(islandSize);
 
-        if (!Permissions.checkPermission(player, permissionRequired)) {
+        if (!player.hasPermission(permissionRequired)) {
             player.sendMessage(Messages.error.NO_PERMISSION);
             return;
         }
@@ -78,7 +78,7 @@ public class createSubcommand extends Subcommand {
             }
         }
 
-        if (previousIslands >= islandsLimit && !Permissions.checkPermission(player, Permissions.bypass.create)) {
+        if (previousIslands >= islandsLimit && !player.hasPermission(Permissions.bypass.create)) {
             player.sendMessage(Messages.error.ISLAND_LIMIT);
             return;
         }

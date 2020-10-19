@@ -20,7 +20,7 @@ public class deleteSubcommand extends Subcommand {
 
     @Override
     public void onCommand(Player player, String[] args, boolean confirmed) {
-        if (!Permissions.checkPermission(player, Permissions.command.delete)) {
+        if (!player.hasPermission(Permissions.command.delete)) {
             player.sendMessage(Messages.error.NO_PERMISSION);
             return;
         }
@@ -38,7 +38,7 @@ public class deleteSubcommand extends Subcommand {
         }
 
         if (!layout.getUUID(islandId).equals(player.getUniqueId().toString())
-                && !Permissions.checkPermission(player, Permissions.bypass.delete)) {
+                && !player.hasPermission(Permissions.bypass.delete)) {
             player.sendMessage(Messages.error.UNAUTHORIZED);
             return;
         }

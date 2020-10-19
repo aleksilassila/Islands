@@ -28,3 +28,133 @@ commands:
   untrust:
     description: Untrust a player
     usage: /<command> player
+permissions:
+  islands.*:
+    description: All islands commands and bypasses
+    children:
+      islands.command.*: true
+      islands.bypass.*: true
+  islands.command.*:
+    description: Access to all island commands
+    children:
+      islands.command: true
+      islands.command.create: true
+      islands.command.recreate: true
+      islands.command.delete: true
+      islands.command.give: true
+      islands.command.name: true
+      islands.command.unname: true
+      islands.command.home.*: true
+      islands.command.turst.*: true
+      islands.command.visit: true
+      islands.command.setspawn: true
+      islands.command.create.custom: true
+  islands.bypass.*:
+    description: Access to all island bypasses
+    children:
+      islands.bypass.islandLimit: true
+      islands.bypass.recreate: true
+      islands.bypass.delete: true
+      islands.bypass.give: true
+      islands.bypass.name: true
+      islands.bypass.unname: true
+      islands.bypass.trust: true
+      islands.bypass.setspawn: true
+      islands.bypass.untrust: true
+      islands.bypass.protection: true
+      islands.bypass.home: true
+      islands.bypass.trust.list: true
+  islands.command.home.*:
+    description: Access to home commands
+    children:
+      islands.command.home: true
+      islands.command.home.list: true
+  islands.command.trust.*:
+    description: Access to trust commands
+    children:
+      islands.command.trust: true
+      islands.command.trust.list: true
+      islands.command.untrust: true
+
+  islands.command:
+    description: Access to island command
+    default: true
+  islands.command.create:
+    description: Access to island create command
+    default: true
+  islands.command.recreate:
+    description: Access to island recreate command
+    default: true
+  islands.command.home:
+    description: Access to home command
+    default: true
+  islands.command.home.list:
+    description: Access to homes command
+    default: true
+  islands.command.visit:
+    description: Access to island visit command
+    default: true
+  islands.command.setspawn:
+    description: Access to island setspawn command
+    default: true
+  islands.command.create.custom:
+    description: Access to island create custom size command
+    default: "op"
+  islands.command.delete:
+    description: Access to island delete command
+    default: "op"
+  islands.command.give:
+    description: Access to island command
+    default: "op"
+  islands.command.name:
+    description: Access to island name command
+    default: "op"
+  islands.command.unname:
+    description: Access to island unname command
+    default: "op"
+  islands.command.turst:
+    description: Access to trust command
+    default: "op"
+  islands.command.turst.list:
+    description: Access to trusted command
+    default: "op"
+  islands.command.untrust:
+    description: Access to untrust command
+    default: "op"
+
+  islands.bypass.islandLimit:
+    description: Bypass island limit restrictions
+    default: "op"
+  islands.bypass.recreate:
+    description: Bypass recreate restrictions
+    default: "op"
+  islands.bypass.delete:
+    description: Bypass delete restrictions
+    default: "op"
+  islands.bypass.give:
+    description: Bypass give restrictions
+    default: "op"
+  islands.bypass.name:
+    description: Bypass name restrictions
+    default: "op"
+  islands.bypass.unname:
+    description: Bypass unname restrictions
+    default: "op"
+  islands.bypass.setspawn:
+    description: Bypass setspawn restrictions
+    default: "op"
+  islands.bypass.trust:
+    description: Bypass trust restrictions
+    default: "op"
+  islands.bypass.untrust:
+    description: Bypass untrust restrictions
+    default: "op"
+  islands.bypass.turst.list:
+    description: Bypass trusted restrictions
+    default: "op"
+  islands.bypass.protection:
+    description: Bypass protection restrictions
+    default: "op"
+  islands.bypass.home:
+    description: Bypass home restrictions
+    default: "op"

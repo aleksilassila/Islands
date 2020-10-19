@@ -22,7 +22,7 @@ public class giveSubcommand extends Subcommand {
 
     @Override
     public void onCommand(Player player, String[] args, boolean confirmed) {
-        if (!Permissions.checkPermission(player, Permissions.command.give)) {
+        if (!player.hasPermission(Permissions.command.give)) {
             player.sendMessage(Messages.error.NO_PERMISSION);
             return;
         }
@@ -32,8 +32,8 @@ public class giveSubcommand extends Subcommand {
             return;
         }
 
-        if ((args.length != 1 && !Permissions.checkPermission(player, Permissions.bypass.give))
-                || (Permissions.checkPermission(player, Permissions.bypass.give) && args.length > 1)) {
+        if ((args.length != 1 && !player.hasPermission(Permissions.bypass.give))
+                || (player.hasPermission(Permissions.bypass.give) && args.length > 1)) {
             player.sendMessage(Messages.help.GIVE);
             return;
         }
@@ -46,7 +46,7 @@ public class giveSubcommand extends Subcommand {
         }
         ConfigurationSection section = plugin.getIslandsConfig().getConfigurationSection(islandId + ".UUID");
         if ((section != null && layout.getUUID(islandId).equals(player.getUniqueId().toString()))
-                || Permissions.checkPermission(player, Permissions.bypass.give)) {
+                || player.hasPermission(Permissions.bypass.give)) {
             if (plugin.getIslandsConfig().getBoolean(islandId + ".public")) {
                 if (!confirmed) {
                     player.sendMessage(Messages.info.CONFIRM);

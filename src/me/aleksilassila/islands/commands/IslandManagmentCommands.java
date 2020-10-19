@@ -43,7 +43,7 @@ public class IslandManagmentCommands extends ChatUtils implements TabExecutor {
 
         Player player = (Player) sender;
 
-        if (!Permissions.checkPermission(player, Permissions.command.island)) {
+        if (!player.hasPermission(Permissions.command.island)) {
             player.sendMessage(Messages.error.NO_PERMISSION);
             return true;
         }

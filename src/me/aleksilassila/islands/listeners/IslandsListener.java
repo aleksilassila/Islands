@@ -124,7 +124,7 @@ public class IslandsListener extends ChatUtils implements Listener {
     @EventHandler
     public void onEntityDamageEvent(EntityDamageByEntityEvent e) {
          if (e.getEntity().getWorld().equals(plugin.islandsWorld) && e.getDamager() instanceof Player) {
-             if (Permissions.checkPermission((Player) e.getDamager(), Permissions.bypass.interactEverywhere)) return;
+             if (e.getDamager().hasPermission(Permissions.bypass.interactEverywhere)) return;
 
              int x = e.getEntity().getLocation().getBlockX();
              int z = e.getEntity().getLocation().getBlockZ();
@@ -145,7 +145,7 @@ public class IslandsListener extends ChatUtils implements Listener {
     @EventHandler // Player interact restriction
     public void onPlayerInteract(PlayerInteractEvent event) {
         if (event.getClickedBlock() == null) return;
-        if (Permissions.checkPermission(event.getPlayer(), Permissions.bypass.interactEverywhere)) return;
+        if (event.getPlayer().hasPermission(Permissions.bypass.interactEverywhere)) return;
 
         if (event.getPlayer().getWorld().equals(plugin.islandsWorld)) {
             int x = event.getClickedBlock().getX();
@@ -169,7 +169,7 @@ public class IslandsListener extends ChatUtils implements Listener {
     @EventHandler
     private void onBlockPlace(BlockPlaceEvent event) {
         if (event.isCancelled()) return;
-        if (Permissions.checkPermission(event.getPlayer(), Permissions.bypass.interactEverywhere)) return;
+        if (event.getPlayer().hasPermission(Permissions.bypass.interactEverywhere)) return;
 
         if (event.getBlock().getWorld().equals(plugin.islandsWorld)) {
             int x = event.getBlock().getX();

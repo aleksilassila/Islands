@@ -20,7 +20,7 @@ public class setSpawnSubcommand extends Subcommand {
 
     @Override
     public void onCommand(Player player, String[] args, boolean confirmed) {
-        if (!Permissions.checkPermission(player, Permissions.command.setSpawn)) {
+        if (!player.hasPermission(Permissions.command.setSpawn)) {
             player.sendMessage(Messages.error.NO_PERMISSION);
             return;
         }
@@ -38,7 +38,7 @@ public class setSpawnSubcommand extends Subcommand {
         }
 
         if (layout.getUUID(islandId).equals(player.getUniqueId().toString())
-                || Permissions.checkPermission(player, Permissions.bypass.setSpawn)) {
+                || player.hasPermission(Permissions.bypass.setSpawn)) {
             layout.setSpawnPoint(islandId, player.getLocation().getBlockX(), player.getLocation().getBlockZ());
 
             player.sendMessage(Messages.success.SPAWNPOINT_CHANGED);

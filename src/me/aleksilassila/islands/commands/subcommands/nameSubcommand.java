@@ -22,7 +22,7 @@ public class nameSubcommand extends Subcommand {
 
     @Override
     public void onCommand(Player player, String[] args, boolean confirmed) {
-        if (!Permissions.checkPermission(player, Permissions.command.name)) {
+        if (!player.hasPermission(Permissions.command.name)) {
             player.sendMessage(Messages.error.NO_PERMISSION);
             return;
         }
@@ -45,7 +45,7 @@ public class nameSubcommand extends Subcommand {
         }
 
         if (layout.getUUID(islandId).equals(player.getUniqueId().toString())
-                || Permissions.checkPermission(player, Permissions.bypass.name)) {
+                || player.hasPermission(Permissions.bypass.name)) {
             if (layout.getIslandByName(args[0]) != null) {
                 player.sendMessage(Messages.error.NAME_TAKEN);
                 return;

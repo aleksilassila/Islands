@@ -203,8 +203,6 @@ public class Islands extends JavaPlugin {
 
     @NotNull
     public String getCreatePermission(int islandSize) {
-        // FIXME: Explain in wiki
-
         for (String definedSize : definedIslandSizes.keySet()) {
             if (definedIslandSizes.get(definedSize) == islandSize) return Permissions.command.create + "." + definedSize;
         }

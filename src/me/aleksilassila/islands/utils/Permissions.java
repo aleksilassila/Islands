@@ -1,25 +1,6 @@
 package me.aleksilassila.islands.utils;
 
-import org.bukkit.Bukkit;
-import org.bukkit.entity.Player;
-
-import java.util.Arrays;
-
 public class Permissions {
-    public static boolean checkPermission(Player player, String permission) {
-        if (player.hasPermission(permission)) return true;
-        if (player.hasPermission("*")) return true;
-
-        String[] parts = permission.split("\\.");
-
-        for (int index = 0; index < parts.length; index++) {
-            String joined = String.join(".", Arrays.copyOfRange(parts, 0, index + 1));
-            if (player.hasPermission(joined + ".*")) return true;
-        }
-
-        return false;
-    }
-
     public static class bypass {
         public static final String create = "islands.bypass.islandLimit";       // Create unlimited islands
         public static final String recreate = "islands.bypass.recreate";        // Recreate any island
