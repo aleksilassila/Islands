@@ -6,15 +6,6 @@ that can be reset often without losing players' progress.
 
 If you want to experience the plugin in game, you can hop on blucraft.mc.gg! (1.16.3)
 
-## Table Of Contents
-- [Features](#features)
-- [Commands](#commands)
-- [Screenshots](#screenshots)
-- [Setting up](#setting-up)
-- [Permissions](#permissions)
-- [How does it work?](#how-does-it-work)
-
-
 ## Features
 "Okay cool, islands. What's the point?" Here are some problems that this plugin solves.
 
@@ -34,32 +25,17 @@ This plugin allows resetting the survival world whenever you feel like it withou
 Your islands and inventory are saved in a separate world. 
 
 **Community.** Players can easily visit each other's islands with `/visit` command.
+The plugin has gui menu for browsing public islands. It is also possible to set up
+"official" islands like spawn island that are owned by the server.
 *Tip for admins: `/island name spawn` for accessing spawn via `/vi spawn`*
 
 The plugin has customizable generation settings, so the plugin can be optimized for any hardware.
+**To set up the plugin, check out [Wiki](https://github.com/aleksilassila/Islands/wiki).
+You can also find extensive list of permissions, commands and configuration there.**
 
 I'd recommend admins to set up daily or weekly reset of wilderness world and possibly nether and end too. 
 This ensures that players have fresh resources available at all times and encourages players to build on islands as intended.
 You can google more about how to schedule reboots and resets.
-
-### Commands
-
-Island Managment:
-- `/island create <biome> (<SMALL / NORMAL / BIG>)`
-- `/island regenerate <biome> (<SMALL / NORMAL / BIG>)`
-- `/island delete`
-- `/island give <player>`, transfers island ownership
-- `/island name <name>`, allows other players to `/vi <name>`
-- `/island unname`, sets island to private
-- `/island setspawn`, set island spawnpoint
-
-
-Other
-- `/home (<id>)`
-- `/homes`, list all player's islands
-- `/visit <name>`, `/vi <name>`, visit public island
-- `/trust <player>`, allow player to interact with blocks and entities of your island
-- `/untrust <player>`
 
 ## Screenshots
 ### Functionality
@@ -103,103 +79,3 @@ Comes with a handy gui that players can use to visit other public islands!
 ![biome](screenshots/islandTypes/dark_woods_hills.png?raw=true)
 
 ![biome](screenshots/islandTypes/desert_night.png?raw=true)
-
-## Setting up
-
-To set up the plugin, add following lines to your `bukkit.yml` file.
-You will also have to install VoidGenerator plugin.
-
-```
-worlds:
-  <Islands World Name>:
-    generator: VoidGenerator:PLAINS
-```
-
-Replace `<Islands World Name>` with the **value of** `islandsWorldName` from `plugins/Islands/config.yml`.
-You may want to also set `level-name` in `server.properties` as `islandsWorldName`.
-This is because the world specified in `level-name` holds player inventory data. If you set up automatical
-`wilderness` (see below) wipes, make sure you are not using the world specified in `level-name` as wilderness. 
-
-**Should you not set the world generator for `islands` world, your islands will spawn in normal world instead of an empty one.**
-
-Also it is recommended to allocate > 2GB of memory to the server, 
-since the plugin needs 2 additional worlds to be active (wilderness and islandSource worlds).
-If you experience server freezes when creating an island (like my demo server), 
-it's probably because your server can't handle generating the needed chunks for the new island. 
-
-### Optional
-
-You can set a specific island as default spawn island for new players.
-To do so, set `isSpawn: true` for the target island in `islands.yml`.
-
-The plugin will generate `wilderness` world for you, which is where players will spawn when they jump off their island.
-You can change the world name with `wildernessWorldName` in the plugin config.
-*Unless `wildernessWorldName` is the same as `level-name`, deleting this world should not wipe players' inventories.*
-
-To further customize the plugin, check [plugins/islands/config.yml example](src/config.yml) and [How does it work?](#how-does-it-work).
-
-## Permissions
-
-| Permission                      | Affect                                  |
-|---------------------------------|-----------------------------------------|
-| `islands.command`               | Use /islands command                    |
-| `islands.command.create`        | Create island                           |
-| `islands.command.create.small`  | Create / regenerate small island        |
-| `islands.command.create.normal` | Create / regenerate normal island       |
-| `islands.command.create.big`    | Create / regenerate big island          |
-| `islands.command.create.custom` | Create / regenerate custom sized island |
-| `islands.command.regenerate`    | Regenerate island                       |
-| `islands.command.delete`        | Delete island                           |
-| `islands.command.give`          | Give island                             |
-| `islands.command.name`          | Name island                             |
-| `islands.command.unname`        | Unname island                           |
-| `islands.command.home`          | Use /home command                       |
-| `islands.command.home.list`     | Use /homes command                      |
-| `islands.command.turst`         | Trust person                            |
-| `islands.command.turst.list`    | List island's trusted players           |
-| `islands.command.untrust`       | Untrust person                          |
-| `islands.command.visit`         | Visit island                            |
-
-
-Bypasses
-
-| Permission                   | Affect                                                                  |
-|------------------------------|-------------------------------------------------------------------------|
-| `islands.bypass.islandLimit` | Ignore island create limit                                              |
-| `islands.bypass.regenerate`  | Regenerate anyone's island                                              |
-| `islands.bypass.delete`      | Delete anyone's island                                                  |
-| `islands.bypass.give`        | Transfer any island's ownership / remove owner if no arguments provided |
-| `islands.bypass.name`        | Name anyone's island                                                    |
-| `islands.bypass.unname`      | Unname anyone's island                                                  |
-| `islands.bypass.trust`       | Add trusted person to anyone's island                                   |
-| `islands.bypass.trust.list`  | List any island's trusted players                                       |
-| `islands.bypass.untrust`     | Remove trusted person from anyone's island                              |
-| `islands.bypass.protection`  | Interact with anyone's island                                           |
-| `islands.bypass.home`        | Use /home from anywhere                                                 |
-
-## How does it work?
-
-The plugin searches `islandsSource` world for biomes that are big enough for an island.
-Once it finds one, it saves the location of that biome in `plugins/Islands/biomeCache.yml`.
-When a player creates island with that specific biome, 
-it fetches the biome location from that file and copies the correct blocks in island shape from
-`islandsSource` world to `islands` world.
-
-So `biomeCache.yml` holds a list of biome coordinates. Each coordinate points to corresponding biome in `islandsSource` world.
-This file gets overwritten whenever new `islandsSource` world gets generated (=the source seed changes).
-
-You can change the biome search area in `config.yml` to increase the variety of available biomes.
-To combat increasing server start time, you can lower `generation.maxVariationsPerBiome` and 
-blacklist unwanted biomes.
-
-`islands.yml` contains all the information about islands: their name, status, position etc.
-Islands are generated in square grid layout (example below). Each island has its unique islandId that points
-its location in the grid. Ids follow simple formula: grid x + "x" + grid y. For example: 0x0, 2x4, 12x1.
-
-Layout:
-```
-0 3 8
-1 2 7
-4 5 6
-9 ...
-```
