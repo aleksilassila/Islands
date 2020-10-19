@@ -29,6 +29,8 @@ The plugin has gui menu for browsing public islands. It is also possible to set 
 "official" islands like spawn island that are owned by the server.
 *Tip for admins: `/island name spawn` for accessing spawn via `/vi spawn`*
 
+## Getting Started
+
 The plugin has customizable generation settings, so the plugin can be optimized for any hardware.
 **To set up the plugin, check out [Wiki](https://github.com/aleksilassila/Islands/wiki).
 You can also find extensive list of permissions, commands and configuration there.**
