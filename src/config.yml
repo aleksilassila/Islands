@@ -1,8 +1,8 @@
 defaultIslandLimit: 2
-groupLimits:                  # Requires vault to work, all limits can be bypassed with islands.bypass.islandLimit
+groupLimits:                            # Requires vault to work, all limits can be bypassed with islands.bypass.islandLimit
   staff: 5
 
-islandSizes:                            # Island sizing. You can add as many sizes as you want.
+islandSizes:                            # Island sizing. You can add or remove as many sizes as you want.
   BIG: 80                               # NORMAL is the fallback size. At least 1 size has to be defined.
   NORMAL: 64
   SMALL: 32
@@ -18,18 +18,18 @@ replaceOnGeneration:                    # Replace blocks when generating new isl
 
 generation:
   searchJump: 8                         # How man blocks should be skipped when looking for biomes, bigger faster
-  biomeSearchArea: 3500                 # Biome search area, smaller faster. Increase to make more biomes available.
-  islandGridSpacing: 100                # At least the size of island.BIG + 4
-  islandGridVerticalSpacing: 50
-  generationDelayInTicks: 0.3           # 2 Will generate 1 row per 2 ticks, 0.5 will generate 2 rows per 1 tick
-  maxVariationsPerBiome: 3              # Max locations generated for each biome, lower the value to speed up server startup.
+  biomeSearchArea: 3500                 # Biome search area, smaller faster. Increase this if you want more biomes to be available.
+  islandGridSpacing: 100                # At least the size of island.BIG + 4. Space between island centres.
+  islandGridVerticalSpacing: 50         # Vertical space between two islands next to each other.
+  generationDelayInTicks: 0.3           # 2 Will generate 1 row per 2 ticks, 0.5 will generate 2 rows per 1 tick.
+  maxVariationsPerBiome: 5              # Max locations generated for each biome, lower the value to speed up server startup.
 
 disableMobsOnIslands: true
 tpCooldownTime: 10                      # /home and /visit cooldown after damage.
-illegalIslandNames:                     # Blocked island names.
+illegalIslandNames:                     # Blocked island names. Useful if you want to reserve name for "official" island
 #  - spawn
-biomeBlacklist:                         # These biomes do not get picked up by island generator
-  - DEEP_OCEAN
+biomeBlacklist:                         # These biomes do not get picked up by island generator.
+  - DEEP_OCEAN                          # Ocean biomes work poorly with islands.
   - DEEP_WARM_OCEAN
   - DEEP_LUKEWARM_OCEAN
   - DEEP_COLD_OCEAN
@@ -39,6 +39,6 @@ biomeBlacklist:                         # These biomes do not get picked up by i
   - MOUNTAINS
   - GRAVELLY_MOUNTAINS
   - MODIFIED_GRAVELLY_MOUNTAINS
-wildernessCoordinateMultiplier: 4       # Player's x and z coordinates gets multiplied with this value when they jump to wilderness.
+wildernessCoordinateMultiplier: 4       # Player's x and z coordinates gets multiplied by this value when they jump to wilderness.
 islandsWorldName: world
 wildernessWorldName: wilderness
