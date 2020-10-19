@@ -21,8 +21,8 @@ public class IslandLayout {
     public IslandLayout(Islands instance) {
         this.islands = instance;
 
-        this.islandSpacing = instance.plugin.getConfig().getInt("generation.islandSpacing");
-        this.verticalSpacing = islands.plugin.getConfig().getInt("generation.islandVerticalSpacing");
+        this.islandSpacing = instance.plugin.getConfig().getInt("generation.islandGridSpacing");
+        this.verticalSpacing = islands.plugin.getConfig().getInt("generation.islandGridVerticalSpacing");
     }
 
     private FileConfiguration getIslandsConfig() {

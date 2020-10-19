@@ -17,9 +17,9 @@ replaceOnGeneration:                    # Replace blocks when generating new isl
 
 generation:
   searchJump: 8                         # How man blocks should be skipped when looking for biomes, bigger faster
-  searchArea: 3500                      # Biome search area, smaller faster
-  islandSpacing: 100                    # At least the size of island.BIG + 4
-  islandVerticalSpacing: 50
+  biomeSearchArea: 3500                 # Biome search area, smaller faster. Increase to make more biomes available.
+  islandGridSpacing: 100                # At least the size of island.BIG + 4
+  islandGridVerticalSpacing: 50
   generationDelayInTicks: 0.3           # 2 Will generate 1 row per 2 ticks, 0.5 will generate 2 rows per 1 tick
   maxVariationsPerBiome: 3              # Max locations generated for each biome, lower the value to speed up server startup.
 

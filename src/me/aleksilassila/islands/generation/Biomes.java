@@ -28,7 +28,7 @@ public class Biomes {
         this.plugin = plugin;
 
         this.biomeSearchJumpBlocks = plugin.getConfig().getInt("generation.searchJump");
-        this.biomeSearchSize = plugin.getConfig().getInt("generation.searchArea");
+        this.biomeSearchSize = plugin.getConfig().getInt("generation.biomeSearchArea");
         this.maxLocationsPerBiome = plugin.getConfig().getInt("generation.maxVariationsPerBiome");
         this.biomeBlacklist = plugin.getConfig().getStringList("biomeBlacklist");
 
