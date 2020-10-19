@@ -72,6 +72,7 @@ Custom island shapes can be created to enhance the look of your islands!
 
 ![Island Shapes](screenshots/functionality/shapes.png?raw=true)
 
+![Island Shapes](screenshots/islandTypes/shape_normal.png?raw=true)
 
 ### Example Islands
 
