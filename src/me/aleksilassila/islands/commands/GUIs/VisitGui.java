@@ -21,9 +21,10 @@ import java.util.regex.Pattern;
 public class VisitGui implements IVisitGui {
     private final Islands plugin;
 
-    private final int INVENTORY_SIZE = 9 * 2;
+    private final int inventorySize;
+    private final int islandsOnPage;
+
     private final int WHITESPACE = 0;
-    private final int ISLANDS_ON_PAGE = INVENTORY_SIZE - WHITESPACE - 9;
 
     private final Material TOOLBAR_FILL_MATERIAL = Material.GRAY_STAINED_GLASS_PANE;
 
@@ -35,6 +36,10 @@ public class VisitGui implements IVisitGui {
 
     public VisitGui(Islands plugin) {
         this.plugin = plugin;
+
+         // Yes, it updates only on restarts. Good enough.
+        this.inventorySize = Math.min(plugin.layout.getPublicIslands().size() / 9 + 1, 6) * 9;
+        this.islandsOnPage = inventorySize - WHITESPACE - 9;
     }
 
     @Override
@@ -47,21 +52,21 @@ public class VisitGui implements IVisitGui {
         if(clickedItem == null || clickedItem.getType().equals(Material.AIR) || clickedItem.getType().equals(TOOLBAR_FILL_MATERIAL))
             return;
 
-        if (slot < ISLANDS_ON_PAGE) {
+        if (slot < islandsOnPage) {
             player.closeInventory();
             player.performCommand("visit " +  ChatColor.stripColor(clickedItem.getItemMeta().getDisplayName()));
-        } else if (slot - ISLANDS_ON_PAGE - WHITESPACE == PREVIOUS_PAGE_PADDING) {
+        } else if (slot - islandsOnPage - WHITESPACE == PREVIOUS_PAGE_PADDING) {
             player.openInventory(this.setPage(parsePage(inventoryView.getTitle()) - 1).getInventory());
-        } else if (slot - ISLANDS_ON_PAGE - WHITESPACE == NEXT_PAGE_PADDING) {
+        } else if (slot - islandsOnPage - WHITESPACE == NEXT_PAGE_PADDING) {
             player.openInventory(this.setPage(parsePage(inventoryView.getTitle()) + 1).getInventory());
-        } else if (slot - ISLANDS_ON_PAGE - WHITESPACE == 4) {
+        } else if (slot - islandsOnPage - WHITESPACE == 4) {
             int i = parseSort(inventoryView.getTitle());
             player.openInventory(this.setPage(parsePage(inventoryView.getTitle())).setSort(i == 0 ? 1 : 0).getInventory());
         }
     }
 
     private Inventory getInventoryPage() {
-        Inventory inv = Bukkit.createInventory(this, INVENTORY_SIZE, "Visit Island - By " + parseSort(sort) + " - [" + page + "]");
+        Inventory inv = Bukkit.createInventory(this, inventorySize, "Visit Island - By " + parseSort(sort) + " - [" + page + "]");
         Map<String, Map<String, String>> publicIslands = plugin.layout.getPublicIslands();
 
         List<String> sortedSet = new ArrayList<>(publicIslands.keySet());
@@ -76,9 +81,9 @@ public class VisitGui implements IVisitGui {
 
         // Add islands to inventory
         int index = 0;
-        int startIndex = ISLANDS_ON_PAGE * page;
+        int startIndex = islandsOnPage * page;
         for (String islandId : sortedSet) {
-            if (index < startIndex || index >= startIndex + ISLANDS_ON_PAGE) {
+            if (index < startIndex || index >= startIndex + islandsOnPage) {
                 index++;
                 continue;
             }
@@ -99,23 +104,23 @@ public class VisitGui implements IVisitGui {
         }
 
         // Add toolbar
-        if ((page + 1) * ISLANDS_ON_PAGE < publicIslands.size()) {
-            inv.setItem(ISLANDS_ON_PAGE + WHITESPACE + NEXT_PAGE_PADDING,
+        if ((page + 1) * islandsOnPage < publicIslands.size()) {
+            inv.setItem(islandsOnPage + WHITESPACE + NEXT_PAGE_PADDING,
                     createGuiItem(Material.ARROW, ChatColor.GOLD + "Next page", false));
         }
 
         if (page > 0) {
-            inv.setItem(ISLANDS_ON_PAGE + WHITESPACE + PREVIOUS_PAGE_PADDING,
+            inv.setItem(islandsOnPage + WHITESPACE + PREVIOUS_PAGE_PADDING,
                     createGuiItem(Material.ARROW, ChatColor.GOLD + "Previous page", false));
         }
 
-        inv.setItem(ISLANDS_ON_PAGE + WHITESPACE + 4,
+        inv.setItem(islandsOnPage + WHITESPACE + 4,
                 createGuiItem(Material.REDSTONE, ChatColor.GOLD + "Sort by " + parseSort(sort == 1 ? 0 : 1), false));
 
         // Fill empty toolbar slots
         for (int toolbarIndex = 0; toolbarIndex < 9; toolbarIndex++) {
-            if (inv.getItem(INVENTORY_SIZE - 9 + toolbarIndex) == null)
-                inv.setItem(INVENTORY_SIZE - 9 + toolbarIndex, createGuiItem(TOOLBAR_FILL_MATERIAL, "", false));
+            if (inv.getItem(inventorySize - 9 + toolbarIndex) == null)
+                inv.setItem(inventorySize - 9 + toolbarIndex, createGuiItem(TOOLBAR_FILL_MATERIAL, "", false));
         }
 
         return inv;

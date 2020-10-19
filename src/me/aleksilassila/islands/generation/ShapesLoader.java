@@ -4,6 +4,7 @@ import me.aleksilassila.islands.Islands;
 
 import javax.annotation.Nullable;
 import java.io.File;
+import java.util.Objects;
 
 public class ShapesLoader {
     private final Islands plugin;
@@ -20,13 +21,13 @@ public class ShapesLoader {
 
     @Nullable
     public Shape loadFromFile(String fileName) {
-        for (String file : schematicsDirectory.list()) {
+        for (String file : Objects.requireNonNull(schematicsDirectory.list())) {
             if (!file.equalsIgnoreCase(fileName + ".schem") && !file.equalsIgnoreCase(fileName + ".schematic") && !file.equalsIgnoreCase(fileName + ".litematic")) continue;
 
             try {
                 return new Shape(new File(SCHEMATIC_DIRECTORY + file));
 
-            } catch (IllegalArgumentException e) { }
+            } catch (IllegalArgumentException ignored) { }
         }
 
         plugin.getLogger().severe("Could not load schematic file " + fileName);

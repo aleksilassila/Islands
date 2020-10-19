@@ -5,6 +5,7 @@ import com.sun.istack.internal.NotNull;
 import com.sun.istack.internal.Nullable;
 import me.aleksilassila.islands.commands.GUIs.VisitGui;
 import me.aleksilassila.islands.commands.IslandCommands;
+import me.aleksilassila.islands.commands.IslandManagmentCommands;
 import me.aleksilassila.islands.commands.TrustCommands;
 import me.aleksilassila.islands.generation.IslandGeneration;
 import me.aleksilassila.islands.generation.Shape;
@@ -52,7 +53,7 @@ public class Islands extends JavaPlugin {
     public VisitGui visitGui;
 
     public Map<String, Integer> definedIslandSizes;
-    public Map<Integer, Shape> definedIslandShapes;
+    public Map<Integer, List<Shape>> definedIslandShapes;
 
     @Override
     public void onEnable() {
@@ -94,8 +95,7 @@ public class Islands extends JavaPlugin {
 
         visitGui = new VisitGui(this);
 
-
-        new IslandsListener(this);
+        new IslandManagmentCommands(this);
 
         IslandCommands islandCommands = new IslandCommands(this);
 
@@ -135,7 +135,9 @@ public class Islands extends JavaPlugin {
                     false,
                     0,
                     0,
-                    definedIslandShapes.getOrDefault(islandSize, null)
+                    definedIslandShapes.getOrDefault(islandSize, null) != null
+                            ? definedIslandShapes.get(islandSize).get(new Random().nextInt(definedIslandShapes.get(islandSize).size()))
+                            : null
             );
 
             if (!success) {
@@ -151,11 +153,10 @@ public class Islands extends JavaPlugin {
 
     }
 
-    public boolean recreateteIsland(String islandId, Biome biome, int islandSize, Player player, boolean shouldClearArea) throws IllegalArgumentException {
+    public boolean recreateIsland(String islandId, Biome biome, int islandSize, Player player, boolean shouldClearArea) throws IllegalArgumentException {
         layout.updateIsland(islandId, islandSize, biome);
 
         try {
-
             return islandGeneration.copyIsland(
                     player,
                     biome,
@@ -166,7 +167,9 @@ public class Islands extends JavaPlugin {
                     shouldClearArea,
                     getIslandsConfig().getInt(islandId + ".xIndex"),
                     getIslandsConfig().getInt(islandId + ".zIndex"),
-                    definedIslandShapes.getOrDefault(islandSize, null)
+                    definedIslandShapes.getOrDefault(islandSize, null) != null
+                            ? definedIslandShapes.get(islandSize).get(new Random().nextInt(definedIslandShapes.get(islandSize).size()))
+                            : null
             );
         } catch (IllegalArgumentException e) {
             throw new IllegalArgumentException();
@@ -310,20 +313,23 @@ public class Islands extends JavaPlugin {
         return sizes;
     }
 
-    private Map<Integer, Shape> setupShapes() {
-        ConfigurationSection configIslandShapes = getConfig().getConfigurationSection("islandShapes");
+    private Map<Integer, List<Shape>> setupShapes() {
+        Map<Integer, List<Shape>> shapes = new HashMap<>();
 
-        Map<Integer, Shape> shapes = new HashMap<>();
+        if (worldEdit == null) return shapes;
 
-        if (configIslandShapes == null || worldEdit == null) return shapes;
-
-        for (String key : configIslandShapes.getKeys(false)) {
-            String fileName = getConfig().getString("islandShapes." + key);
+        for (String fileName : getConfig().getStringList("islandShapes")) {
 
             Shape shape = shapesLoader.loadFromFile(fileName);
 
             if (shape != null) {
-                shapes.put(shape.getWidth(), shape);
+                if (shapes.containsKey(shape.getWidth()))
+                    shapes.get(shape.getWidth()).add(shape);
+                else {
+                    List<Shape> list = new ArrayList<>(Collections.singletonList(shape));
+                    shapes.put(shape.getWidth(), list);
+                }
+
                 getLogger().info("Added shape " + shape.file.getName() + " for islandSize " + shape.getWidth() + ".");
             }
 

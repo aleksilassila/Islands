@@ -100,7 +100,7 @@ public class recreateSubcommand extends Subcommand {
         }
 
         try {
-            boolean success = plugin.recreateteIsland(islandId, targetBiome, islandSize, player, isSmallerThanOldIsland(islandSize, islandId));
+            boolean success = plugin.recreateIsland(islandId, targetBiome, islandSize, player, isSmallerThanOldIsland(islandSize, islandId));
 
             if (!success) {
                 player.sendMessage(Messages.error.ONGOING_QUEUE_EVENT);
