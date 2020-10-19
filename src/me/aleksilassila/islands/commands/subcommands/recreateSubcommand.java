@@ -26,10 +26,6 @@ public class recreateSubcommand extends Subcommand {
         this.layout = plugin.layout;
     }
 
-    private boolean isSmallerThanOldIsland(int newSize, String islandId) {
-        return newSize < plugin.getIslandsConfig().getInt(islandId + ".size");
-    }
-
     @Override
     public void onCommand(Player player, String[] args, boolean confirmed) {
         HashMap<Biome, List<Location>> availableLocations = plugin.islandGeneration.biomes.availableLocations;
@@ -100,7 +96,7 @@ public class recreateSubcommand extends Subcommand {
         }
 
         try {
-            boolean success = plugin.recreateIsland(islandId, targetBiome, islandSize, player, isSmallerThanOldIsland(islandSize, islandId));
+            boolean success = plugin.recreateIsland(islandId, targetBiome, islandSize, player);
 
             if (!success) {
                 player.sendMessage(Messages.error.ONGOING_QUEUE_EVENT);

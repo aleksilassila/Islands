@@ -153,7 +153,7 @@ public class Islands extends JavaPlugin {
 
     }
 
-    public boolean recreateIsland(String islandId, Biome biome, int islandSize, Player player, boolean shouldClearArea) throws IllegalArgumentException {
+    public boolean recreateIsland(String islandId, Biome biome, int islandSize, Player player) throws IllegalArgumentException {
         layout.updateIsland(islandId, islandSize, biome);
 
         try {
@@ -164,7 +164,7 @@ public class Islands extends JavaPlugin {
                     getIslandsConfig().getInt(islandId + ".x"),
                     getIslandsConfig().getInt(islandId + ".y"),
                     getIslandsConfig().getInt(islandId + ".z"),
-                    shouldClearArea,
+                    true,
                     getIslandsConfig().getInt(islandId + ".xIndex"),
                     getIslandsConfig().getInt(islandId + ".zIndex"),
                     definedIslandShapes.getOrDefault(islandSize, null) != null

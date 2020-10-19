@@ -100,7 +100,7 @@ public class IslandGeneration {
 
         private int index;
 
-        private boolean clearingArea;
+        private boolean shouldClearArea;
         private int clearingIndex;
 
         private final int xIndex;
@@ -123,7 +123,7 @@ public class IslandGeneration {
 
             this.player = player;
 
-            this.clearingArea = shouldClearArea;
+            this.shouldClearArea = shouldClearArea;
             this.clearingIndex = 0;
             this.xIndex = xIndex;
             this.zIndex = zIndex;
@@ -135,7 +135,7 @@ public class IslandGeneration {
 
         @Override
         public void run() {
-            if (clearingArea) {
+            if (shouldClearArea) {
                 for (int count = 0; count < rowsBuiltPerDelay; count++) {
                     for (int y = startY + plugin.layout.islandSpacing; y >= startY; y--) {
                         int relativeX = clearingIndex / plugin.layout.islandSpacing;
@@ -154,7 +154,7 @@ public class IslandGeneration {
                     if (clearingIndex >= plugin.layout.islandSpacing * plugin.layout.islandSpacing) {
                         player.sendMessage(Messages.success.CLEARING_DONE);
 
-                        clearingArea = false;
+                        shouldClearArea = false;
                         break;
                     } else if (clearingIndex == plugin.layout.islandSpacing * plugin.layout.islandSpacing / 4) {
                         player.sendMessage(Messages.info.CLEARING_STATUS(25));
