@@ -22,7 +22,7 @@ public class Permissions {
 
     public static class bypass {
         public static final String create = "islands.bypass.islandLimit";       // Create unlimited islands
-        public static final String regenerate = "islands.bypass.regenerate";    // Regenerate any island
+        public static final String recreate = "islands.bypass.recreate";        // Recreate any island
         public static final String delete = "islands.bypass.delete";            // Delete any island
         public static final String give = "islands.bypass.give";                // Transfer any island ownership
         public static final String name = "islands.bypass.name";                // Name any island
@@ -39,11 +39,8 @@ public class Permissions {
 
     public static class command {
         public static final String create = "islands.command.create";
-        public static final String createBig = "islands.command.create.big";
-        public static final String createNormal = "islands.command.create.normal";
-        public static final String createSmall = "islands.command.create.small";
         public static final String createCustom = "islands.command.create.custom";
-        public static final String regenerate = "islands.command.regenerate";
+        public static final String recreate = "islands.command.recreate";
         public static final String delete = "islands.command.delete";
         public static final String give = "islands.command.give";
         public static final String name = "islands.command.name";

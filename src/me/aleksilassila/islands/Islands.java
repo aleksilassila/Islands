@@ -151,7 +151,7 @@ public class Islands extends JavaPlugin {
 
     }
 
-    public boolean regenerateIsland(String islandId, Biome biome, int islandSize, Player player, boolean shouldClearArea) throws IllegalArgumentException {
+    public boolean recreateteIsland(String islandId, Biome biome, int islandSize, Player player, boolean shouldClearArea) throws IllegalArgumentException {
         layout.updateIsland(islandId, islandSize, biome);
 
         try {

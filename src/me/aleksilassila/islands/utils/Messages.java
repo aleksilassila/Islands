@@ -98,8 +98,8 @@ public class Messages extends ChatUtils {
             public static final String UNTRUST = info("/untrust <player> (You have to be on target island)");
             public static final String TRUST = info("/trust <player> (You have to be on target island)");
             public static final String SETSPAWN = info("/island setspawn");
-            public static final String CREATE = ChatColor.GRAY + "/island create <biome> (<BIG/NORMAL/SMALL>)";
-            public static final String REGENERATE = ChatColor.GRAY + "/island regenerate <biome> (<BIG/NORMAL/SMALL>) (You have to be on target island)";
+            public static final String CREATE = ChatColor.GRAY + "/island create <biome> (<SIZE>)";
+            public static final String RECREATE = ChatColor.GRAY + "/island recreate <biome> (<SIZE>) (You have to be on target island)";
             public static final String NAME = ChatColor.GRAY + "/island name <name> (You have to be on target island)";
             public static final String UNNAME = ChatColor.GRAY + "/island unname (You have to be on target island)";
             public static final String GIVE = ChatColor.GRAY + "/island give <name> (You have to be on target island)";

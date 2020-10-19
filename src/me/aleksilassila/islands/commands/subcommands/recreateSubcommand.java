@@ -15,13 +15,13 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-public class regenerateSubcommand extends Subcommand {
+public class recreateSubcommand extends Subcommand {
     private final Islands plugin;
     private final IslandLayout layout;
 
     private final IslandManagmentCommands.Utils utils = new IslandManagmentCommands.Utils();
 
-    public regenerateSubcommand(Islands plugin) {
+    public recreateSubcommand(Islands plugin) {
         this.plugin = plugin;
         this.layout = plugin.layout;
     }
@@ -36,7 +36,7 @@ public class regenerateSubcommand extends Subcommand {
         String islandId;
         Biome targetBiome;
 
-        if (!Permissions.checkPermission(player, Permissions.command.regenerate)) {
+        if (!Permissions.checkPermission(player, Permissions.command.recreate)) {
             player.sendMessage(Messages.error.NO_PERMISSION);
             return;
         }
@@ -61,7 +61,7 @@ public class regenerateSubcommand extends Subcommand {
         }
 
         if (args.length < 1) {
-            player.sendMessage(Messages.help.REGENERATE);
+            player.sendMessage(Messages.help.RECREATE);
 
             for (Biome biome : availableLocations.keySet()) {
                 if (availableLocations.get(biome).size() > 0) {
@@ -77,7 +77,7 @@ public class regenerateSubcommand extends Subcommand {
 
         if (islandId == null ||
                 (!layout.getUUID(islandId).equals(player.getUniqueId().toString())
-                && !Permissions.checkPermission(player, Permissions.bypass.regenerate))) {
+                && !Permissions.checkPermission(player, Permissions.bypass.recreate))) {
             player.sendMessage(Messages.error.UNAUTHORIZED);
             return;
         }
@@ -100,7 +100,7 @@ public class regenerateSubcommand extends Subcommand {
         }
 
         try {
-            boolean success = plugin.regenerateIsland(islandId, targetBiome, islandSize, player, isSmallerThanOldIsland(islandSize, islandId));
+            boolean success = plugin.recreateteIsland(islandId, targetBiome, islandSize, player, isSmallerThanOldIsland(islandSize, islandId));
 
             if (!success) {
                 player.sendMessage(Messages.error.ONGOING_QUEUE_EVENT);
@@ -133,12 +133,12 @@ public class regenerateSubcommand extends Subcommand {
 
     @Override
     public String getName() {
-        return "regenerate";
+        return "recreate";
     }
 
     @Override
     public String help() {
-        return Messages.help.REGENERATE;
+        return Messages.help.RECREATE;
     }
 
     @Override

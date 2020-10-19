@@ -27,7 +27,7 @@ public class IslandManagmentCommands extends ChatUtils implements TabExecutor {
         subcommands = new HashSet<>();
 
         subcommands.add(new createSubcommand(plugin));
-        subcommands.add(new regenerateSubcommand(plugin));
+        subcommands.add(new recreateSubcommand(plugin));
         subcommands.add(new deleteSubcommand(plugin));
         subcommands.add(new nameSubcommand(plugin));
         subcommands.add(new unnameSubcommand(plugin));
@@ -97,7 +97,7 @@ public class IslandManagmentCommands extends ChatUtils implements TabExecutor {
         player.sendMessage(success("Available /island subcommands:"));
 
         player.sendMessage(Messages.help.CREATE);
-        player.sendMessage(Messages.help.REGENERATE);
+        player.sendMessage(Messages.help.RECREATE);
         player.sendMessage(Messages.help.DELETE);
         player.sendMessage(Messages.help.NAME);
         player.sendMessage(Messages.help.UNNAME);
