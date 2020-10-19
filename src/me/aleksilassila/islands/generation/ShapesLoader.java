@@ -11,7 +11,7 @@ public class ShapesLoader {
     private final Main plugin;
     private final File schematicsDirectory;
 
-    String SCHEMATIC_DIRECTORY =  "plugins/Islands/schematics/";
+    String SCHEMATIC_DIRECTORY =  "plugins/Islands/shapes/";
 
     public ShapesLoader(Main plugin) {
         this.plugin = plugin;
