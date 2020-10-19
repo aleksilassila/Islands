@@ -45,7 +45,7 @@ permissions:
       islands.command.name: true
       islands.command.unname: true
       islands.command.home.*: true
-      islands.command.turst.*: true
+      islands.command.trust.*: true
       islands.command.visit: true
       islands.command.setspawn: true
       islands.command.create.custom: true
@@ -112,10 +112,10 @@ permissions:
   islands.command.unname:
     description: Access to island unname command
     default: "op"
-  islands.command.turst:
+  islands.command.trust:
     description: Access to trust command
     default: "op"
-  islands.command.turst.list:
+  islands.command.trust.list:
     description: Access to trusted command
     default: "op"
   islands.command.untrust:
@@ -149,7 +149,7 @@ permissions:
   islands.bypass.untrust:
     description: Bypass untrust restrictions
     default: "op"
-  islands.bypass.turst.list:
+  islands.bypass.trust.list:
     description: Bypass trusted restrictions
     default: "op"
   islands.bypass.protection:
