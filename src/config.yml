@@ -7,10 +7,6 @@ islandSizes:                            # Island sizing. You can add or remove a
   NORMAL: 64
   SMALL: 32
 
-islandShapes:                           # Island shapes. Shapes are located in plugins/Islands/shapes/
-  - shape_small                         # File name without .schem or .schematic extension. For example, this shape has
-                                        # width of 32, so it will be used for all islands that are 32x32.
-
 replaceOnGeneration:                    # Replace blocks when generating new island. Format: toReplace: replaceWith
   iron_ore: stone
   gold_ore: stone

@@ -314,28 +314,9 @@ public class Islands extends JavaPlugin {
     }
 
     private Map<Integer, List<Shape>> setupShapes() {
-        Map<Integer, List<Shape>> shapes = new HashMap<>();
+        if (worldEdit == null) return new HashMap<>();
 
-        if (worldEdit == null) return shapes;
-
-        for (String fileName : getConfig().getStringList("islandShapes")) {
-
-            Shape shape = shapesLoader.loadFromFile(fileName);
-
-            if (shape != null) {
-                if (shapes.containsKey(shape.getWidth()))
-                    shapes.get(shape.getWidth()).add(shape);
-                else {
-                    List<Shape> list = new ArrayList<>(Collections.singletonList(shape));
-                    shapes.put(shape.getWidth(), list);
-                }
-
-                getLogger().info("Added shape " + shape.file.getName() + " for islandSize " + shape.getWidth() + ".");
-            }
-
-        }
-
-        return shapes;
+        return shapesLoader.loadAll();
     }
 
     public FileConfiguration getIslandsConfig() {

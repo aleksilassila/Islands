@@ -1,10 +1,11 @@
 package me.aleksilassila.islands.generation;
 
+import com.sun.istack.internal.NotNull;
 import me.aleksilassila.islands.Islands;
 
 import javax.annotation.Nullable;
 import java.io.File;
-import java.util.Objects;
+import java.util.*;
 
 public class ShapesLoader {
     private final Islands plugin;
@@ -17,6 +18,31 @@ public class ShapesLoader {
 
         this.schematicsDirectory = new File(SCHEMATIC_DIRECTORY);
         if (!schematicsDirectory.exists()) schematicsDirectory.mkdirs();
+    }
+
+    @NotNull
+    public Map<Integer, List<Shape>> loadAll() {
+        Map<Integer, List<Shape>> shapes = new HashMap<>();
+
+        for (String file : Objects.requireNonNull(schematicsDirectory.list())) {
+            if (!file.endsWith(".schem") && !file.endsWith(".schematic")) continue;
+
+            try {
+                Shape shape = new Shape(new File(SCHEMATIC_DIRECTORY + file));
+
+                if (shapes.containsKey(shape.getWidth()))
+                    shapes.get(shape.getWidth()).add(shape);
+                else {
+                    List<Shape> list = new ArrayList<>(Collections.singletonList(shape));
+                    shapes.put(shape.getWidth(), list);
+                }
+
+                plugin.getLogger().info("Added shape " + shape.file.getName() + " for islandSize " + shape.getWidth() + ".");
+
+            } catch (IllegalArgumentException ignored) { }
+        }
+
+        return shapes;
     }
 
     @Nullable
