@@ -13,20 +13,20 @@ import org.bukkit.entity.Player;
 import java.util.*;
 
 public class IslandLayout {
-    private final Islands islands;
+    private final Islands plugin;
 
     public final int islandSpacing;
     public final int verticalSpacing;
 
-    public IslandLayout(Islands instance) {
-        this.islands = instance;
+    public IslandLayout(Islands plugin) {
+        this.plugin = plugin;
 
-        this.islandSpacing = instance.plugin.getConfig().getInt("generation.islandGridSpacing");
-        this.verticalSpacing = islands.plugin.getConfig().getInt("generation.islandGridVerticalSpacing");
+        this.islandSpacing = plugin.getConfig().getInt("generation.islandGridSpacing");
+        this.verticalSpacing = plugin.getConfig().getInt("generation.islandGridVerticalSpacing");
     }
 
     private FileConfiguration getIslandsConfig() {
-        return islands.plugin.getIslandsConfig();
+        return plugin.getIslandsConfig();
     }
 
     public String createIsland(UUID uuid, int islandSize, Biome biome) {
@@ -70,7 +70,7 @@ public class IslandLayout {
         getIslandsConfig().set(islandId + ".public", false);
         getIslandsConfig().set(islandId + ".biome", biome.name());
 
-        islands.plugin.saveIslandsConfig();
+        plugin.saveIslandsConfig();
 
         return islandId;
     }
@@ -159,7 +159,7 @@ public class IslandLayout {
     public Location getIslandSpawn(String islandId) {
         if (getIslandsConfig().getKeys(false).contains(islandId)) {
             return new Location(
-                    islands.plugin.islandsWorld,
+                    plugin.islandsWorld,
                     getIslandsConfig().getInt(islandId + ".spawnPoint.x"),
                     getIslandsConfig().getInt(islandId + ".y") + 100,
                     getIslandsConfig().getInt(islandId + ".spawnPoint.z")
@@ -268,7 +268,7 @@ public class IslandLayout {
         getIslandsConfig().set(islandId + ".size", islandSize);
         getIslandsConfig().set(islandId + ".biome", biome.name());
 
-        islands.plugin.saveIslandsConfig();
+        plugin.saveIslandsConfig();
     }
 
     public void addTrusted(String islandId, String UUID) {
@@ -276,21 +276,21 @@ public class IslandLayout {
         trusted.add(UUID);
         getIslandsConfig().set(islandId + ".trusted", trusted);
 
-        islands.plugin.saveIslandsConfig();
+        plugin.saveIslandsConfig();
     }
 
     public void removeTrusted(String islandId, String UUID) {
         List<String> trusted = getIslandsConfig().getStringList(islandId + ".trusted");
         trusted.remove(UUID);
         getIslandsConfig().set(islandId + ".trusted", trusted);
-        islands.plugin.saveIslandsConfig();
+        plugin.saveIslandsConfig();
     }
 
     public void setSpawnPoint(String islandId, int x, int z) {
         getIslandsConfig().set(islandId + ".spawnPoint.x", x);
         getIslandsConfig().set(islandId + ".spawnPoint.z", z);
 
-        islands.plugin.saveIslandsConfig();
+        plugin.saveIslandsConfig();
     }
 
     public void unnameIsland(String islandId) {
@@ -299,34 +299,34 @@ public class IslandLayout {
         getIslandsConfig().set(islandId + ".name", String.valueOf(homeId));
         getIslandsConfig().set(islandId + ".public", false);
 
-        islands.plugin.saveIslandsConfig();
+        plugin.saveIslandsConfig();
     }
 
     public void nameIsland(String islandId, String name){
             getIslandsConfig().set(islandId + ".name", name);
             getIslandsConfig().set(islandId + ".public", true);
 
-            islands.plugin.saveIslandsConfig();
+            plugin.saveIslandsConfig();
     }
 
     public void giveIsland(String islandId, Player player) {
         getIslandsConfig().set(islandId + ".home", getNewHomeId(player.getUniqueId()));
         getIslandsConfig().set(islandId + ".UUID", player.getUniqueId().toString());
 
-        islands.plugin.saveIslandsConfig();
+        plugin.saveIslandsConfig();
     }
 
     public void giveIsland(String islandId) {
         getIslandsConfig().set(islandId + ".home", -1);
         getIslandsConfig().set(islandId + ".UUID", null);
 
-        islands.plugin.saveIslandsConfig();
+        plugin.saveIslandsConfig();
     }
 
     public void deleteIsland(String islandId) {
         getIslandsConfig().set(islandId, null);
 
-        islands.plugin.saveIslandsConfig();
+        plugin.saveIslandsConfig();
     }
 
     public static class placement {

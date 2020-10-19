@@ -1,6 +1,6 @@
 package me.aleksilassila.islands.listeners;
 
-import me.aleksilassila.islands.Main;
+import me.aleksilassila.islands.Islands;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -20,14 +20,14 @@ import java.util.*;
 public class IslandVisitGuiHandler implements Listener {
     private final Map<Integer, Inventory> inventories = new HashMap<>();
     private List<String> islandIds;
-    private final Main plugin;
+    private final Islands plugin;
     private Map<String, Map<String, String>> publicIslands;
 
     private final int inventorySize = 9 * 3;
     private final int whiteSpace = 9;
     private final int islandsOnPage = inventorySize - whiteSpace - 9;
 
-    public IslandVisitGuiHandler(Main plugin) {
+    public IslandVisitGuiHandler(Islands plugin) {
         this.plugin = plugin;
 
         plugin.getServer().getPluginManager().registerEvents(this, plugin);
@@ -37,7 +37,7 @@ public class IslandVisitGuiHandler implements Listener {
     private void updatePage(int page) {
         Inventory inv = Bukkit.createInventory(null, inventorySize, "Visit Island");
         islandIds = new ArrayList<>();
-        publicIslands = plugin.islands.layout.getPublicIslands();
+        publicIslands = plugin.layout.getPublicIslands();
 
         islandIds.addAll(publicIslands.keySet());
 

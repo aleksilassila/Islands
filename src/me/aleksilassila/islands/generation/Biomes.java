@@ -2,8 +2,7 @@ package me.aleksilassila.islands.generation;
 
 import com.sun.istack.internal.NotNull;
 import com.sun.istack.internal.Nullable;
-import me.aleksilassila.islands.Main;
-import org.bukkit.Bukkit;
+import me.aleksilassila.islands.Islands;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.block.Biome;
@@ -11,7 +10,7 @@ import org.bukkit.block.Biome;
 import java.util.*;
 
 public class Biomes {
-    private final Main plugin;
+    private final Islands plugin;
 
     private final World world;
     public HashMap<Biome, List<Location>> availableLocations;
@@ -22,7 +21,7 @@ public class Biomes {
     final int maxLocationsPerBiome;
     final List<String> biomeBlacklist;
 
-    public Biomes(World world, Main plugin) {
+    public Biomes(Islands plugin, World world) {
         this.world = world;
         this.biggestIslandSize = plugin.getConfig().getInt("island.BIG");
         this.plugin = plugin;
@@ -35,7 +34,7 @@ public class Biomes {
         this.availableLocations = new HashMap<>();
 
         // Generate biomes and save them to config
-        if (plugin.getBiomesConfig().getString("seed") == null || !plugin.getBiomesConfig().getString("seed").equals(String.valueOf(plugin.islandsSourceWorld.getSeed()))) {
+        if (plugin.getBiomesCache().getString("seed") == null || !plugin.getBiomesCache().getString("seed").equals(String.valueOf(plugin.islandsSourceWorld.getSeed()))) {
             generateAndSaveBiomes();
         } else { // Load existing biomes from config
             loadBiomesFromConfig();
@@ -44,14 +43,14 @@ public class Biomes {
 
     private void loadBiomesFromConfig() {
         // Loop biomes
-        for (String key : plugin.getBiomesConfig().getKeys(false)) {
+        for (String key : plugin.getBiomesCache().getKeys(false)) {
             Biome biome = getTargetBiome(key);
             if (biome != null) {
                 List<Location> locations = new ArrayList<>();
 
                 // Loop locations inside a biome
-                for (String coordinatesIndex : plugin.getBiomesConfig().getConfigurationSection(key).getKeys(false)) {
-                    List<String> locationStrings = plugin.getBiomesConfig().getStringList(key + "." + coordinatesIndex);
+                for (String coordinatesIndex : plugin.getBiomesCache().getConfigurationSection(key).getKeys(false)) {
+                    List<String> locationStrings = plugin.getBiomesCache().getStringList(key + "." + coordinatesIndex);
 
                     if (locationStrings.size() != 3) continue;
 
@@ -72,10 +71,10 @@ public class Biomes {
     }
 
     private void generateAndSaveBiomes() {
-        plugin.clearBiomesConfig();
+        plugin.clearBiomesCache();
         this.availableLocations = generateIslandLocations(biggestIslandSize);
 
-        plugin.getBiomesConfig().set("seed", String.valueOf(plugin.islandsSourceWorld.getSeed()));
+        plugin.getBiomesCache().set("seed", String.valueOf(plugin.islandsSourceWorld.getSeed()));
 
         for (Biome biome : availableLocations.keySet()) {
             List<Location> locationsList = availableLocations.get(biome);
@@ -88,7 +87,7 @@ public class Biomes {
                 stringsList.add(String.valueOf(location.getBlockY()));
                 stringsList.add(String.valueOf(location.getBlockZ()));
 
-                plugin.getBiomesConfig().set(biome.toString() + "." + index, stringsList);
+                plugin.getBiomesCache().set(biome.toString() + "." + index, stringsList);
                 index++;
             }
 

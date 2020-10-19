@@ -1,6 +1,6 @@
 package me.aleksilassila.islands.utils;
 
-import me.aleksilassila.islands.Main;
+import me.aleksilassila.islands.Islands;
 import org.bukkit.Bukkit;
 
 import java.io.IOException;
@@ -10,10 +10,10 @@ import java.util.Scanner;
 import java.util.function.Consumer;
 
 public class UpdateChecker {
-    private Main plugin;
+    private Islands plugin;
     private int resourceId;
 
-    public UpdateChecker(Main plugin, int resourceId) {
+    public UpdateChecker(Islands plugin, int resourceId) {
         this.plugin = plugin;
         this.resourceId = resourceId;
     }

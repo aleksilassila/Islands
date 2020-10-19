@@ -1,10 +1,10 @@
 package me.aleksilassila.islands.listeners;
 
-import me.aleksilassila.islands.Main;
+import me.aleksilassila.islands.Islands;
 import me.aleksilassila.islands.commands.GUIs.IVisitGui;
+import me.aleksilassila.islands.utils.ChatUtils;
 import me.aleksilassila.islands.utils.Messages;
 import me.aleksilassila.islands.utils.Permissions;
-import me.aleksilassila.islands.utils.ChatUtils;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -27,11 +27,11 @@ import org.bukkit.event.player.PlayerRespawnEvent;
 import java.util.Date;
 
 public class IslandsListener extends ChatUtils implements Listener {
-    private final Main plugin;
+    private final Islands plugin;
 
     private final boolean disableMobs;
 
-    public IslandsListener(Main plugin) {
+    public IslandsListener(Islands plugin) {
         this.plugin = plugin;
 
         this.disableMobs = plugin.getConfig().getBoolean("disableMobsOnIslands");
@@ -42,20 +42,20 @@ public class IslandsListener extends ChatUtils implements Listener {
     @EventHandler(priority = EventPriority.LOWEST)
     public void onPlayerJoin(PlayerJoinEvent event) {
         if (!event.getPlayer().hasPlayedBefore()) {
-            String spawnIsland = plugin.islands.layout.getSpawnIsland();
+            String spawnIsland = plugin.layout.getSpawnIsland();
 
             if (spawnIsland != null) {
-                event.getPlayer().teleport(plugin.islands.layout.getIslandSpawn(spawnIsland));
+                event.getPlayer().teleport(plugin.layout.getIslandSpawn(spawnIsland));
             }
         }
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void onPlayerRespawn(PlayerRespawnEvent event) {
-        String spawnIsland = plugin.islands.layout.getSpawnIsland();
+        String spawnIsland = plugin.layout.getSpawnIsland();
 
         if (spawnIsland != null) {
-            event.setRespawnLocation(plugin.islands.layout.getIslandSpawn(spawnIsland));
+            event.setRespawnLocation(plugin.layout.getIslandSpawn(spawnIsland));
         }
     }
 
@@ -78,7 +78,7 @@ public class IslandsListener extends ChatUtils implements Listener {
     @EventHandler
     public void onBlockFromTo(BlockFromToEvent event) {
         if (!event.getBlock().getWorld().equals(plugin.islandsWorld)) return;
-        boolean canFlow = plugin.islands.layout.isBlockInIslandSphere(event.getBlock().getX(), event.getBlock().getY(), event.getBlock().getZ());
+        boolean canFlow = plugin.layout.isBlockInIslandSphere(event.getBlock().getX(), event.getBlock().getY(), event.getBlock().getZ());
 
         if(!canFlow) {
             event.setCancelled(true);
@@ -107,16 +107,16 @@ public class IslandsListener extends ChatUtils implements Listener {
 
                 player.sendTitle("", ChatColor.GOLD + "Type /home to get back to your island.", (int)(20 * 0.5), 20 * 5, (int)(20 * 0.5));
 
-                plugin.islands.playersWithNoFall.add(player);
+                plugin.playersWithNoFall.add(player);
 
                 e.setCancelled(true);
-            } else if (e.getCause().equals(EntityDamageEvent.DamageCause.FALL) && plugin.islands.playersWithNoFall.contains(player)) {
-                plugin.islands.playersWithNoFall.remove(player);
+            } else if (e.getCause().equals(EntityDamageEvent.DamageCause.FALL) && plugin.playersWithNoFall.contains(player)) {
+                plugin.playersWithNoFall.remove(player);
                 e.setCancelled(true);
             } else if (player.getWorld().equals(plugin.islandsWorld)) {
                 e.setCancelled(true);
             } else {
-                plugin.islands.teleportCooldowns.put(player.getUniqueId().toString(), new Date().getTime());
+                plugin.teleportCooldowns.put(player.getUniqueId().toString(), new Date().getTime());
             }
         }
     }
@@ -129,9 +129,9 @@ public class IslandsListener extends ChatUtils implements Listener {
              int x = e.getEntity().getLocation().getBlockX();
              int z = e.getEntity().getLocation().getBlockZ();
 
-             String ownerUUID = plugin.islands.layout.getBlockOwnerUUID(x, z);
+             String ownerUUID = plugin.layout.getBlockOwnerUUID(x, z);
              if (ownerUUID != null && !ownerUUID.equals(e.getDamager().getUniqueId().toString())) {
-                 if (plugin.islands.layout.getTrusted(plugin.islands.layout.getIslandId(x, z)).contains(e.getDamager().getUniqueId().toString())) {
+                 if (plugin.layout.getTrusted(plugin.layout.getIslandId(x, z)).contains(e.getDamager().getUniqueId().toString())) {
                      return;
                  }
 
@@ -151,10 +151,10 @@ public class IslandsListener extends ChatUtils implements Listener {
             int x = event.getClickedBlock().getX();
             int z = event.getClickedBlock().getZ();
 
-            String ownerUUID = plugin.islands.layout.getBlockOwnerUUID(x, z);
+            String ownerUUID = plugin.layout.getBlockOwnerUUID(x, z);
 
             if (ownerUUID == null || !ownerUUID.equals(event.getPlayer().getUniqueId().toString())) {
-                if (plugin.islands.layout.getTrusted(plugin.islands.layout.getIslandId(x, z)).contains(event.getPlayer().getUniqueId().toString())) {
+                if (plugin.layout.getTrusted(plugin.layout.getIslandId(x, z)).contains(event.getPlayer().getUniqueId().toString())) {
                     return;
                 }
 
@@ -175,10 +175,10 @@ public class IslandsListener extends ChatUtils implements Listener {
             int x = event.getBlock().getX();
             int z = event.getBlock().getZ();
 
-            String ownerUUID = plugin.islands.layout.getBlockOwnerUUID(x, z);
+            String ownerUUID = plugin.layout.getBlockOwnerUUID(x, z);
 
             if (ownerUUID == null || !ownerUUID.equals(event.getPlayer().getUniqueId().toString())) {
-                if (plugin.islands.layout.getTrusted(plugin.islands.layout.getIslandId(x, z)).contains(event.getPlayer().getUniqueId().toString())) {
+                if (plugin.layout.getTrusted(plugin.layout.getIslandId(x, z)).contains(event.getPlayer().getUniqueId().toString())) {
                     return;
                 }
 

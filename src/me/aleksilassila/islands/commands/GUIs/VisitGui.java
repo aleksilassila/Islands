@@ -1,7 +1,7 @@
 package me.aleksilassila.islands.commands.GUIs;
 
 import me.aleksilassila.islands.IslandLayout;
-import me.aleksilassila.islands.Main;
+import me.aleksilassila.islands.Islands;
 import me.aleksilassila.islands.utils.BiomeMaterials;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -19,7 +19,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class VisitGui implements IVisitGui {
-    private final Main plugin;
+    private final Islands plugin;
 
     private final int INVENTORY_SIZE = 9 * 2;
     private final int WHITESPACE = 0;
@@ -33,7 +33,7 @@ public class VisitGui implements IVisitGui {
     private int page = 0;
     private int sort = 0;
 
-    public VisitGui(Main plugin) {
+    public VisitGui(Islands plugin) {
         this.plugin = plugin;
     }
 
@@ -62,7 +62,7 @@ public class VisitGui implements IVisitGui {
 
     private Inventory getInventoryPage() {
         Inventory inv = Bukkit.createInventory(this, INVENTORY_SIZE, "Visit Island - By " + parseSort(sort) + " - [" + page + "]");
-        Map<String, Map<String, String>> publicIslands = plugin.islands.layout.getPublicIslands();
+        Map<String, Map<String, String>> publicIslands = plugin.layout.getPublicIslands();
 
         List<String> sortedSet = new ArrayList<>(publicIslands.keySet());
 

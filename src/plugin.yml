@@ -1,7 +1,7 @@
 name: Islands
 version: 4.1.0
 author: Aleksi Lassila
-main: me.aleksilassila.islands.Main
+main: me.aleksilassila.islands.Islands
 api-version: 1.15
 softdepend: [Vault, WorldEdit]
 commands:

@@ -1,7 +1,7 @@
 package me.aleksilassila.islands.commands.subcommands;
 
 import me.aleksilassila.islands.IslandLayout;
-import me.aleksilassila.islands.Main;
+import me.aleksilassila.islands.Islands;
 import me.aleksilassila.islands.commands.IslandManagmentCommands;
 import me.aleksilassila.islands.commands.Subcommand;
 import me.aleksilassila.islands.utils.Messages;
@@ -17,14 +17,14 @@ import java.util.HashMap;
 import java.util.List;
 
 public class createSubcommand extends Subcommand {
-    private final Main plugin;
+    private final Islands plugin;
     private final IslandLayout layout;
     private final IslandManagmentCommands.Utils utils = new IslandManagmentCommands.Utils();
 
-    public createSubcommand(Main plugin) {
+    public createSubcommand(Islands plugin) {
         this.plugin = plugin;
 
-        this.layout = plugin.islands.layout;
+        this.layout = plugin.layout;
     }
 
     @Override
@@ -34,21 +34,21 @@ public class createSubcommand extends Subcommand {
             return;
         }
 
-        int islandSize = args.length == 2 ? plugin.islands.parseIslandSize(args[1]) : plugin.islands.parseIslandSize("");
+        int islandSize = args.length == 2 ? plugin.parseIslandSize(args[1]) : plugin.parseIslandSize("");
 
-        String permissionRequired = plugin.islands.getCreatePermission(islandSize);
+        String permissionRequired = plugin.getCreatePermission(islandSize);
 
         if (!Permissions.checkPermission(player, permissionRequired)) {
             player.sendMessage(Messages.error.NO_PERMISSION);
             return;
         }
 
-        if (islandSize < plugin.islands.getSmallestIslandSize() || islandSize + 4 >= layout.islandSpacing) {
+        if (islandSize < plugin.getSmallestIslandSize() || islandSize + 4 >= layout.islandSpacing) {
             player.sendMessage(Messages.error.INVALID_ISLAND_SIZE);
             return;
         }
 
-        HashMap<Biome, List<Location>> availableLocations = plugin.islands.islandGeneration.biomes.availableLocations;
+        HashMap<Biome, List<Location>> availableLocations = plugin.islandGeneration.biomes.availableLocations;
 
         if (args.length < 1) {
             player.sendMessage(Messages.help.CREATE);
@@ -98,7 +98,7 @@ public class createSubcommand extends Subcommand {
         String islandId = null;
 
         try {
-            islandId = plugin.islands.createNewIsland(targetBiome, islandSize, player);
+            islandId = plugin.createNewIsland(targetBiome, islandSize, player);
         } catch (IllegalArgumentException e) {
             player.sendMessage(Messages.error.NO_LOCATIONS_FOR_BIOME);
 
@@ -118,13 +118,13 @@ public class createSubcommand extends Subcommand {
         List<String> availableArgs = new ArrayList<>();
 
         if (args.length == 1) {
-            HashMap<Biome, List<Location>> availableLocations = plugin.islands.islandGeneration.biomes.availableLocations;
+            HashMap<Biome, List<Location>> availableLocations = plugin.islandGeneration.biomes.availableLocations;
 
             for (Biome biome : availableLocations.keySet()) {
                 availableArgs.add(biome.name());
             }
         } else if (args.length == 2) {
-            availableArgs.addAll(plugin.islands.definedIslandSizes.keySet());
+            availableArgs.addAll(plugin.definedIslandSizes.keySet());
         }
 
         return availableArgs;

@@ -2,7 +2,6 @@ package me.aleksilassila.islands.commands.subcommands;
 
 import me.aleksilassila.islands.IslandLayout;
 import me.aleksilassila.islands.Islands;
-import me.aleksilassila.islands.Main;
 import me.aleksilassila.islands.commands.IslandManagmentCommands;
 import me.aleksilassila.islands.commands.Subcommand;
 import me.aleksilassila.islands.utils.Messages;
@@ -13,19 +12,18 @@ import org.bukkit.block.Biome;
 import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
 public class regenerateSubcommand extends Subcommand {
-    private final Main plugin;
+    private final Islands plugin;
     private final IslandLayout layout;
 
     private final IslandManagmentCommands.Utils utils = new IslandManagmentCommands.Utils();
 
-    public regenerateSubcommand(Main plugin) {
+    public regenerateSubcommand(Islands plugin) {
         this.plugin = plugin;
-        this.layout = plugin.islands.layout;
+        this.layout = plugin.layout;
     }
 
     private boolean isSmallerThanOldIsland(int newSize, String islandId) {
@@ -34,7 +32,7 @@ public class regenerateSubcommand extends Subcommand {
 
     @Override
     public void onCommand(Player player, String[] args, boolean confirmed) {
-        HashMap<Biome, List<Location>> availableLocations = plugin.islands.islandGeneration.biomes.availableLocations;
+        HashMap<Biome, List<Location>> availableLocations = plugin.islandGeneration.biomes.availableLocations;
         String islandId;
         Biome targetBiome;
 
@@ -43,16 +41,16 @@ public class regenerateSubcommand extends Subcommand {
             return;
         }
 
-        int islandSize = args.length == 2 ? plugin.islands.parseIslandSize(args[1]) : plugin.islands.parseIslandSize("");
+        int islandSize = args.length == 2 ? plugin.parseIslandSize(args[1]) : plugin.parseIslandSize("");
 
-        String permissionRequired = plugin.islands.getCreatePermission(islandSize);
+        String permissionRequired = plugin.getCreatePermission(islandSize);
 
         if (!Permissions.checkPermission(player, permissionRequired)) {
             player.sendMessage(Messages.error.NO_PERMISSION);
             return;
         }
 
-        if (islandSize < plugin.islands.getSmallestIslandSize() || islandSize + 4 >= layout.islandSpacing) {
+        if (islandSize < plugin.getSmallestIslandSize() || islandSize + 4 >= layout.islandSpacing) {
             player.sendMessage(Messages.error.INVALID_ISLAND_SIZE);
             return;
         }
@@ -91,7 +89,7 @@ public class regenerateSubcommand extends Subcommand {
             return;
         }
 
-        if (!plugin.islands.islandGeneration.biomes.availableLocations.containsKey(targetBiome)) {
+        if (!plugin.islandGeneration.biomes.availableLocations.containsKey(targetBiome)) {
             player.sendMessage(Messages.error.NO_LOCATIONS_FOR_BIOME);
             return;
         }
@@ -102,7 +100,7 @@ public class regenerateSubcommand extends Subcommand {
         }
 
         try {
-            boolean success = plugin.islands.regenerateIsland(islandId, targetBiome, islandSize, player, isSmallerThanOldIsland(islandSize, islandId));
+            boolean success = plugin.regenerateIsland(islandId, targetBiome, islandSize, player, isSmallerThanOldIsland(islandSize, islandId));
 
             if (!success) {
                 player.sendMessage(Messages.error.ONGOING_QUEUE_EVENT);
@@ -120,14 +118,14 @@ public class regenerateSubcommand extends Subcommand {
         List<String> availableArgs = new ArrayList<>();
 
         if (args.length == 1) {
-            HashMap<Biome, List<Location>> availableLocations = plugin.islands.islandGeneration.biomes.availableLocations;
+            HashMap<Biome, List<Location>> availableLocations = plugin.islandGeneration.biomes.availableLocations;
 
             for (Biome biome : availableLocations.keySet()) {
                 availableArgs.add(biome.name());
             }
 
         } else if (args.length == 2) {
-            availableArgs.addAll(plugin.islands.definedIslandSizes.keySet());
+            availableArgs.addAll(plugin.definedIslandSizes.keySet());
         }
 
         return availableArgs;

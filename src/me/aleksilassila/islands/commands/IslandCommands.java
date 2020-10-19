@@ -1,10 +1,9 @@
 package me.aleksilassila.islands.commands;
 
-import me.aleksilassila.islands.Main;
-import me.aleksilassila.islands.commands.GUIs.VisitGui;
+import me.aleksilassila.islands.IslandLayout;
+import me.aleksilassila.islands.Islands;
 import me.aleksilassila.islands.utils.Messages;
 import me.aleksilassila.islands.utils.Permissions;
-import me.aleksilassila.islands.IslandLayout;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -17,12 +16,12 @@ import java.util.Date;
 import java.util.List;
 
 public class IslandCommands {
-    private final Main plugin;
+    private final Islands plugin;
     private final IslandLayout layout;
 
-    public IslandCommands(Main plugin) {
+    public IslandCommands(Islands plugin) {
         this.plugin = plugin;
-        this.layout = plugin.islands.layout;
+        this.layout = plugin.layout;
     }
 
     public class VisitCommand implements CommandExecutor {
@@ -40,7 +39,7 @@ public class IslandCommands {
 
             Player player = (Player) sender;
 
-            plugin.islands.confirmations.remove(player.getUniqueId().toString());
+            plugin.confirmations.remove(player.getUniqueId().toString());
 
             if (!Permissions.checkPermission(player, Permissions.command.visit)) {
                 player.sendMessage(Messages.error.NO_PERMISSION);
@@ -49,7 +48,7 @@ public class IslandCommands {
 
             if (args.length != 1) {
 //                player.sendMessage(Messages.help.VISIT);
-                player.openInventory(plugin.islands.visitGui.getDefaultInventory());
+                player.openInventory(plugin.visitGui.getDefaultInventory());
                 return true;
             }
 
@@ -58,10 +57,10 @@ public class IslandCommands {
                 return true;
             }
 
-            String islandId = plugin.islands.layout.getIslandByName(args[0]);
+            String islandId = plugin.layout.getIslandByName(args[0]);
 
             if (islandId != null) {
-                player.teleport(plugin.islands.layout.getIslandSpawn(islandId));
+                player.teleport(plugin.layout.getIslandSpawn(islandId));
             } else {
                 player.sendMessage(Messages.error.ISLAND_NOT_FOUND);
             }
@@ -85,7 +84,7 @@ public class IslandCommands {
 
             Player player = (Player) sender;
 
-            plugin.islands.confirmations.remove(player.getUniqueId().toString());
+            plugin.confirmations.remove(player.getUniqueId().toString());
 
             if (args.length == 1 && args[0].equalsIgnoreCase("list") || label.equalsIgnoreCase("homes")) {
                 if (!Permissions.checkPermission(player, Permissions.command.listHomes)) {
@@ -93,7 +92,7 @@ public class IslandCommands {
                     return true;
                 }
 
-                List<String> ids = plugin.islands.layout.getIslandIds(player.getUniqueId());
+                List<String> ids = plugin.layout.getIslandIds(player.getUniqueId());
 
                 player.sendMessage(Messages.success.HOMES_FOUND(ids.size()));
                 for (String islandId : ids) {
@@ -163,9 +162,9 @@ public class IslandCommands {
     }
 
     private boolean canTeleport(Player player) {
-        if (plugin.islands.teleportCooldowns.containsKey(player.getUniqueId().toString())) {
+        if (plugin.teleportCooldowns.containsKey(player.getUniqueId().toString())) {
             long cooldownTime  = plugin.getConfig().getInt("tpCooldownTime") * 1000;
-            long timePassed = new Date().getTime() - plugin.islands.teleportCooldowns.get(player.getUniqueId().toString());
+            long timePassed = new Date().getTime() - plugin.teleportCooldowns.get(player.getUniqueId().toString());
 
             return timePassed >= cooldownTime;
         }
@@ -174,9 +173,9 @@ public class IslandCommands {
     }
 
     private int teleportCooldown(Player player) {
-        if (plugin.islands.teleportCooldowns.containsKey(player.getUniqueId().toString())) {
+        if (plugin.teleportCooldowns.containsKey(player.getUniqueId().toString())) {
             long cooldownTime  = plugin.getConfig().getInt("tpCooldownTime") * 1000;
-            long timePassed = new Date().getTime() - plugin.islands.teleportCooldowns.get(player.getUniqueId().toString());
+            long timePassed = new Date().getTime() - plugin.teleportCooldowns.get(player.getUniqueId().toString());
 
             long remaining = cooldownTime - timePassed;
 

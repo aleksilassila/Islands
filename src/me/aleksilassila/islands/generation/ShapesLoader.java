@@ -1,19 +1,17 @@
 package me.aleksilassila.islands.generation;
 
-import me.aleksilassila.islands.Main;
+import me.aleksilassila.islands.Islands;
 
 import javax.annotation.Nullable;
 import java.io.File;
-import java.util.HashMap;
-import java.util.Map;
 
 public class ShapesLoader {
-    private final Main plugin;
+    private final Islands plugin;
     private final File schematicsDirectory;
 
     String SCHEMATIC_DIRECTORY =  "plugins/Islands/shapes/";
 
-    public ShapesLoader(Main plugin) {
+    public ShapesLoader(Islands plugin) {
         this.plugin = plugin;
 
         this.schematicsDirectory = new File(SCHEMATIC_DIRECTORY);

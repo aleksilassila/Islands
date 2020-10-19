@@ -1,7 +1,7 @@
 package me.aleksilassila.islands.commands.subcommands;
 
 import me.aleksilassila.islands.IslandLayout;
-import me.aleksilassila.islands.Main;
+import me.aleksilassila.islands.Islands;
 import me.aleksilassila.islands.commands.Subcommand;
 import me.aleksilassila.islands.utils.Messages;
 import me.aleksilassila.islands.utils.Permissions;
@@ -10,12 +10,12 @@ import org.bukkit.entity.Player;
 import java.util.List;
 
 public class setSpawnSubcommand extends Subcommand {
-    private final Main plugin;
+    private final Islands plugin;
     private final IslandLayout layout;
 
-    public setSpawnSubcommand(Main plugin) {
+    public setSpawnSubcommand(Islands plugin) {
         this.plugin = plugin;
-        this.layout = plugin.islands.layout;
+        this.layout = plugin.layout;
     }
 
     @Override

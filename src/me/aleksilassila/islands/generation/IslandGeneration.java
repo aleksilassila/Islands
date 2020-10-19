@@ -2,7 +2,6 @@ package me.aleksilassila.islands.generation;
 
 import com.sun.istack.internal.Nullable;
 import me.aleksilassila.islands.Islands;
-import me.aleksilassila.islands.Main;
 import me.aleksilassila.islands.utils.Messages;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -16,8 +15,7 @@ import java.util.*;
 
 public class IslandGeneration {
 
-    private final Islands islands;
-    private final Main plugin;
+    private final Islands plugin;
     public Biomes biomes;
     public List<CopyTask> queue = new ArrayList<>();
     private final int buildDelay;
@@ -25,10 +23,9 @@ public class IslandGeneration {
 
     private final Map<Material, Material> replacementMap;
 
-    public IslandGeneration(Main plugin, Islands islands) {
+    public IslandGeneration(Islands plugin) {
         this.plugin = plugin;
-        this.islands = islands;
-        this.biomes = new Biomes(plugin.islandsSourceWorld, plugin);
+        this.biomes = new Biomes(plugin, plugin.islandsSourceWorld);
 
         double delay = plugin.getConfig().getDouble("generation.generationDelayInTicks");
 
@@ -140,30 +137,30 @@ public class IslandGeneration {
         public void run() {
             if (clearingArea) {
                 for (int count = 0; count < rowsBuiltPerDelay; count++) {
-                    for (int y = startY + islands.layout.islandSpacing; y >= startY; y--) {
-                        int relativeX = clearingIndex / islands.layout.islandSpacing;
-                        int relativeZ = clearingIndex - relativeX * islands.layout.islandSpacing;
+                    for (int y = startY + plugin.layout.islandSpacing; y >= startY; y--) {
+                        int relativeX = clearingIndex / plugin.layout.islandSpacing;
+                        int relativeZ = clearingIndex - relativeX * plugin.layout.islandSpacing;
 
                         Block target = plugin.islandsWorld.getBlockAt(
-                                xIndex * islands.layout.islandSpacing + relativeX,
+                                xIndex * plugin.layout.islandSpacing + relativeX,
                                 targetY + (y - startY),
-                                zIndex * islands.layout.islandSpacing + relativeZ
+                                zIndex * plugin.layout.islandSpacing + relativeZ
                         );
 
                         target.setType(Material.AIR);
                         target.setBiome(Biome.PLAINS);
                     }
 
-                    if (clearingIndex >= islands.layout.islandSpacing * islands.layout.islandSpacing) {
+                    if (clearingIndex >= plugin.layout.islandSpacing * plugin.layout.islandSpacing) {
                         player.sendMessage(Messages.success.CLEARING_DONE);
 
                         clearingArea = false;
                         break;
-                    } else if (clearingIndex == islands.layout.islandSpacing * islands.layout.islandSpacing / 4) {
+                    } else if (clearingIndex == plugin.layout.islandSpacing * plugin.layout.islandSpacing / 4) {
                         player.sendMessage(Messages.info.CLEARING_STATUS(25));
-                    } else if (clearingIndex == islands.layout.islandSpacing * islands.layout.islandSpacing / 2) {
+                    } else if (clearingIndex == plugin.layout.islandSpacing * plugin.layout.islandSpacing / 2) {
                         player.sendMessage(Messages.info.CLEARING_STATUS(50));
-                    } else if (clearingIndex == islands.layout.islandSpacing * islands.layout.islandSpacing / 4 * 3) {
+                    } else if (clearingIndex == plugin.layout.islandSpacing * plugin.layout.islandSpacing / 4 * 3) {
                         player.sendMessage(Messages.info.CLEARING_STATUS(75));
                     }
 
@@ -178,7 +175,7 @@ public class IslandGeneration {
                     int relativeX = index / islandSize;
                     int relativeZ = index - relativeX * islandSize;
 
-                    Block sourceBlock = islands.sourceWorld.getBlockAt(startX + relativeX, y, startZ + relativeZ);
+                    Block sourceBlock = plugin.islandsSourceWorld.getBlockAt(startX + relativeX, y, startZ + relativeZ);
 
                     if (replacementMap.containsKey(sourceBlock.getType())) {
                         Material material = replacementMap.get(sourceBlock.getType());
@@ -262,7 +259,7 @@ public class IslandGeneration {
             int centerX = (int) (sourceLocation.getBlockX() + ((double) islandSize) / 2.0);
             int centerZ = (int) (sourceLocation.getBlockZ() + ((double) islandSize) / 2.0);
 
-            Material material = islands.sourceWorld.getBlockAt(centerX, centerY, centerZ).getBlockData().getMaterial();
+            Material material = plugin.islandsSourceWorld.getBlockAt(centerX, centerY, centerZ).getBlockData().getMaterial();
             if (shape != null && !material.isAir() && !material.isBurnable()) {
                 break;
             } else if (Arrays.asList(Material.WATER, Material.SANDSTONE, Material.STONE).contains(material)) {

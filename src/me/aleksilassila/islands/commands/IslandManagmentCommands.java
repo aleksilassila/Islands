@@ -1,15 +1,12 @@
 package me.aleksilassila.islands.commands;
 
-import com.sun.istack.internal.NotNull;
 import com.sun.istack.internal.Nullable;
 import me.aleksilassila.islands.Islands;
-import me.aleksilassila.islands.Main;
-import me.aleksilassila.islands.utils.Permissions;
 import me.aleksilassila.islands.commands.subcommands.*;
-import me.aleksilassila.islands.IslandLayout;
 import me.aleksilassila.islands.utils.ChatUtils;
 import me.aleksilassila.islands.utils.ConfirmItem;
 import me.aleksilassila.islands.utils.Messages;
+import me.aleksilassila.islands.utils.Permissions;
 import org.bukkit.block.Biome;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -19,10 +16,10 @@ import org.bukkit.entity.Player;
 import java.util.*;
 
 public class IslandManagmentCommands extends ChatUtils implements TabExecutor {
-    private final Main plugin;
+    private final Islands plugin;
     private final Set<Subcommand> subcommands;
 
-    public IslandManagmentCommands(Main plugin) {
+    public IslandManagmentCommands(Islands plugin) {
         this.plugin = plugin;
 
         plugin.getCommand("island").setExecutor(this);
@@ -54,15 +51,15 @@ public class IslandManagmentCommands extends ChatUtils implements TabExecutor {
         boolean confirmed = false;
         String issuedCommand = String.join(" ", label, String.join(" ", args));
 
-        ConfirmItem item = plugin.islands.confirmations.get(player.getUniqueId().toString());
+        ConfirmItem item = plugin.confirmations.get(player.getUniqueId().toString());
         if (item != null
                 && item.command.equals(issuedCommand)
                 && !item.expired()) {
-            plugin.islands.confirmations.remove(player.getUniqueId().toString());
+            plugin.confirmations.remove(player.getUniqueId().toString());
 
             confirmed = true;
         } else {
-            plugin.islands.confirmations.put(player.getUniqueId().toString(), new ConfirmItem(issuedCommand, 8 * 1000));
+            plugin.confirmations.put(player.getUniqueId().toString(), new ConfirmItem(issuedCommand, 8 * 1000));
         }
 
         if (args.length >= 1) {
