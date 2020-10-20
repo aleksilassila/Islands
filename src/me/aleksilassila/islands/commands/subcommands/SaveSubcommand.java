@@ -52,12 +52,12 @@ public class SaveSubcommand extends Subcommand {
 
             int height;
 
-            try {
+            try { // FIXME test
                 height = args.length == 1
                         ? Integer.parseInt(args[0])
-                        : islandSize;
+                        : plugin.getIslandsConfig().getInt(islandId + ".height");
             } catch (NumberFormatException e) {
-                height = islandSize;
+                height = plugin.getIslandsConfig().getInt(islandId + ".height");
             }
 
             File file = new File(SAVE_DIRECTORY + name + ".schem");
@@ -77,7 +77,7 @@ public class SaveSubcommand extends Subcommand {
             }
 
             if (SaveHandler.saveSchematic(file, plugin.islandsWorld, startX, startY, startZ, islandSize, height))
-                player.sendMessage(Messages.success.ISLAND_SAVED(name));
+                player.sendMessage(Messages.success.ISLAND_SAVED(name, islandSize, height));
             else
                 player.sendMessage(Messages.error.ISLAND_SAVE_ERROR);
 

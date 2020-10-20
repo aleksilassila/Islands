@@ -61,8 +61,8 @@ public class Messages extends ChatUtils {
                 return success("Found " + amount + " home" + (amount == 1 ? "" : "s") + ".");
             }
 
-            public static String ISLAND_SAVED(String name) {
-                return success("Island saved as " + name + ".schem.");
+            public static String ISLAND_SAVED(String name, int width, int height) {
+                return success("Island saved as " + name + ".schem. (" + width + "x" + height + "x" + width + ")");
             }
         }
 

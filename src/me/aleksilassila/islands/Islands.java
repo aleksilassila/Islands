@@ -123,7 +123,15 @@ public class Islands extends JavaPlugin {
 
     @Nullable
     public String createNewIsland(Biome biome, int islandSize, Player player) throws IllegalArgumentException {
-        String islandId = layout.createIsland(player.getUniqueId(), islandSize, biome);
+        Shape shape = definedIslandShapes.getOrDefault(islandSize, null) != null
+                ? definedIslandShapes.get(islandSize).get(new Random().nextInt(definedIslandShapes.get(islandSize).size()))
+                : null;
+
+        int height = shape != null
+                ? shape.getHeight() + islandSize / 2
+                : islandSize;
+
+        String islandId = layout.createIsland(player.getUniqueId(), islandSize, height, biome);
         try {
             boolean success = islandGeneration.copyIsland(
                     player,
@@ -135,9 +143,7 @@ public class Islands extends JavaPlugin {
                     false,
                     0,
                     0,
-                    definedIslandShapes.getOrDefault(islandSize, null) != null
-                            ? definedIslandShapes.get(islandSize).get(new Random().nextInt(definedIslandShapes.get(islandSize).size()))
-                            : null
+                    shape
             );
 
             if (!success) {
@@ -154,7 +160,15 @@ public class Islands extends JavaPlugin {
     }
 
     public boolean recreateIsland(String islandId, Biome biome, int islandSize, Player player) throws IllegalArgumentException {
-        layout.updateIsland(islandId, islandSize, biome);
+        Shape shape = definedIslandShapes.getOrDefault(islandSize, null) != null
+                ? definedIslandShapes.get(islandSize).get(new Random().nextInt(definedIslandShapes.get(islandSize).size()))
+                : null;
+
+        int height = shape != null
+                ? shape.getHeight() + islandSize / 2
+                : islandSize;
+
+        layout.updateIsland(islandId, islandSize, height, biome);
 
         try {
             return islandGeneration.copyIsland(
@@ -167,9 +181,7 @@ public class Islands extends JavaPlugin {
                     true,
                     getIslandsConfig().getInt(islandId + ".xIndex"),
                     getIslandsConfig().getInt(islandId + ".zIndex"),
-                    definedIslandShapes.getOrDefault(islandSize, null) != null
-                            ? definedIslandShapes.get(islandSize).get(new Random().nextInt(definedIslandShapes.get(islandSize).size()))
-                            : null
+                    shape
             );
         } catch (IllegalArgumentException e) {
             throw new IllegalArgumentException();

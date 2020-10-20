@@ -29,14 +29,14 @@ public class IslandLayout {
         return plugin.getIslandsConfig();
     }
 
-    public String createIsland(UUID uuid, int islandSize, Biome biome) {
+    public String createIsland(UUID uuid, int islandSize, int height, Biome biome) {
         int index = 0;
 
         while (true) {
             int[] pos = placement.getIslandPos(index);
 
             if (!getIslandsConfig().getKeys(false).contains(posToIslandId(pos[0], pos[1]))) {
-                return addIslandToConfig(pos[0], pos[1], islandSize, uuid, String.valueOf(getNewHomeId(uuid)), biome);
+                return addIslandToConfig(pos[0], pos[1], islandSize, height, uuid, String.valueOf(getNewHomeId(uuid)), biome);
             }
 
             index++;
@@ -44,7 +44,7 @@ public class IslandLayout {
     }
 
     @NotNull
-    private String addIslandToConfig(int xIndex, int zIndex, int islandSize, UUID uuid, String name, Biome biome) {
+    private String addIslandToConfig(int xIndex, int zIndex, int islandSize, int height, UUID uuid, String name, Biome biome) {
         int realX = xIndex * islandSpacing + islandSpacing / 2 - islandSize / 2;
         int realY = getIslandY(xIndex, zIndex);
         int realZ = zIndex * islandSpacing + islandSpacing / 2 - islandSize / 2;
@@ -67,6 +67,7 @@ public class IslandLayout {
         getIslandsConfig().set(islandId + ".name", name);
         getIslandsConfig().set(islandId + ".home", home);
         getIslandsConfig().set(islandId + ".size", islandSize);
+        getIslandsConfig().set(islandId + ".height", height);
         getIslandsConfig().set(islandId + ".public", false);
         getIslandsConfig().set(islandId + ".biome", biome.name());
 
@@ -255,7 +256,7 @@ public class IslandLayout {
 
     // MANAGMENT
 
-    public void updateIsland(String islandId, int islandSize, Biome biome) {
+    public void updateIsland(String islandId, int islandSize, int height, Biome biome) {
         int xIndex = getIslandsConfig().getInt(islandId + ".xIndex");
         int zIndex = getIslandsConfig().getInt(islandId + ".zIndex");
 
@@ -266,6 +267,7 @@ public class IslandLayout {
         getIslandsConfig().set(islandId + ".z", realZ);
 
         getIslandsConfig().set(islandId + ".size", islandSize);
+        getIslandsConfig().set(islandId + ".height", height);
         getIslandsConfig().set(islandId + ".biome", biome.name());
 
         plugin.saveIslandsConfig();
