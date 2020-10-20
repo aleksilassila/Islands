@@ -7,33 +7,26 @@ import me.aleksilassila.islands.utils.Messages;
 import me.aleksilassila.islands.utils.Permissions;
 import org.bukkit.entity.Player;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
-public class nameSubcommand extends Subcommand {
+public class DeleteSubcommand extends Subcommand {
     private final Islands plugin;
     private final IslandLayout layout;
 
-    public nameSubcommand(Islands plugin) {
+    public DeleteSubcommand(Islands plugin) {
         this.plugin = plugin;
         this.layout = plugin.layout;
     }
 
     @Override
     public void onCommand(Player player, String[] args, boolean confirmed) {
-        if (!player.hasPermission(Permissions.command.name)) {
+        if (!player.hasPermission(Permissions.command.delete)) {
             player.sendMessage(Messages.error.NO_PERMISSION);
             return;
         }
 
         if (!player.getWorld().equals(plugin.islandsWorld)) {
             player.sendMessage(Messages.error.WRONG_WORLD);
-            return;
-        }
-
-        if (args.length != 1) {
-            player.sendMessage(Messages.help.NAME);
             return;
         }
 
@@ -44,44 +37,34 @@ public class nameSubcommand extends Subcommand {
             return;
         }
 
-        if (layout.getUUID(islandId).equals(player.getUniqueId().toString())
-                || player.hasPermission(Permissions.bypass.name)) {
-            if (layout.getIslandByName(args[0]) != null) {
-                player.sendMessage(Messages.error.NAME_TAKEN);
-                return;
-            }
-
-            if (plugin.getConfig().getStringList("illegalIslandNames").contains(args[0])) {
-                player.sendMessage(Messages.error.NAME_BLOCKED);
-                return;
-            }
-
-            layout.nameIsland(islandId, args[0]);
-
-            player.sendMessage(Messages.success.NAME_CHANGED(args[0]));
-        } else {
+        if (!layout.getUUID(islandId).equals(player.getUniqueId().toString())
+                && !player.hasPermission(Permissions.bypass.delete)) {
             player.sendMessage(Messages.error.UNAUTHORIZED);
+            return;
         }
 
+        if (!confirmed) {
+            player.sendMessage(Messages.info.CONFIRM);
+            return;
+        }
+
+        layout.deleteIsland(islandId);
+        player.sendMessage(Messages.success.DELETED);
     }
 
     @Override
     public List<String> onTabComplete(Player player, String[] args) {
-        if (args.length == 1) {
-            return new ArrayList<String>(Arrays.asList("<name>"));
-        }
-
         return null;
     }
 
     @Override
     public String getName() {
-        return "name";
+        return "delete";
     }
 
     @Override
     public String help() {
-        return Messages.help.NAME;
+        return Messages.help.DELETE;
     }
 
     @Override

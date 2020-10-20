@@ -9,11 +9,11 @@ import org.bukkit.entity.Player;
 
 import java.util.List;
 
-public class setSpawnSubcommand extends Subcommand {
+public class SetSpawnSubcommand extends Subcommand {
     private final Islands plugin;
     private final IslandLayout layout;
 
-    public setSpawnSubcommand(Islands plugin) {
+    public SetSpawnSubcommand(Islands plugin) {
         this.plugin = plugin;
         this.layout = plugin.layout;
     }

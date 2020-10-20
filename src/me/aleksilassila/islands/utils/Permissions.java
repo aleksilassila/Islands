@@ -35,5 +35,6 @@ public class Permissions {
         public static final String untrust = "islands.command.untrust";
         public static final String visit = "islands.command.visit";
         public static final String island = "islands.command";
+        public static final String save = "islands.command.save";
     }
 }

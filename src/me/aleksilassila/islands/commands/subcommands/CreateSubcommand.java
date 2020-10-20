@@ -9,30 +9,27 @@ import me.aleksilassila.islands.utils.Permissions;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.block.Biome;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-public class recreateSubcommand extends Subcommand {
+public class CreateSubcommand extends Subcommand {
     private final Islands plugin;
     private final IslandLayout layout;
-
     private final IslandManagmentCommands.Utils utils = new IslandManagmentCommands.Utils();
 
-    public recreateSubcommand(Islands plugin) {
+    public CreateSubcommand(Islands plugin) {
         this.plugin = plugin;
+
         this.layout = plugin.layout;
     }
 
     @Override
     public void onCommand(Player player, String[] args, boolean confirmed) {
-        HashMap<Biome, List<Location>> availableLocations = plugin.islandGeneration.biomes.availableLocations;
-        String islandId;
-        Biome targetBiome;
-
-        if (!player.hasPermission(Permissions.command.recreate)) {
+        if (!player.hasPermission(Permissions.command.create)) {
             player.sendMessage(Messages.error.NO_PERMISSION);
             return;
         }
@@ -51,13 +48,10 @@ public class recreateSubcommand extends Subcommand {
             return;
         }
 
-        if (!player.getWorld().equals(plugin.islandsWorld)) {
-            player.sendMessage(Messages.error.WRONG_WORLD);
-            return;
-        }
+        HashMap<Biome, List<Location>> availableLocations = plugin.islandGeneration.biomes.availableLocations;
 
         if (args.length < 1) {
-            player.sendMessage(Messages.help.RECREATE);
+            player.sendMessage(Messages.help.CREATE);
 
             for (Biome biome : availableLocations.keySet()) {
                 if (availableLocations.get(biome).size() > 0) {
@@ -69,44 +63,54 @@ public class recreateSubcommand extends Subcommand {
             return;
         }
 
-        islandId = layout.getIslandId(player.getLocation().getBlockX(), player.getLocation().getBlockZ());
 
-        if (islandId == null ||
-                (!layout.getUUID(islandId).equals(player.getUniqueId().toString())
-                && !player.hasPermission(Permissions.bypass.recreate))) {
-            player.sendMessage(Messages.error.UNAUTHORIZED);
+        int previousIslands = layout.getIslandIds(player.getUniqueId()).size();
+
+        int islandsLimit = plugin.getConfig().getInt("defaultIslandLimit");
+
+        ConfigurationSection section = plugin.getConfig().getConfigurationSection("groupLimits");
+
+        if (plugin.perms != null && section != null) {
+            for (String group : plugin.perms.getGroups()) {
+                if (plugin.perms.playerInGroup(player, group) && section.getInt(group) > islandsLimit) {
+                    islandsLimit = section.getInt(group);
+                }
+            }
+        }
+
+        if (previousIslands >= islandsLimit && !player.hasPermission(Permissions.bypass.create)) {
+            player.sendMessage(Messages.error.ISLAND_LIMIT);
             return;
         }
 
-        targetBiome = utils.getTargetBiome(args[0]);
+        Biome targetBiome = utils.getTargetBiome(args[0]);
 
         if (targetBiome == null) {
             player.sendMessage(Messages.error.NO_BIOME_FOUND);
             return;
         }
 
-        if (!plugin.islandGeneration.biomes.availableLocations.containsKey(targetBiome)) {
+        if (!availableLocations.containsKey(targetBiome)) {
             player.sendMessage(Messages.error.NO_LOCATIONS_FOR_BIOME);
             return;
         }
 
-        if (!confirmed) {
-            player.sendMessage(Messages.info.CONFIRM);
-            return;
-        }
+        String islandId = null;
 
         try {
-            boolean success = plugin.recreateIsland(islandId, targetBiome, islandSize, player);
-
-            if (!success) {
-                player.sendMessage(Messages.error.ONGOING_QUEUE_EVENT);
-                return;
-            }
-
-            player.sendTitle(Messages.success.ISLAND_GEN_TITLE, Messages.success.ISLAND_GEN_SUBTITLE, 10, 20 * 7, 10);
+            islandId = plugin.createNewIsland(targetBiome, islandSize, player);
         } catch (IllegalArgumentException e) {
             player.sendMessage(Messages.error.NO_LOCATIONS_FOR_BIOME);
+
+            return;
         }
+
+        if (islandId == null) {
+            player.sendMessage(Messages.error.ONGOING_QUEUE_EVENT);
+            return;
+        }
+
+        player.sendTitle(Messages.success.ISLAND_GEN_TITLE, Messages.success.ISLAND_GEN_SUBTITLE, 10, 20 * 7, 10);
     }
 
     @Override
@@ -119,7 +123,6 @@ public class recreateSubcommand extends Subcommand {
             for (Biome biome : availableLocations.keySet()) {
                 availableArgs.add(biome.name());
             }
-
         } else if (args.length == 2) {
             availableArgs.addAll(plugin.definedIslandSizes.keySet());
         }
@@ -129,12 +132,12 @@ public class recreateSubcommand extends Subcommand {
 
     @Override
     public String getName() {
-        return "recreate";
+        return "create";
     }
 
     @Override
     public String help() {
-        return Messages.help.RECREATE;
+        return Messages.help.CREATE;
     }
 
     @Override

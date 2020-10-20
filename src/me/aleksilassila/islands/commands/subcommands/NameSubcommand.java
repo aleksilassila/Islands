@@ -7,20 +7,22 @@ import me.aleksilassila.islands.utils.Messages;
 import me.aleksilassila.islands.utils.Permissions;
 import org.bukkit.entity.Player;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
-public class unnameSubcommand extends Subcommand {
+public class NameSubcommand extends Subcommand {
     private final Islands plugin;
     private final IslandLayout layout;
 
-    public unnameSubcommand(Islands plugin) {
+    public NameSubcommand(Islands plugin) {
         this.plugin = plugin;
         this.layout = plugin.layout;
     }
 
     @Override
     public void onCommand(Player player, String[] args, boolean confirmed) {
-        if (!player.hasPermission(Permissions.command.unname)) {
+        if (!player.hasPermission(Permissions.command.name)) {
             player.sendMessage(Messages.error.NO_PERMISSION);
             return;
         }
@@ -30,8 +32,8 @@ public class unnameSubcommand extends Subcommand {
             return;
         }
 
-        if (args.length != 0) {
-            player.sendMessage(Messages.help.UNNAME);
+        if (args.length != 1) {
+            player.sendMessage(Messages.help.NAME);
             return;
         }
 
@@ -42,35 +44,44 @@ public class unnameSubcommand extends Subcommand {
             return;
         }
 
-        if (plugin.getIslandsConfig().getInt(islandId + ".home") <= 0
-                || plugin.getIslandsConfig().getString(islandId + ".UUID") == null) {
-            player.sendMessage(Messages.error.ISLAND_NO_OWNER);
-            return;
-        }
-
         if (layout.getUUID(islandId).equals(player.getUniqueId().toString())
-                || player.hasPermission(Permissions.bypass.unname)) {
-            layout.unnameIsland(islandId);
+                || player.hasPermission(Permissions.bypass.name)) {
+            if (layout.getIslandByName(args[0]) != null) {
+                player.sendMessage(Messages.error.NAME_TAKEN);
+                return;
+            }
 
-            player.sendMessage(Messages.success.UNNAMED);
+            if (plugin.getConfig().getStringList("illegalIslandNames").contains(args[0])) {
+                player.sendMessage(Messages.error.NAME_BLOCKED);
+                return;
+            }
+
+            layout.nameIsland(islandId, args[0]);
+
+            player.sendMessage(Messages.success.NAME_CHANGED(args[0]));
         } else {
             player.sendMessage(Messages.error.UNAUTHORIZED);
         }
+
     }
 
     @Override
     public List<String> onTabComplete(Player player, String[] args) {
+        if (args.length == 1) {
+            return new ArrayList<String>(Arrays.asList("<name>"));
+        }
+
         return null;
     }
 
     @Override
     public String getName() {
-        return "unname";
+        return "name";
     }
 
     @Override
     public String help() {
-        return Messages.help.UNNAME;
+        return Messages.help.NAME;
     }
 
     @Override

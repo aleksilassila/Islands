@@ -28,6 +28,7 @@ commands:
   untrust:
     description: Untrust a player
     usage: /<command> player
+
 permissions:
   islands.*:
     description: All islands commands and bypasses
@@ -49,6 +50,7 @@ permissions:
       islands.command.visit: true
       islands.command.setspawn: true
       islands.command.create.custom: true
+      islands.command.save: true
   islands.bypass.*:
     description: Access to all island bypasses
     children:
@@ -120,6 +122,9 @@ permissions:
     default: "op"
   islands.command.untrust:
     description: Access to untrust command
+    default: "op"
+  islands.command.save:
+    description: Access to islands save command
     default: "op"
 
   islands.bypass.islandLimit:

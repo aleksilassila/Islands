@@ -11,11 +11,11 @@ import org.bukkit.entity.Player;
 
 import java.util.List;
 
-public class giveSubcommand extends Subcommand {
+public class GiveSubcommand extends Subcommand {
     private final Islands plugin;
     private final IslandLayout layout;
 
-    public giveSubcommand(Islands plugin) {
+    public GiveSubcommand(Islands plugin) {
         this.plugin = plugin;
         this.layout = plugin.layout;
     }

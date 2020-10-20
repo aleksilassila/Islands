@@ -26,13 +26,14 @@ public class IslandManagmentCommands extends ChatUtils implements TabExecutor {
 
         subcommands = new HashSet<>();
 
-        subcommands.add(new createSubcommand(plugin));
-        subcommands.add(new recreateSubcommand(plugin));
-        subcommands.add(new deleteSubcommand(plugin));
-        subcommands.add(new nameSubcommand(plugin));
-        subcommands.add(new unnameSubcommand(plugin));
-        subcommands.add(new giveSubcommand(plugin));
-        subcommands.add(new setSpawnSubcommand(plugin));
+        subcommands.add(new CreateSubcommand(plugin));
+        subcommands.add(new RecreateSubcommand(plugin));
+        subcommands.add(new DeleteSubcommand(plugin));
+        subcommands.add(new NameSubcommand(plugin));
+        subcommands.add(new UnnameSubcommand(plugin));
+        subcommands.add(new GiveSubcommand(plugin));
+        subcommands.add(new SetSpawnSubcommand(plugin));
+        subcommands.add(new SaveSubcommand(plugin));
     }
 
     @Override

@@ -9,24 +9,29 @@ import org.bukkit.entity.Player;
 
 import java.util.List;
 
-public class deleteSubcommand extends Subcommand {
+public class UnnameSubcommand extends Subcommand {
     private final Islands plugin;
     private final IslandLayout layout;
 
-    public deleteSubcommand(Islands plugin) {
+    public UnnameSubcommand(Islands plugin) {
         this.plugin = plugin;
         this.layout = plugin.layout;
     }
 
     @Override
     public void onCommand(Player player, String[] args, boolean confirmed) {
-        if (!player.hasPermission(Permissions.command.delete)) {
+        if (!player.hasPermission(Permissions.command.unname)) {
             player.sendMessage(Messages.error.NO_PERMISSION);
             return;
         }
 
         if (!player.getWorld().equals(plugin.islandsWorld)) {
             player.sendMessage(Messages.error.WRONG_WORLD);
+            return;
+        }
+
+        if (args.length != 0) {
+            player.sendMessage(Messages.help.UNNAME);
             return;
         }
 
@@ -37,19 +42,20 @@ public class deleteSubcommand extends Subcommand {
             return;
         }
 
-        if (!layout.getUUID(islandId).equals(player.getUniqueId().toString())
-                && !player.hasPermission(Permissions.bypass.delete)) {
+        if (plugin.getIslandsConfig().getInt(islandId + ".home") <= 0
+                || plugin.getIslandsConfig().getString(islandId + ".UUID") == null) {
+            player.sendMessage(Messages.error.ISLAND_NO_OWNER);
+            return;
+        }
+
+        if (layout.getUUID(islandId).equals(player.getUniqueId().toString())
+                || player.hasPermission(Permissions.bypass.unname)) {
+            layout.unnameIsland(islandId);
+
+            player.sendMessage(Messages.success.UNNAMED);
+        } else {
             player.sendMessage(Messages.error.UNAUTHORIZED);
-            return;
         }
-
-        if (!confirmed) {
-            player.sendMessage(Messages.info.CONFIRM);
-            return;
-        }
-
-        layout.deleteIsland(islandId);
-        player.sendMessage(Messages.success.DELETED);
     }
 
     @Override
@@ -59,12 +65,12 @@ public class deleteSubcommand extends Subcommand {
 
     @Override
     public String getName() {
-        return "delete";
+        return "unname";
     }
 
     @Override
     public String help() {
-        return Messages.help.DELETE;
+        return Messages.help.UNNAME;
     }
 
     @Override
