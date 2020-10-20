@@ -393,7 +393,5 @@ public class Islands extends JavaPlugin {
     //  - Generation cooldown
     //  - /ContainerTrust etc.
     //  - Fix giant trees cutting off from top.
-    //  - Remember to inform about config changes
     //  - API ??
-    //  - Save island as schematic
 }

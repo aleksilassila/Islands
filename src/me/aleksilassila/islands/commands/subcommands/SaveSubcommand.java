@@ -52,7 +52,7 @@ public class SaveSubcommand extends Subcommand {
 
             int height;
 
-            try { // FIXME test
+            try {
                 height = args.length == 1
                         ? Integer.parseInt(args[0])
                         : plugin.getIslandsConfig().getInt(islandId + ".height");
@@ -64,7 +64,7 @@ public class SaveSubcommand extends Subcommand {
 
             File file = new File(SAVE_DIRECTORY + name + ".schem");
 
-            try { // FIXME Document errors
+            try {
                 file.getParentFile().mkdirs();
 
                 if (file.exists()) {
