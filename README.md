@@ -14,10 +14,10 @@ Every island is protected by default.
 The owner can `/trust` other players so that they can also interact with blocks and entities. 
 
 **"Base managment."**
-Want to start a new base? Just create a new island. Tired of creating a new world
-multiple times to find the biome of your liking? Well, this plugin lets you chooose that too.
-Personally I just like the idea of placing individual creations of mine on their own islands.
-It also makes saving them in a schematic file a lot easier. (Also I might add this as a feature later)
+Want to start a new base? Just create a new island. Tired of creating a new world multiple times
+to find the biome of your liking? Well, this plugin lets you choose that too. Personally I just
+like the idea of placing individual creations of mine on their own islands.
+It also makes saving them in a schematic file a lot easier. (The plugin has a command for that)
 
 **Resources.**
 Everyone hates monuments that are already raided by another player.
