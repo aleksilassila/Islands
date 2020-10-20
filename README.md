@@ -41,7 +41,7 @@ You can google more about how to schedule reboots and resets.
 
 ## Screenshots
 
-![Jungle](screenshots/islandTypes/jungle_big.png?raw=true)
+![Shapes](screenshots/islandTypes/shapes_showcase.png?raw=true)
 
 ### Functionality
 Available biomes are fetched from `islandsSource` world. 

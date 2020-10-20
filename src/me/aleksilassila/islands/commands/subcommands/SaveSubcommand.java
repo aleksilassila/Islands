@@ -60,26 +60,28 @@ public class SaveSubcommand extends Subcommand {
                 height = plugin.getIslandsConfig().getInt(islandId + ".height");
             }
 
+            if (height == 0) height = islandSize;
+
             File file = new File(SAVE_DIRECTORY + name + ".schem");
 
             try { // FIXME Document errors
                 file.getParentFile().mkdirs();
 
                 if (file.exists()) {
-                    player.sendMessage(Messages.error.ISLAND_SAVE_ERROR);
+                    player.sendMessage(Messages.error.ISLAND_SAVE_ERROR(name));
                     return;
                 }
 
                 file.createNewFile();
             } catch (IOException e) {
-                player.sendMessage(Messages.error.ISLAND_SAVE_ERROR);
+                player.sendMessage(Messages.error.ISLAND_SAVE_ERROR(name));
                 return;
             }
 
             if (SaveHandler.saveSchematic(file, plugin.islandsWorld, startX, startY, startZ, islandSize, height))
                 player.sendMessage(Messages.success.ISLAND_SAVED(name, islandSize, height));
             else
-                player.sendMessage(Messages.error.ISLAND_SAVE_ERROR);
+                player.sendMessage(Messages.error.ISLAND_SAVE_ERROR(name));
 
         } else {
             player.sendMessage(Messages.error.NO_WORLDEDIT);
