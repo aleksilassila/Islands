@@ -119,20 +119,22 @@ public class IslandManagmentCommands extends ChatUtils implements TabExecutor {
 
         Player player = (Player) sender;
 
-        List<String> avalableArgs = new ArrayList<>();
+        List<String> availableArgs = new ArrayList<>();
 
         if (args.length == 1) {
             for (Subcommand subcommand : subcommands) {
-                avalableArgs.add(subcommand.getName());
+                if (subcommand.getPermission() == null || player.hasPermission(subcommand.getPermission()))
+                    availableArgs.add(subcommand.getName());
             }
         } else if (args.length > 1) {
             Subcommand currentSubcommand = getSubcommand(args[0]);
             if (currentSubcommand == null) return null;
 
-            avalableArgs = currentSubcommand.onTabComplete(player, Arrays.copyOfRange(args, 1, args.length));
+            if (currentSubcommand.getPermission() == null || player.hasPermission(currentSubcommand.getPermission()))
+                availableArgs = currentSubcommand.onTabComplete(player, Arrays.copyOfRange(args, 1, args.length));
         }
 
-        return avalableArgs;
+        return availableArgs;
     }
 
     public static class Utils {
