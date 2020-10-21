@@ -19,7 +19,8 @@ public class HelpSubcommand extends Subcommand {
         player.sendMessage(Messages.help.AVAILABLE_COMMANDS);
 
         for (Subcommand subcommand : commands.subcommands) {
-            player.sendMessage(Messages.help.SUBCOMMAND(subcommand));
+            if (subcommand.getPermission() == null || player.hasPermission(subcommand.getPermission()))
+                player.sendMessage(Messages.help.SUBCOMMAND(subcommand));
         }
     }
 

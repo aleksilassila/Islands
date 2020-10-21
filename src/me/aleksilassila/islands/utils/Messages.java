@@ -116,7 +116,7 @@ public class Messages extends ChatUtils {
             public static final String GIVE = ChatColor.GRAY + "/island give <name> (You have to be on target island)";
             public static final String DELETE = ChatColor.GRAY + "/island delete (You have to be on target island)";
             public static final String HOME = error("Usage: /home <id>");
-            public static final String AVAILABLE_COMMANDS = ChatColor.WHITE + "Here's a list of available subcommands:";
+            public static final String AVAILABLE_COMMANDS = ChatColor.WHITE + "Here's a list of subcommands you have access to:";
 
             public static String SUBCOMMAND(Subcommand subcommand) {
                 return ChatColor.WHITE + "" + ChatColor.BOLD + subcommand.getName() + ChatColor.RESET + ChatColor.GRAY + ": " + subcommand.help();
