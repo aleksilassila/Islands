@@ -1,5 +1,6 @@
 package me.aleksilassila.islands.utils;
 
+import me.aleksilassila.islands.commands.Subcommand;
 import org.bukkit.ChatColor;
 
 public class Messages extends ChatUtils {
@@ -31,7 +32,7 @@ public class Messages extends ChatUtils {
                 return error("You took damage recently. You have to wait for " + remainingTime + "s before teleporting.");
             }
 
-            public static final String ISLAND_SAVE_ERROR(String name) {
+            public static String ISLAND_SAVE_ERROR(String name) {
                 return error("Could not save " + name + ".schem.");
             }
 
@@ -44,10 +45,11 @@ public class Messages extends ChatUtils {
             public static final String ISLAND_GEN_SUBTITLE = ChatColor.GOLD + "Use /home to access your island.";
             public static final String UNTRUSTED = success("Player untrusted!");
             public static final String TRUSTED = success("Player trusted!");
-            public static final String SPAWNPOINT_CHANGED = success("Island spawn point changed.");
+            public static final String SPAWN_POINT_CHANGED = success("Island spawn point changed.");
             public static final String OWNER_REMOVED = success("Island owner removed.");
             public static final String GENERATION_DONE = success("Island generation completed.");
             public static final String CLEARING_DONE = success("Island clearing done.");
+            public static final String SPAWN_ISLAND_CHANGED = success("Global spawn island changed.");
 
             public static String OWNER_CHANGED(String name) {
                 return success("Island owner switched to " + name + ".");
@@ -107,14 +109,17 @@ public class Messages extends ChatUtils {
         public static class help {
             public static final String UNTRUST = info("/untrust <player> (You have to be on target island)");
             public static final String TRUST = info("/trust <player> (You have to be on target island)");
-            public static final String SETSPAWN = info("/island setspawn");
             public static final String CREATE = ChatColor.GRAY + "/island create <biome> (<SIZE>)";
             public static final String RECREATE = ChatColor.GRAY + "/island recreate <biome> (<SIZE>) (You have to be on target island)";
             public static final String NAME = ChatColor.GRAY + "/island name <name> (You have to be on target island)";
             public static final String UNNAME = ChatColor.GRAY + "/island unname (You have to be on target island)";
             public static final String GIVE = ChatColor.GRAY + "/island give <name> (You have to be on target island)";
             public static final String DELETE = ChatColor.GRAY + "/island delete (You have to be on target island)";
-            public static final String VISIT = info("Usage: /visit name");
             public static final String HOME = error("Usage: /home <id>");
+            public static final String AVAILABLE_COMMANDS = ChatColor.WHITE + "Here's a list of available subcommands:";
+
+            public static String SUBCOMMAND(Subcommand subcommand) {
+                return ChatColor.WHITE + "" + ChatColor.BOLD + subcommand.getName() + ChatColor.RESET + ChatColor.GRAY + ": " + subcommand.help();
+            }
         }
     }

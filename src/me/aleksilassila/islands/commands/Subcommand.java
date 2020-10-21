@@ -9,5 +9,6 @@ public abstract class Subcommand {
     public abstract List<String> onTabComplete(Player player, String[] args);
     public abstract String getName();
     public abstract String help();
+    public abstract String getPermission();
     public abstract String[] aliases();
 }

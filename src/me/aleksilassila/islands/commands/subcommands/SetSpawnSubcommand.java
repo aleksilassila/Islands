@@ -20,11 +20,6 @@ public class SetSpawnSubcommand extends Subcommand {
 
     @Override
     public void onCommand(Player player, String[] args, boolean confirmed) {
-        if (!player.hasPermission(Permissions.command.setSpawn)) {
-            player.sendMessage(Messages.error.NO_PERMISSION);
-            return;
-        }
-
         if (!player.getWorld().equals(plugin.islandsWorld)) {
             player.sendMessage(Messages.error.WRONG_WORLD);
             return;
@@ -33,7 +28,7 @@ public class SetSpawnSubcommand extends Subcommand {
         String islandId = layout.getIslandId(player.getLocation().getBlockX(), player.getLocation().getBlockZ());
 
         if (islandId == null) {
-            player.sendMessage(Messages.error.UNAUTHORIZED);
+            player.sendMessage(Messages.error.NOT_ON_ISLAND);
             return;
         }
 
@@ -41,11 +36,10 @@ public class SetSpawnSubcommand extends Subcommand {
                 || player.hasPermission(Permissions.bypass.setSpawn)) {
             layout.setSpawnPoint(islandId, player.getLocation().getBlockX(), player.getLocation().getBlockZ());
 
-            player.sendMessage(Messages.success.SPAWNPOINT_CHANGED);
+            player.sendMessage(Messages.success.SPAWN_POINT_CHANGED);
         } else {
             player.sendMessage(Messages.error.UNAUTHORIZED);
         }
-
     }
 
     @Override
@@ -60,7 +54,12 @@ public class SetSpawnSubcommand extends Subcommand {
 
     @Override
     public String help() {
-        return Messages.help.SETSPAWN;
+        return "Sets island spawn point";
+    }
+
+    @Override
+    public String getPermission() {
+        return Permissions.command.setSpawn;
     }
 
     @Override

@@ -20,11 +20,6 @@ public class DeleteSubcommand extends Subcommand {
 
     @Override
     public void onCommand(Player player, String[] args, boolean confirmed) {
-        if (!player.hasPermission(Permissions.command.delete)) {
-            player.sendMessage(Messages.error.NO_PERMISSION);
-            return;
-        }
-
         if (!player.getWorld().equals(plugin.islandsWorld)) {
             player.sendMessage(Messages.error.WRONG_WORLD);
             return;
@@ -33,7 +28,7 @@ public class DeleteSubcommand extends Subcommand {
         String islandId = layout.getIslandId(player.getLocation().getBlockX(), player.getLocation().getBlockZ());
 
         if (islandId == null) {
-            player.sendMessage(Messages.error.UNAUTHORIZED);
+            player.sendMessage(Messages.error.NOT_ON_ISLAND);
             return;
         }
 
@@ -64,7 +59,12 @@ public class DeleteSubcommand extends Subcommand {
 
     @Override
     public String help() {
-        return Messages.help.DELETE;
+        return "Delete island from config";
+    }
+
+    @Override
+    public String getPermission() {
+        return Permissions.command.delete;
     }
 
     @Override

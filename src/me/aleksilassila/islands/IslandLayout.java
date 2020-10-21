@@ -4,7 +4,6 @@ import com.sun.istack.internal.NotNull;
 import com.sun.istack.internal.Nullable;
 import me.aleksilassila.islands.generation.IslandGeneration;
 import me.aleksilassila.islands.utils.BiomeMaterials;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.block.Biome;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -329,6 +328,19 @@ public class IslandLayout {
         getIslandsConfig().set(islandId, null);
 
         plugin.saveIslandsConfig();
+    }
+
+    public boolean setSpawnIsland(String islandId) {
+        if (getIslandsConfig().getConfigurationSection(islandId) == null) return false;
+
+        for (String island : getIslandsConfig().getKeys(false)) {
+            if (getIslandsConfig().getBoolean(island + ".isSpawn")) {
+                getIslandsConfig().set(island + ".isSpawn", false);
+            }
+        }
+
+        getIslandsConfig().set(islandId + ".isSpawn", true);
+        return true;
     }
 
     public static class placement {

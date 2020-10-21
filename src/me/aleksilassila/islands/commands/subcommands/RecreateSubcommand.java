@@ -32,11 +32,6 @@ public class RecreateSubcommand extends Subcommand {
         String islandId;
         Biome targetBiome;
 
-        if (!player.hasPermission(Permissions.command.recreate)) {
-            player.sendMessage(Messages.error.NO_PERMISSION);
-            return;
-        }
-
         int islandSize = args.length == 2 ? plugin.parseIslandSize(args[1]) : plugin.parseIslandSize("");
 
         String permissionRequired = plugin.getCreatePermission(islandSize);
@@ -71,9 +66,11 @@ public class RecreateSubcommand extends Subcommand {
 
         islandId = layout.getIslandId(player.getLocation().getBlockX(), player.getLocation().getBlockZ());
 
-        if (islandId == null ||
-                (!layout.getUUID(islandId).equals(player.getUniqueId().toString())
-                && !player.hasPermission(Permissions.bypass.recreate))) {
+        if (islandId == null) {
+            player.sendMessage(Messages.error.NOT_ON_ISLAND);
+            return;
+        } else if (!layout.getUUID(islandId).equals(player.getUniqueId().toString())
+                && !player.hasPermission(Permissions.bypass.recreate)) {
             player.sendMessage(Messages.error.UNAUTHORIZED);
             return;
         }
@@ -134,7 +131,12 @@ public class RecreateSubcommand extends Subcommand {
 
     @Override
     public String help() {
-        return Messages.help.RECREATE;
+        return "Recreate island";
+    }
+
+    @Override
+    public String getPermission() {
+        return Permissions.command.recreate;
     }
 
     @Override

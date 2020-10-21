@@ -27,6 +27,9 @@ public class Permissions {
         public static final String name = "islands.command.name";
         public static final String unname = "islands.command.unname";
         public static final String setSpawn = "islands.command.setspawn";
+        public static final String makeSpawnIsland = "islands.command.setspawnisland";
+        public static final String island = "islands.command";
+        public static final String save = "islands.command.save";
 
         public static final String home = "islands.command.home";
         public static final String listHomes = "islands.command.home.list";
@@ -34,7 +37,5 @@ public class Permissions {
         public static final String listTrusted = "islands.command.turst.list";
         public static final String untrust = "islands.command.untrust";
         public static final String visit = "islands.command.visit";
-        public static final String island = "islands.command";
-        public static final String save = "islands.command.save";
     }
 }

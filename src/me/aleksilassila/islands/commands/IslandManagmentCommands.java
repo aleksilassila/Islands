@@ -17,7 +17,7 @@ import java.util.*;
 
 public class IslandManagmentCommands extends ChatUtils implements TabExecutor {
     private final Islands plugin;
-    private final Set<Subcommand> subcommands;
+    public final Set<Subcommand> subcommands;
 
     public IslandManagmentCommands(Islands plugin) {
         this.plugin = plugin;
@@ -34,6 +34,8 @@ public class IslandManagmentCommands extends ChatUtils implements TabExecutor {
         subcommands.add(new GiveSubcommand(plugin));
         subcommands.add(new SetSpawnSubcommand(plugin));
         subcommands.add(new SaveSubcommand(plugin));
+        subcommands.add(new SetSpawnIslandSubcommand(plugin));
+        subcommands.add(new HelpSubcommand(this));
     }
 
     @Override
@@ -71,6 +73,12 @@ public class IslandManagmentCommands extends ChatUtils implements TabExecutor {
                 sendHelp(player);
                 return true;
             }
+
+            if (target.getPermission() != null && !player.hasPermission(target.getPermission())) {
+                player.sendMessage(Messages.error.NO_PERMISSION);
+                return true;
+            }
+
             try {
                 target.onCommand(player, Arrays.copyOfRange(args, 1, args.length), confirmed);
                 return true;

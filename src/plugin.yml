@@ -1,5 +1,5 @@
 name: Islands
-version: 4.2.0
+version: 4.3.0
 author: Aleksi Lassila
 main: me.aleksilassila.islands.Islands
 api-version: 1.15
@@ -51,6 +51,7 @@ permissions:
       islands.command.setspawn: true
       islands.command.create.custom: true
       islands.command.save: true
+      islands.command.setspawnisland: true
   islands.bypass.*:
     description: Access to all island bypasses
     children:
@@ -125,6 +126,9 @@ permissions:
     default: "op"
   islands.command.save:
     description: Access to islands save command
+    default: "op"
+  islands.command.setspawnisland:
+    description: Access to island setspawn command
     default: "op"
 
   islands.bypass.islandLimit:

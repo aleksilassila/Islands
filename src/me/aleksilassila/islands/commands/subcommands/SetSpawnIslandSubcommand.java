@@ -7,15 +7,13 @@ import me.aleksilassila.islands.utils.Messages;
 import me.aleksilassila.islands.utils.Permissions;
 import org.bukkit.entity.Player;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
-public class NameSubcommand extends Subcommand {
+public class SetSpawnIslandSubcommand extends Subcommand {
     private final Islands plugin;
     private final IslandLayout layout;
 
-    public NameSubcommand(Islands plugin) {
+    public SetSpawnIslandSubcommand(Islands plugin) {
         this.plugin = plugin;
         this.layout = plugin.layout;
     }
@@ -27,11 +25,6 @@ public class NameSubcommand extends Subcommand {
             return;
         }
 
-        if (args.length != 1) {
-            player.sendMessage(Messages.help.NAME);
-            return;
-        }
-
         String islandId = layout.getIslandId(player.getLocation().getBlockX(), player.getLocation().getBlockZ());
 
         if (islandId == null) {
@@ -39,49 +32,30 @@ public class NameSubcommand extends Subcommand {
             return;
         }
 
-        if (layout.getUUID(islandId).equals(player.getUniqueId().toString())
-                || player.hasPermission(Permissions.bypass.name)) {
-            if (layout.getIslandByName(args[0]) != null) {
-                player.sendMessage(Messages.error.NAME_TAKEN);
-                return;
-            }
-
-            if (plugin.getConfig().getStringList("illegalIslandNames").contains(args[0])) {
-                player.sendMessage(Messages.error.NAME_BLOCKED);
-                return;
-            }
-
-            layout.nameIsland(islandId, args[0]);
-
-            player.sendMessage(Messages.success.NAME_CHANGED(args[0]));
-        } else {
-            player.sendMessage(Messages.error.UNAUTHORIZED);
-        }
-
+        if (!layout.setSpawnIsland(islandId))
+            player.sendMessage(Messages.error.NOT_ON_ISLAND);
+        else
+            player.sendMessage(Messages.success.SPAWN_ISLAND_CHANGED);
     }
 
     @Override
     public List<String> onTabComplete(Player player, String[] args) {
-        if (args.length == 1) {
-            return new ArrayList<String>(Arrays.asList("<name>"));
-        }
-
         return null;
     }
 
     @Override
     public String getName() {
-        return "name";
+        return "makespawnisland";
     }
 
     @Override
     public String help() {
-        return "Name island and make it public";
+        return "Sets island as default respawn island.";
     }
 
     @Override
     public String getPermission() {
-        return Permissions.command.name;
+        return Permissions.command.makeSpawnIsland;
     }
 
     @Override
