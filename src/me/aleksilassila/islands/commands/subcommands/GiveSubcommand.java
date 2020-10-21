@@ -23,7 +23,7 @@ public class GiveSubcommand extends Subcommand {
     @Override
     public void onCommand(Player player, String[] args, boolean confirmed) {
         if (!player.getWorld().equals(plugin.islandsWorld)) {
-            player.sendMessage(Messages.error.WRONG_WORLD);
+            player.sendMessage(Messages.tl("error.WRONG_WORLD"));
             return;
         }
 
@@ -36,7 +36,7 @@ public class GiveSubcommand extends Subcommand {
         String islandId = layout.getIslandId(player.getLocation().getBlockX(), player.getLocation().getBlockZ());
 
         if (islandId == null) {
-            player.sendMessage(Messages.error.NOT_ON_ISLAND);
+            player.sendMessage(Messages.tl("error.NOT_ON_ISLAND"));
             return;
         }
         ConfigurationSection section = plugin.getIslandsConfig().getConfigurationSection(islandId + ".UUID");
@@ -44,7 +44,7 @@ public class GiveSubcommand extends Subcommand {
                 || player.hasPermission(Permissions.bypass.give)) {
             if (plugin.getIslandsConfig().getBoolean(islandId + ".public")) {
                 if (!confirmed) {
-                    player.sendMessage(Messages.info.CONFIRM);
+                    player.sendMessage(Messages.tl("info.CONFIRM"));
                     return;
                 }
 
@@ -52,22 +52,22 @@ public class GiveSubcommand extends Subcommand {
                     Player targetPlayer = Bukkit.getPlayer(args[0]);
 
                     if (targetPlayer == null) {
-                        player.sendMessage(Messages.error.NO_PLAYER_FOUND);
+                        player.sendMessage(Messages.tl("error.NO_PLAYER_FOUND"));
                         return;
                     }
 
                     layout.giveIsland(islandId, targetPlayer);
-                    player.sendMessage(Messages.success.OWNER_CHANGED(args[0]));
-                    targetPlayer.sendMessage(Messages.success.ISLAND_RECEIVED(targetPlayer.getName(), args[0]));
+                    player.sendMessage(Messages.tl("success.OWNER_CHANGED", args[0]));
+                    targetPlayer.sendMessage(Messages.tl("success.ISLAND_RECEIVED", targetPlayer.getName(), args[0]));
                 } else {
                     layout.giveIsland(islandId);
-                    player.sendMessage(Messages.success.OWNER_REMOVED);
+                    player.sendMessage(Messages.tl("success.OWNER_REMOVED"));
                 }
             } else {
-                player.sendMessage(Messages.error.NOT_PUBLIC);
+                player.sendMessage(Messages.tl("error.NOT_PUBLIC"));
             }
         } else {
-            player.sendMessage(Messages.error.UNAUTHORIZED);
+            player.sendMessage(Messages.tl("error.UNAUTHORIZED"));
         }
 
     }

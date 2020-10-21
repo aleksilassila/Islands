@@ -1,3 +1,6 @@
+islandsWorldName: world
+wildernessWorldName: wilderness
+
 defaultIslandLimit: 2
 groupLimits:                            # Requires vault to work, all limits can be bypassed with islands.bypass.islandLimit
   staff: 5
@@ -20,10 +23,6 @@ generation:
   generationDelayInTicks: 0.3           # 2 Will generate 1 row per 2 ticks, 0.5 will generate 2 rows per 1 tick.
   maxVariationsPerBiome: 5              # Max locations generated for each biome, lower the value to speed up server startup.
 
-disableMobsOnIslands: true
-tpCooldownTime: 10                      # /home and /visit cooldown after damage.
-illegalIslandNames:                     # Blocked island names. Useful if you want to reserve name for "official" island
-#  - spawn
 biomeBlacklist:                         # These biomes do not get picked up by island generator.
   - DEEP_OCEAN                          # Ocean biomes work poorly with islands.
   - DEEP_WARM_OCEAN
@@ -35,6 +34,10 @@ biomeBlacklist:                         # These biomes do not get picked up by i
   - MOUNTAINS
   - GRAVELLY_MOUNTAINS
   - MODIFIED_GRAVELLY_MOUNTAINS
+
+disableMobsOnIslands: true
+tpCooldownTime: 10                      # /home and /visit cooldown after damage.
+illegalIslandNames:                     # Blocked island names. Useful if you want to reserve name for "official" island
+#  - spawn
 wildernessCoordinateMultiplier: 4       # Player's x and z coordinates gets multiplied by this value when they jump to wilderness.
-islandsWorldName: world
-wildernessWorldName: wilderness
+locale: en

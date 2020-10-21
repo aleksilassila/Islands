@@ -1,106 +1,60 @@
 package me.aleksilassila.islands.utils;
 
+import me.aleksilassila.islands.Islands;
 import me.aleksilassila.islands.commands.Subcommand;
 import org.bukkit.ChatColor;
 
+import java.text.MessageFormat;
+import java.util.Locale;
+import java.util.Optional;
+import java.util.ResourceBundle;
+
 public class Messages extends ChatUtils {
-        public static class error {
-            public static final String UNAUTHORIZED = error("You don't own this island.");
-            public static final String NOT_PUBLIC = error("The island must be public");
-            public static final String NO_PLAYER_FOUND = error("No given player found.");
-            public static final String NAME_TAKEN = error("That name is already taken.");
-            public static final String ONGOING_QUEUE_EVENT = error("Wait for your current queue event to finish.");
-            public static final String NAME_BLOCKED = error("You can't use that name");
-            public static final String NO_PERMISSION = error("You don't have permission to use that command.");
-            public static final String ISLAND_LIMIT = error("You already have maximum amount of islands.");
-            public static final String WRONG_WORLD = error("You can't use that command in this world.");
-            public static final String SUBCOMMAND_NOT_FOUND = error("Invalid subcommand.");
-            public static final String ERROR = "An internal error occurred. Contact staff.";
-            public static final String NOT_ON_ISLAND = error("You have to be on an island.");
-            public static final String NOT_OWNED = error("You don't own this island.");
-            public static final String PLAYER_NOT_FOUND = error("Player not found.");
-            public static final String ISLAND_NO_OWNER = error("To make an island private, it must have an owner.");
-            public static final String NO_BIOME_FOUND = error("Biome not found.");
-            public static final String NO_LOCATIONS_FOR_BIOME = error("No available locations for specified biome.");
-            public static final String ISLAND_NOT_FOUND = error("404 - Island not found.");
-            public static final String HOME_NOT_FOUND = error("404 - Home not found :(");
-            public static final String NOT_TRUSTED = error("You need owner's permission to interact here.");
-            public static final String INVALID_ISLAND_SIZE = error("Island size exceeds limits.");
-            public static final String NO_WORLDEDIT = error("No WorldEdit found.");
+        public static Messages instance;
+        private static Islands plugin;
 
-            public static String COOLDOWN(int remainingTime) {
-                return error("You took damage recently. You have to wait for " + remainingTime + "s before teleporting.");
+        private static ResourceBundle bundle;
+
+        static String BUNDLE_NAME = "messages";
+
+        public static Messages getInstance(Islands plugin) {
+            if (instance == null) {
+                instance = new Messages();
+                Messages.plugin = plugin;
+
+                Locale locale = new Locale(Optional.ofNullable(plugin.getConfig().getString("locale")).orElse("en"));
+                bundle = ResourceBundle.getBundle(BUNDLE_NAME, locale);
+
+                plugin.getLogger().info("Using " + locale.getDisplayName() + " locales");
             }
 
-            public static String ISLAND_SAVE_ERROR(String name) {
-                return error("Could not save " + name + ".schem.");
-            }
-
+            return instance;
         }
 
-        public static class success {
-            public static final String DELETED = success("Island deleted successfully. It will be overwritten when someone creates a new island.");
-            public static final String UNNAMED = success("Island unnamed and made private.");
-            public static final String ISLAND_GEN_TITLE = ChatColor.GOLD + "Island generation event queued!";
-            public static final String ISLAND_GEN_SUBTITLE = ChatColor.GOLD + "Use /home to access your island.";
-            public static final String UNTRUSTED = success("Player untrusted!");
-            public static final String TRUSTED = success("Player trusted!");
-            public static final String SPAWN_POINT_CHANGED = success("Island spawn point changed.");
-            public static final String OWNER_REMOVED = success("Island owner removed.");
-            public static final String GENERATION_DONE = success("Island generation completed.");
-            public static final String CLEARING_DONE = success("Island clearing done.");
-            public static final String SPAWN_ISLAND_CHANGED = success("Global spawn island changed.");
-
-            public static String OWNER_CHANGED(String name) {
-                return success("Island owner switched to " + name + ".");
+        public static String tl(final String string, final Object... objects) {
+            if (instance == null) {
+                return "";
             }
 
-            public static String NAME_CHANGED(String name) {
-                return success("Island name changed to " + name + ". Anyone with your island name can now visit it.");
+            return instance.format(string, objects);
+        }
+
+        public String format(final String string, final Object... objects) {
+            String format = bundle.getString(string);
+            MessageFormat messageFormat;
+
+            try {
+                messageFormat = new MessageFormat(format);
+            } catch (final IllegalArgumentException e) {
+                plugin.getLogger().severe("Invalid Translation key for '" + string + "': " + e.getMessage());
+                format = format.replaceAll("\\{(\\D*?)\\}", "\\[$1\\]");
+                messageFormat = new MessageFormat(format);
             }
 
-            public static String ISLAND_RECEIVED(String playerName, String islandName) {
-                return success("You are now the owner of " + islandName + " island, previously owned by " + playerName + ".");
-            }
-
-            public static String HOMES_FOUND(int amount) {
-                return success("Found " + amount + " home" + (amount == 1 ? "" : "s") + ".");
-            }
-
-            public static String ISLAND_SAVED(String name, int width, int height) {
-                return success("Island saved as " + name + ".schem. (" + width + "x" + height + "x" + width + ")");
-            }
+            return messageFormat.format(objects);
         }
 
         public static class info {
-            public static final String CONFIRM = info("Are you sure? Repeat the command to confirm.");
-            public static final String ON_SURFACE = info("You can only use this command on surface.");
-            public static final String IN_OVERWORLD = info("You can only use this command in overworld.");
-
-            public static String TRUSTED_INFO(int numberOfPlayers) {
-                return info("You have trusted " + numberOfPlayers + " player(s).");
-            }
-
-            public static String TRUSTED_PLAYER(String displayName) {
-                return ChatColor.GRAY + " - " + displayName;
-            }
-
-            public static String GENERATION_STARTED(double time) {
-                return info("Your generation event has been started. It will take approximately " + (int) time + " seconds.");
-            }
-
-            public static String QUEUE_STATUS(int queueSize) {
-                return info("Your event has been added to the queue. There are " + (queueSize - 1) + " event(s) before yours.");
-            }
-
-            public static String GENERATION_STATUS(int status) {
-                return info("Your generation event is " + status + "% completed.");
-            }
-
-            public static String CLEARING_STATUS(int status) {
-                return info("Clearing event " + status + "% completed.");
-            }
-
             public static String VERSION_INFO(String version) {
                 return info("Islands " + version);
             }

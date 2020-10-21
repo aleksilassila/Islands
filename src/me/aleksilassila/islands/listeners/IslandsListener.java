@@ -137,7 +137,7 @@ public class IslandsListener extends ChatUtils implements Listener {
 
                  e.setCancelled(true);
 
-                 e.getDamager().sendMessage(Messages.error.NOT_TRUSTED);
+                 e.getDamager().sendMessage(Messages.tl("error.NOT_TRUSTED"));
             }
         }
     }
@@ -160,7 +160,7 @@ public class IslandsListener extends ChatUtils implements Listener {
 
                 event.setCancelled(true);
 
-                event.getPlayer().sendMessage(Messages.error.NOT_TRUSTED);
+                event.getPlayer().sendMessage(Messages.tl("error.NOT_TRUSTED"));
             }
         }
     }
@@ -184,7 +184,7 @@ public class IslandsListener extends ChatUtils implements Listener {
 
                 event.setCancelled(true);
 
-                if (ownerUUID != null) event.getPlayer().sendMessage(Messages.error.NOT_TRUSTED);
+                if (ownerUUID != null) event.getPlayer().sendMessage(Messages.tl("error.NOT_TRUSTED"));
             }
 
         }

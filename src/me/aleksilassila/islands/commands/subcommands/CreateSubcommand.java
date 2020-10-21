@@ -34,12 +34,12 @@ public class CreateSubcommand extends Subcommand {
         String permissionRequired = plugin.getCreatePermission(islandSize);
 
         if (!player.hasPermission(permissionRequired)) {
-            player.sendMessage(Messages.error.NO_PERMISSION);
+            player.sendMessage(Messages.tl("error.NO_PERMISSION"));
             return;
         }
 
         if (islandSize < plugin.getSmallestIslandSize() || islandSize + 4 >= layout.islandSpacing) {
-            player.sendMessage(Messages.error.INVALID_ISLAND_SIZE);
+            player.sendMessage(Messages.tl("error.INVALID_ISLAND_SIZE"));
             return;
         }
 
@@ -74,19 +74,19 @@ public class CreateSubcommand extends Subcommand {
         }
 
         if (previousIslands >= islandsLimit && !player.hasPermission(Permissions.bypass.create)) {
-            player.sendMessage(Messages.error.ISLAND_LIMIT);
+            player.sendMessage(Messages.tl("error.ISLAND_LIMIT"));
             return;
         }
 
         Biome targetBiome = utils.getTargetBiome(args[0]);
 
         if (targetBiome == null) {
-            player.sendMessage(Messages.error.NO_BIOME_FOUND);
+            player.sendMessage(Messages.tl("error.NO_BIOME_FOUND"));
             return;
         }
 
         if (!availableLocations.containsKey(targetBiome)) {
-            player.sendMessage(Messages.error.NO_LOCATIONS_FOR_BIOME);
+            player.sendMessage(Messages.tl("error.NO_LOCATIONS_FOR_BIOME"));
             return;
         }
 
@@ -95,17 +95,17 @@ public class CreateSubcommand extends Subcommand {
         try {
             islandId = plugin.createNewIsland(targetBiome, islandSize, player);
         } catch (IllegalArgumentException e) {
-            player.sendMessage(Messages.error.NO_LOCATIONS_FOR_BIOME);
+            player.sendMessage(Messages.tl("error.NO_LOCATIONS_FOR_BIOME"));
 
             return;
         }
 
         if (islandId == null) {
-            player.sendMessage(Messages.error.ONGOING_QUEUE_EVENT);
+            player.sendMessage(Messages.tl("error.ONGOING_QUEUE_EVENT"));
             return;
         }
 
-        player.sendTitle(Messages.success.ISLAND_GEN_TITLE, Messages.success.ISLAND_GEN_SUBTITLE, 10, 20 * 7, 10);
+        player.sendTitle(Messages.tl("success.ISLAND_GEN_TITLE"), Messages.tl("success.ISLAND_GEN_SUBTITLE"), 10, 20 * 7, 10);
     }
 
     @Override

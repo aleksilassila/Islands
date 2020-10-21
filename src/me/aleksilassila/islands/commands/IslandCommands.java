@@ -42,7 +42,7 @@ public class IslandCommands {
             plugin.confirmations.remove(player.getUniqueId().toString());
 
             if (!player.hasPermission(Permissions.command.visit)) {
-                player.sendMessage(Messages.error.NO_PERMISSION);
+                player.sendMessage(Messages.tl("error.NO_PERMISSION"));
                 return true;
             }
 
@@ -53,7 +53,7 @@ public class IslandCommands {
             }
 
             if (!canTeleport(player) && !player.hasPermission(Permissions.bypass.home)) {
-                player.sendMessage(Messages.error.COOLDOWN(teleportCooldown(player)));
+                player.sendMessage(Messages.tl("error.COOLDOWN", teleportCooldown(player)));
                 return true;
             }
 
@@ -62,7 +62,7 @@ public class IslandCommands {
             if (islandId != null) {
                 player.teleport(plugin.layout.getIslandSpawn(islandId));
             } else {
-                player.sendMessage(Messages.error.ISLAND_NOT_FOUND);
+                player.sendMessage(Messages.tl("error.ISLAND_NOT_FOUND"));
             }
 
             return true;
@@ -88,28 +88,28 @@ public class IslandCommands {
 
             if (args.length == 1 && args[0].equalsIgnoreCase("list") || label.equalsIgnoreCase("homes")) {
                 if (!player.hasPermission(Permissions.command.listHomes)) {
-                    player.sendMessage(Messages.error.NO_PERMISSION);
+                    player.sendMessage(Messages.tl("error.NO_PERMISSION"));
                     return true;
                 }
 
                 List<String> ids = plugin.layout.getIslandIds(player.getUniqueId());
 
-                player.sendMessage(Messages.success.HOMES_FOUND(ids.size()));
+                player.sendMessage(Messages.tl("success.HOMES_FOUND", ids.size()));
                 for (String islandId : ids) {
                     String name = plugin.getIslandsConfig().getString(islandId + ".name");
                     String homeNumber = plugin.getIslandsConfig().getString(islandId + ".home");
-                    player.sendMessage(ChatColor.AQUA + " - " + name + " (" + homeNumber + ")");
+                    player.sendMessage(Messages.tl("success.HOME_ITEM", name, homeNumber));
                 }
 
                 return true;
             } else {
                 if (!player.hasPermission(Permissions.command.home)) {
-                    player.sendMessage(Messages.error.NO_PERMISSION);
+                    player.sendMessage(Messages.tl("error.NO_PERMISSION"));
                     return true;
                 }
 
                 if (!canTeleport(player) && !player.hasPermission(Permissions.bypass.home)) {
-                    player.sendMessage(Messages.error.COOLDOWN(teleportCooldown(player)));
+                    player.sendMessage(Messages.tl("error.COOLDOWN", teleportCooldown(player)));
                     return true;
                 }
 
@@ -124,7 +124,7 @@ public class IslandCommands {
             }
 
             if (player.getWorld().getName().equals("world_nether") && !player.hasPermission(Permissions.bypass.home)) {
-                player.sendMessage(Messages.info.IN_OVERWORLD);
+                player.sendMessage(Messages.tl("info.IN_OVERWORLD"));
                 return true;
             }
 
@@ -135,7 +135,7 @@ public class IslandCommands {
                 for (int y = playerLocation.getBlockY(); y < player.getWorld().getHighestBlockYAt(playerLocation); y++) {
                     playerLocation.setY(y);
                     if (player.getWorld().getBlockAt(playerLocation).getBlockData().getMaterial().equals(Material.STONE)) {
-                        player.sendMessage(Messages.info.ON_SURFACE);
+                        player.sendMessage(Messages.tl("info.ON_SURFACE"));
                         return true;
                     }
                 }
@@ -154,7 +154,7 @@ public class IslandCommands {
             if (location != null) {
                 player.teleport(location);
             } else {
-                player.sendMessage(Messages.error.HOME_NOT_FOUND);
+                player.sendMessage(Messages.tl("error.HOME_NOT_FOUND"));
             }
 
             return true;

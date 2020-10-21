@@ -47,7 +47,7 @@ public class IslandManagmentCommands extends ChatUtils implements TabExecutor {
         Player player = (Player) sender;
 
         if (!player.hasPermission(Permissions.command.island)) {
-            player.sendMessage(Messages.error.NO_PERMISSION);
+            player.sendMessage(Messages.tl("error.NO_PERMISSION"));
             return true;
         }
 
@@ -69,13 +69,13 @@ public class IslandManagmentCommands extends ChatUtils implements TabExecutor {
             Subcommand target = getSubcommand(args[0]);
 
             if (target == null) {
-                player.sendMessage(Messages.error.SUBCOMMAND_NOT_FOUND);
+                player.sendMessage(Messages.tl("error.SUBCOMMAND_NOT_FOUND"));
                 sendHelp(player);
                 return true;
             }
 
             if (target.getPermission() != null && !player.hasPermission(target.getPermission())) {
-                player.sendMessage(Messages.error.NO_PERMISSION);
+                player.sendMessage(Messages.tl("error.NO_PERMISSION"));
                 return true;
             }
 
@@ -83,12 +83,12 @@ public class IslandManagmentCommands extends ChatUtils implements TabExecutor {
                 target.onCommand(player, Arrays.copyOfRange(args, 1, args.length), confirmed);
                 return true;
             } catch (Exception e) {
-                player.sendMessage(Messages.error.ERROR);
+                player.sendMessage(Messages.tl("error.ERROR"));
                 return true;
             }
         }
 
-        player.sendMessage(Messages.info.VERSION_INFO(plugin.getDescription().getVersion()));
+        player.sendMessage(Messages.tl("info.VERSION_INFO", plugin.getDescription().getVersion()));
 
         return true;
     }

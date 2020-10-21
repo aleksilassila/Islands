@@ -33,13 +33,13 @@ public class TrustCommands {
             plugin.confirmations.remove(player.getUniqueId().toString());
 
             if (!player.hasPermission(Permissions.command.untrust)) {
-                player.sendMessage(Messages.error.NO_PERMISSION);
+                player.sendMessage(Messages.tl("error.NO_PERMISSION"));
                 return true;
             }
 
 
             if (!player.getWorld().equals(plugin.islandsWorld)) {
-                player.sendMessage(Messages.error.WRONG_WORLD);
+                player.sendMessage(Messages.tl("error.WRONG_WORLD"));
                 return true;
             }
 
@@ -53,25 +53,25 @@ public class TrustCommands {
             String islandId = plugin.layout.getIslandId(player.getLocation().getBlockX(), player.getLocation().getBlockZ());
 
             if (ownerUUID == null || islandId == null) {
-                player.sendMessage(Messages.error.NOT_ON_ISLAND);
+                player.sendMessage(Messages.tl("error.NOT_ON_ISLAND"));
                 return true;
             }
 
             if (!ownerUUID.equals(player.getUniqueId().toString()) && !player.hasPermission(Permissions.bypass.untrust)) {
-                player.sendMessage(Messages.error.NOT_OWNED);
+                player.sendMessage(Messages.tl("error.NOT_OWNED"));
                 return true;
             }
 
             Player targetPlayer = Bukkit.getPlayer(args[0]);
 
             if (targetPlayer == null) {
-                player.sendMessage(Messages.error.PLAYER_NOT_FOUND);
+                player.sendMessage(Messages.tl("error.PLAYER_NOT_FOUND"));
                 return true;
             }
 
             plugin.layout.removeTrusted(islandId, targetPlayer.getUniqueId().toString());
 
-            player.sendMessage(Messages.success.UNTRUSTED);
+            player.sendMessage(Messages.tl("success.UNTRUSTED"));
 
             return true;
         }
@@ -91,7 +91,7 @@ public class TrustCommands {
             plugin.confirmations.remove(player.getUniqueId().toString());
 
             if (!player.hasPermission(Permissions.command.trust)) {
-                player.sendMessage(Messages.error.NO_PERMISSION);
+                player.sendMessage(Messages.tl("error.NO_PERMISSION"));
                 return true;
             }
 
@@ -104,25 +104,25 @@ public class TrustCommands {
             String islandId = plugin.layout.getIslandId(player.getLocation().getBlockX(), player.getLocation().getBlockZ());
 
             if (ownerUUID == null || islandId == null) {
-                player.sendMessage(Messages.error.NOT_ON_ISLAND);
+                player.sendMessage(Messages.tl("error.NOT_ON_ISLAND"));
                 return true;
             }
 
             if (!ownerUUID.equals(player.getUniqueId().toString()) && !player.hasPermission(Permissions.bypass.trust)) {
-                player.sendMessage(Messages.error.NOT_OWNED);
+                player.sendMessage(Messages.tl("error.NOT_OWNED"));
                 return true;
             }
 
             Player targetPlayer = Bukkit.getPlayer(args[0]);
 
             if (targetPlayer == null) {
-                player.sendMessage(Messages.error.PLAYER_NOT_FOUND);
+                player.sendMessage(Messages.tl("error.PLAYER_NOT_FOUND"));
                 return true;
             }
 
             plugin.layout.addTrusted(islandId, targetPlayer.getUniqueId().toString());
 
-            player.sendMessage(Messages.success.TRUSTED);
+            player.sendMessage(Messages.tl("success.TRUSTED"));
 
             return true;
         }
@@ -142,7 +142,7 @@ public class TrustCommands {
             plugin.confirmations.remove(player.getUniqueId().toString());
 
             if (!player.hasPermission(Permissions.command.listTrusted)) {
-                player.sendMessage(Messages.error.NO_PERMISSION);
+                player.sendMessage(Messages.tl("error.NO_PERMISSION"));
                 return true;
             }
 
@@ -150,22 +150,22 @@ public class TrustCommands {
             String islandId = plugin.layout.getIslandId(player.getLocation().getBlockX(), player.getLocation().getBlockZ());
 
             if (ownerUUID == null || islandId == null) {
-                player.sendMessage(Messages.error.NOT_ON_ISLAND);
+                player.sendMessage(Messages.tl("error.NOT_ON_ISLAND"));
                 return true;
             }
 
             if (!ownerUUID.equals(player.getUniqueId().toString()) && !player.hasPermission(Permissions.bypass.listTrusted)) {
-                player.sendMessage(Messages.error.NOT_OWNED);
+                player.sendMessage(Messages.tl("error.NOT_OWNED"));
                 return true;
             }
 
             List<String> trustedList = plugin.layout.getTrusted(islandId);
 
-            player.sendMessage(Messages.info.TRUSTED_INFO(trustedList.size()));
+            player.sendMessage(Messages.tl("info.TRUSTED_INFO", trustedList.size()));
             for (String uuid : trustedList) {
                 Player trustedPlayer = Bukkit.getPlayer(UUID.fromString(uuid));
 
-                if (trustedPlayer != null) player.sendMessage(Messages.info.TRUSTED_PLAYER(trustedPlayer.getDisplayName()));
+                if (trustedPlayer != null) player.sendMessage(Messages.tl("info.TRUSTED_PLAYER", trustedPlayer.getDisplayName()));
             }
 
             return true;

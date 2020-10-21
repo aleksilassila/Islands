@@ -23,7 +23,7 @@ public class NameSubcommand extends Subcommand {
     @Override
     public void onCommand(Player player, String[] args, boolean confirmed) {
         if (!player.getWorld().equals(plugin.islandsWorld)) {
-            player.sendMessage(Messages.error.WRONG_WORLD);
+            player.sendMessage(Messages.tl("error.WRONG_WORLD"));
             return;
         }
 
@@ -35,27 +35,27 @@ public class NameSubcommand extends Subcommand {
         String islandId = layout.getIslandId(player.getLocation().getBlockX(), player.getLocation().getBlockZ());
 
         if (islandId == null) {
-            player.sendMessage(Messages.error.NOT_ON_ISLAND);
+            player.sendMessage(Messages.tl("error.NOT_ON_ISLAND"));
             return;
         }
 
         if (layout.getUUID(islandId).equals(player.getUniqueId().toString())
                 || player.hasPermission(Permissions.bypass.name)) {
             if (layout.getIslandByName(args[0]) != null) {
-                player.sendMessage(Messages.error.NAME_TAKEN);
+                player.sendMessage(Messages.tl("error.NAME_TAKEN"));
                 return;
             }
 
             if (plugin.getConfig().getStringList("illegalIslandNames").contains(args[0])) {
-                player.sendMessage(Messages.error.NAME_BLOCKED);
+                player.sendMessage(Messages.tl("error.NAME_BLOCKED"));
                 return;
             }
 
             layout.nameIsland(islandId, args[0]);
 
-            player.sendMessage(Messages.success.NAME_CHANGED(args[0]));
+            player.sendMessage(Messages.tl("success.NAME_CHANGED", args[0]));
         } else {
-            player.sendMessage(Messages.error.UNAUTHORIZED);
+            player.sendMessage(Messages.tl("error.UNAUTHORIZED"));
         }
 
     }

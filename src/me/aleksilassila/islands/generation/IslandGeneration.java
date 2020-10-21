@@ -67,7 +67,7 @@ public class IslandGeneration {
         popFromQueue(task.player.getUniqueId().toString());
         queue.add(task);
 
-        task.player.sendMessage(Messages.info.QUEUE_STATUS(queue.size()));
+        task.player.sendMessage(Messages.tl("info.QUEUE_STATUS", queue.size() - 1));
     }
 
     @Nullable
@@ -152,16 +152,16 @@ public class IslandGeneration {
                     }
 
                     if (clearingIndex >= plugin.layout.islandSpacing * plugin.layout.islandSpacing) {
-                        player.sendMessage(Messages.success.CLEARING_DONE);
+                        player.sendMessage(Messages.tl("success.CLEARING_DONE"));
 
                         shouldClearArea = false;
                         break;
                     } else if (clearingIndex == plugin.layout.islandSpacing * plugin.layout.islandSpacing / 4) {
-                        player.sendMessage(Messages.info.CLEARING_STATUS(25));
+                        player.sendMessage(Messages.tl("info.CLEARING_STATUS", 25));
                     } else if (clearingIndex == plugin.layout.islandSpacing * plugin.layout.islandSpacing / 2) {
-                        player.sendMessage(Messages.info.CLEARING_STATUS(50));
+                        player.sendMessage(Messages.tl("info.CLEARING_STATUS", 50));
                     } else if (clearingIndex == plugin.layout.islandSpacing * plugin.layout.islandSpacing / 4 * 3) {
-                        player.sendMessage(Messages.info.CLEARING_STATUS(75));
+                        player.sendMessage(Messages.tl("info.CLEARING_STATUS", 75));
                     }
 
                     clearingIndex++;
@@ -213,23 +213,23 @@ public class IslandGeneration {
                     // Update lighting
                     plugin.islandsWorld.getChunkAt(targetX + islandSize / 2, targetZ + islandSize / 2);
 
-                    player.sendMessage(Messages.success.GENERATION_DONE);
+                    player.sendMessage(Messages.tl("success.GENERATION_DONE"));
                     queue.remove(this);
 
                     if (queue.size() > 0) {
                         CopyTask nextTask = queue.get(0);
                         nextTask.runTaskTimer(plugin, 0, buildDelay);
-                        nextTask.player.sendMessage(Messages.info.GENERATION_STARTED(nextTask.islandSize * nextTask.islandSize / 20.0));
+                        nextTask.player.sendMessage(Messages.tl("info.GENERATION_STARTED", nextTask.islandSize * nextTask.islandSize / 20.0));
                     }
 
                     this.cancel();
                     break;
                 } else if (index == islandSize * islandSize / 4) {
-                    player.sendMessage(Messages.info.GENERATION_STATUS(25));
+                    player.sendMessage(Messages.tl("info.GENERATION_STATUS", 25));
                 } else if (index == islandSize * islandSize / 2) {
-                    player.sendMessage(Messages.info.GENERATION_STATUS(50));
+                    player.sendMessage(Messages.tl("info.GENERATION_STATUS", 50));
                 } else if (index == islandSize * islandSize / 4 * 3) {
-                    player.sendMessage(Messages.info.GENERATION_STATUS(75));
+                    player.sendMessage(Messages.tl("info.GENERATION_STATUS", 75));
                 }
 
                 index++;

@@ -12,6 +12,7 @@ import me.aleksilassila.islands.generation.Shape;
 import me.aleksilassila.islands.generation.ShapesLoader;
 import me.aleksilassila.islands.listeners.IslandsListener;
 import me.aleksilassila.islands.utils.ConfirmItem;
+import me.aleksilassila.islands.utils.Messages;
 import me.aleksilassila.islands.utils.Permissions;
 import me.aleksilassila.islands.utils.UpdateChecker;
 import net.milkbowl.vault.permission.Permission;
@@ -109,6 +110,8 @@ public class Islands extends JavaPlugin {
         trustCommands.new ListTrustedCommand();
 
         new IslandsListener(this);
+
+        Messages.getInstance(this);
 
         int pluginId = 8974;
         new Metrics(this, pluginId);
@@ -394,4 +397,6 @@ public class Islands extends JavaPlugin {
     //  - /ContainerTrust etc.
     //  - Fix giant trees cutting off from top.
     //  - API ??
+    //  - Go through messages
+    //  - Explain game styles?
 }
