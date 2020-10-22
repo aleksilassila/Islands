@@ -21,7 +21,7 @@ public class UnnameSubcommand extends Subcommand {
     @Override
     public void onCommand(Player player, String[] args, boolean confirmed) {
         if (!player.getWorld().equals(plugin.islandsWorld)) {
-            player.sendMessage(Messages.tl("error.WRONG_WORLD"));
+            player.sendMessage(Messages.get("error.WRONG_WORLD"));
             return;
         }
 
@@ -33,13 +33,13 @@ public class UnnameSubcommand extends Subcommand {
         String islandId = layout.getIslandId(player.getLocation().getBlockX(), player.getLocation().getBlockZ());
 
         if (islandId == null) {
-            player.sendMessage(Messages.tl("error.NOT_ON_ISLAND"));
+            player.sendMessage(Messages.get("error.NOT_ON_ISLAND"));
             return;
         }
 
         if (plugin.getIslandsConfig().getInt(islandId + ".home") <= 0
                 || plugin.getIslandsConfig().getString(islandId + ".UUID") == null) {
-            player.sendMessage(Messages.tl("error.ISLAND_NO_OWNER"));
+            player.sendMessage(Messages.get("error.ISLAND_NO_OWNER"));
             return;
         }
 
@@ -47,9 +47,9 @@ public class UnnameSubcommand extends Subcommand {
                 || player.hasPermission(Permissions.bypass.unname)) {
             layout.unnameIsland(islandId);
 
-            player.sendMessage(Messages.tl("success.UNNAMED"));
+            player.sendMessage(Messages.get("success.UNNAMED"));
         } else {
-            player.sendMessage(Messages.tl("error.UNAUTHORIZED"));
+            player.sendMessage(Messages.get("error.UNAUTHORIZED"));
         }
     }
 

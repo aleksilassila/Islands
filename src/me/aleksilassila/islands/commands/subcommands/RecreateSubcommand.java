@@ -37,17 +37,17 @@ public class RecreateSubcommand extends Subcommand {
         String permissionRequired = plugin.getCreatePermission(islandSize);
 
         if (!player.hasPermission(permissionRequired)) {
-            player.sendMessage(Messages.tl("error.NO_PERMISSION"));
+            player.sendMessage(Messages.get("error.NO_PERMISSION"));
             return;
         }
 
         if (islandSize < plugin.getSmallestIslandSize() || islandSize + 4 >= layout.islandSpacing) {
-            player.sendMessage(Messages.tl("error.INVALID_ISLAND_SIZE"));
+            player.sendMessage(Messages.get("error.INVALID_ISLAND_SIZE"));
             return;
         }
 
         if (!player.getWorld().equals(plugin.islandsWorld)) {
-            player.sendMessage(Messages.tl("error.WRONG_WORLD"));
+            player.sendMessage(Messages.get("error.WRONG_WORLD"));
             return;
         }
 
@@ -67,28 +67,28 @@ public class RecreateSubcommand extends Subcommand {
         islandId = layout.getIslandId(player.getLocation().getBlockX(), player.getLocation().getBlockZ());
 
         if (islandId == null) {
-            player.sendMessage(Messages.tl("error.NOT_ON_ISLAND"));
+            player.sendMessage(Messages.get("error.NOT_ON_ISLAND"));
             return;
         } else if (!layout.getUUID(islandId).equals(player.getUniqueId().toString())
                 && !player.hasPermission(Permissions.bypass.recreate)) {
-            player.sendMessage(Messages.tl("error.UNAUTHORIZED"));
+            player.sendMessage(Messages.get("error.UNAUTHORIZED"));
             return;
         }
 
         targetBiome = utils.getTargetBiome(args[0]);
 
         if (targetBiome == null) {
-            player.sendMessage(Messages.tl("error.NO_BIOME_FOUND"));
+            player.sendMessage(Messages.get("error.NO_BIOME_FOUND"));
             return;
         }
 
         if (!plugin.islandGeneration.biomes.availableLocations.containsKey(targetBiome)) {
-            player.sendMessage(Messages.tl("error.NO_LOCATIONS_FOR_BIOME"));
+            player.sendMessage(Messages.get("error.NO_LOCATIONS_FOR_BIOME"));
             return;
         }
 
         if (!confirmed) {
-            player.sendMessage(Messages.tl("info.CONFIRM"));
+            player.sendMessage(Messages.get("info.CONFIRM"));
             return;
         }
 
@@ -96,13 +96,13 @@ public class RecreateSubcommand extends Subcommand {
             boolean success = plugin.recreateIsland(islandId, targetBiome, islandSize, player);
 
             if (!success) {
-                player.sendMessage(Messages.tl("error.ONGOING_QUEUE_EVENT"));
+                player.sendMessage(Messages.get("error.ONGOING_QUEUE_EVENT"));
                 return;
             }
 
-            player.sendTitle(Messages.tl("success.ISLAND_GEN_TITLE"), Messages.tl("success.ISLAND_GEN_SUBTITLE"), 10, 20 * 7, 10);
+            player.sendTitle(Messages.get("success.ISLAND_GEN_TITLE"), Messages.get("success.ISLAND_GEN_SUBTITLE"), 10, 20 * 7, 10);
         } catch (IllegalArgumentException e) {
-            player.sendMessage(Messages.tl("error.NO_LOCATIONS_FOR_BIOME"));
+            player.sendMessage(Messages.get("error.NO_LOCATIONS_FOR_BIOME"));
         }
     }
 

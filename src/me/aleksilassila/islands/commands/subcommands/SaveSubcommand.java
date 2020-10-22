@@ -23,14 +23,14 @@ public class SaveSubcommand extends Subcommand {
     @Override
     public void onCommand(Player player, String[] args, boolean confirmed) {
         if (!player.getWorld().equals(plugin.islandsWorld)) {
-            player.sendMessage(Messages.tl("error.WRONG_WORLD"));
+            player.sendMessage(Messages.get("error.WRONG_WORLD"));
             return;
         }
 
         String islandId = plugin.layout.getIslandId(player.getLocation().getBlockX(), player.getLocation().getBlockZ());
 
         if (islandId == null) {
-            player.sendMessage(Messages.tl("error.NOT_ON_ISLAND"));
+            player.sendMessage(Messages.get("error.NOT_ON_ISLAND"));
             return;
         }
 
@@ -63,23 +63,23 @@ public class SaveSubcommand extends Subcommand {
                 file.getParentFile().mkdirs();
 
                 if (file.exists()) {
-                    player.sendMessage(Messages.tl("error.ISLAND_SAVE_ERROR", name));
+                    player.sendMessage(Messages.get("error.ISLAND_SAVE_ERROR", name));
                     return;
                 }
 
                 file.createNewFile();
             } catch (IOException e) {
-                player.sendMessage(Messages.tl("error.ISLAND_SAVE_ERROR", name));
+                player.sendMessage(Messages.get("error.ISLAND_SAVE_ERROR", name));
                 return;
             }
 
             if (SaveHandler.saveSchematic(file, plugin.islandsWorld, startX, startY, startZ, islandSize, height))
-                player.sendMessage(Messages.tl("success.ISLAND_SAVED", name, islandSize, height));
+                player.sendMessage(Messages.get("success.ISLAND_SAVED", name, islandSize, height));
             else
-                player.sendMessage(Messages.tl("error.ISLAND_SAVE_ERROR", name));
+                player.sendMessage(Messages.get("error.ISLAND_SAVE_ERROR", name));
 
         } else {
-            player.sendMessage(Messages.tl("error.NO_WORLDEDIT"));
+            player.sendMessage(Messages.get("error.NO_WORLDEDIT"));
         }
     }
 

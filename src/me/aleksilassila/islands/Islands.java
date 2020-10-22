@@ -111,7 +111,7 @@ public class Islands extends JavaPlugin {
 
         new IslandsListener(this);
 
-        Messages.getInstance(this);
+        Messages.init(this);
 
         int pluginId = 8974;
         new Metrics(this, pluginId);

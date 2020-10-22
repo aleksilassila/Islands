@@ -4,6 +4,9 @@ import me.aleksilassila.islands.Islands;
 import me.aleksilassila.islands.commands.Subcommand;
 import org.bukkit.ChatColor;
 
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLClassLoader;
 import java.text.MessageFormat;
 import java.util.Locale;
 import java.util.Optional;
@@ -17,21 +20,31 @@ public class Messages extends ChatUtils {
 
         static String BUNDLE_NAME = "messages";
 
-        public static Messages getInstance(Islands plugin) {
-            if (instance == null) {
-                instance = new Messages();
-                Messages.plugin = plugin;
-
-                Locale locale = new Locale(Optional.ofNullable(plugin.getConfig().getString("locale")).orElse("en"));
-                bundle = ResourceBundle.getBundle(BUNDLE_NAME, locale);
-
-                plugin.getLogger().info("Using " + locale.getDisplayName() + " locales");
+        public static Messages init(Islands plugin) {
+            if (instance != null) {
+                return instance;
             }
 
+            instance = new Messages();
+            Messages.plugin = plugin;
+
+            Locale locale = new Locale(Optional.ofNullable(plugin.getConfig().getString("locale")).orElse("en"));
+
+            try {
+                URL[] urls = new URL[]{plugin.getDataFolder().toURI().toURL()};
+                ClassLoader loader = new URLClassLoader(urls);
+                bundle = ResourceBundle.getBundle(BUNDLE_NAME, locale, loader);
+            } catch (Exception ignored) {
+                bundle = ResourceBundle.getBundle(BUNDLE_NAME, locale);
+            }
+
+            plugin.getLogger().info("Using " + locale.getDisplayName() + " locales");
+
             return instance;
+
         }
 
-        public static String tl(final String string, final Object... objects) {
+        public static String get(final String string, final Object... objects) {
             if (instance == null) {
                 return "";
             }
