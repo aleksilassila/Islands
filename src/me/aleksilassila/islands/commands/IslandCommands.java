@@ -1,5 +1,6 @@
 package me.aleksilassila.islands.commands;
 
+import me.aleksilassila.islands.GUIs.VisitGUI;
 import me.aleksilassila.islands.IslandLayout;
 import me.aleksilassila.islands.Islands;
 import me.aleksilassila.islands.utils.Messages;
@@ -46,8 +47,7 @@ public class IslandCommands {
             }
 
             if (args.length != 1) {
-//                player.sendMessage(Messages.help.VISIT);
-                player.openInventory(plugin.visitGui.getDefaultInventory());
+                new VisitGUI(plugin, player).open();
                 return true;
             }
 

@@ -3,7 +3,6 @@ package me.aleksilassila.islands;
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import com.sun.istack.internal.NotNull;
 import com.sun.istack.internal.Nullable;
-import me.aleksilassila.islands.commands.GUIs.VisitGui;
 import me.aleksilassila.islands.commands.IslandCommands;
 import me.aleksilassila.islands.commands.IslandManagmentCommands;
 import me.aleksilassila.islands.commands.TrustCommands;
@@ -51,8 +50,6 @@ public class Islands extends JavaPlugin {
     public HashMap<String, ConfirmItem> confirmations;
     public Map<String, Long> teleportCooldowns;
 
-    public VisitGui visitGui;
-
     public Map<String, Integer> definedIslandSizes;
     public Map<Integer, List<Shape>> definedIslandShapes;
 
@@ -85,6 +82,8 @@ public class Islands extends JavaPlugin {
         wildernessWorld = getWilderness();
 
         // ISLANDS
+        Messages.init(this);
+
         teleportCooldowns = new HashMap<>();
         confirmations = new HashMap<>();
 
@@ -93,8 +92,6 @@ public class Islands extends JavaPlugin {
 
         islandGeneration = new IslandGeneration(this);
         layout = new IslandLayout(this);
-
-        visitGui = new VisitGui(this);
 
         new IslandManagmentCommands(this);
 
@@ -110,8 +107,6 @@ public class Islands extends JavaPlugin {
         trustCommands.new ListTrustedCommand();
 
         new IslandsListener(this);
-
-        Messages.init(this);
 
         int pluginId = 8974;
         new Metrics(this, pluginId);

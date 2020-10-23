@@ -1,7 +1,6 @@
 package me.aleksilassila.islands.listeners;
 
 import me.aleksilassila.islands.Islands;
-import me.aleksilassila.islands.commands.GUIs.IVisitGui;
 import me.aleksilassila.islands.utils.ChatUtils;
 import me.aleksilassila.islands.utils.Messages;
 import me.aleksilassila.islands.utils.Permissions;
@@ -17,8 +16,6 @@ import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
-import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerPortalEvent;
@@ -187,22 +184,6 @@ public class IslandsListener extends ChatUtils implements Listener {
                 if (ownerUUID != null) event.getPlayer().sendMessage(Messages.get("error.NOT_TRUSTED"));
             }
 
-        }
-    }
-
-    @EventHandler
-    public void onInventoryClick(InventoryClickEvent event) {
-        if(event.getInventory().getHolder() instanceof IVisitGui) {
-            event.setCancelled(true);
-            IVisitGui gui = (IVisitGui) event.getInventory().getHolder();
-            gui.onInventoryClick((Player) event.getWhoClicked(), event.getRawSlot(), event.getCurrentItem(), event.getView());
-        }
-    }
-
-    @EventHandler
-    public void onInventoryClick(final InventoryDragEvent event) {
-        if (event.getInventory().getHolder() instanceof IVisitGui) {
-            event.setCancelled(true);
         }
     }
 }
