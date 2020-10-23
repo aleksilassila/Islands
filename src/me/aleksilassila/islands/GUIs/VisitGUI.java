@@ -40,6 +40,7 @@ public class VisitGUI {
 
     public Gui getGui() {
         Gui gui = new Gui(PAGE_HEIGHT, Messages.get("info.VISIT_GUI_TITLE", getSort(false)));
+        gui.setOnGlobalClick(event -> event.setCancelled(true));
 
         PaginatedPane pane = new PaginatedPane(0, 0, 9, PAGE_HEIGHT - 1);
 
@@ -56,7 +57,7 @@ public class VisitGUI {
         // Toolbar
 
         OutlinePane background = new OutlinePane(0, PAGE_HEIGHT - 1, 9, 1, Pane.Priority.LOWEST);
-        background.addItem(new GuiItem(createGuiItem(Material.GRAY_STAINED_GLASS_PANE, "", false, ""), inventoryClickEvent -> inventoryClickEvent.setCancelled(true)));
+        background.addItem(new GuiItem(createGuiItem(Material.GRAY_STAINED_GLASS_PANE, ChatColor.RESET + "", false)));
         background.setRepeat(true);
 
         gui.addPane(background);
@@ -64,7 +65,7 @@ public class VisitGUI {
         StaticPane back = new StaticPane(2, PAGE_HEIGHT - 1, 1, 1);
         StaticPane forward = new StaticPane(6, PAGE_HEIGHT - 1, 1, 1);
 
-        back.addItem(new GuiItem(createGuiItem(Material.ARROW, ChatColor.GOLD + "Previous page", false), event -> {
+        back.addItem(new GuiItem(createGuiItem(Material.ARROW, Messages.get("gui.visit.PREVIOUS_PAGE"), false), event -> {
             pane.setPage(pane.getPage() - 1);
 
             if (pane.getPage() == 0) {
@@ -77,7 +78,7 @@ public class VisitGUI {
 
         back.setVisible(false);
 
-        forward.addItem(new GuiItem(createGuiItem(Material.ARROW, ChatColor.GOLD + "Next page", false), event -> {
+        forward.addItem(new GuiItem(createGuiItem(Material.ARROW, Messages.get("gui.visit.NEXT_PAGE"), false), event -> {
 
         pane.setPage(pane.getPage() + 1);
 
@@ -96,7 +97,7 @@ public class VisitGUI {
 
         StaticPane sort = new StaticPane(4, PAGE_HEIGHT - 1, 1, 1);
 
-        sort.addItem(new GuiItem(createGuiItem(Material.REDSTONE, ChatColor.GOLD + "Sort by " + getSort(true), false), event -> {
+        sort.addItem(new GuiItem(createGuiItem(Material.REDSTONE, Messages.get("gui.visit.SORT", getSort(true)), false), event -> {
             toggleSort();
             event.getWhoClicked().closeInventory();
             getGui().show(event.getWhoClicked());
@@ -140,9 +141,9 @@ public class VisitGUI {
             }
 
             pane.addItem(new GuiItem(createGuiItem(BiomeMaterials.valueOf(publicIslands.get(islandId).get("material")).getMaterial(),
-                        ChatColor.GOLD + publicIslands.get(islandId).get("name"),
+                        Messages.get("gui.visit.ISLAND_NAME", publicIslands.get(islandId).get("name")),
                         displayName.equals("Server"),
-                        ChatColor.GRAY + "By " + displayName),
+                        Messages.get("gui.visit.ISLAND_OWNER", displayName)),
                         event -> {
                             if (!(event.getWhoClicked() instanceof Player)) return; // Dunno if this is necessary in practice, cows don't click inventories
 
