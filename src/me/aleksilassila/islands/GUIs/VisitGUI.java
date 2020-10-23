@@ -39,7 +39,7 @@ public class VisitGUI {
     }
 
     public Gui getGui() {
-        Gui gui = new Gui(PAGE_HEIGHT, Messages.get("info.VISIT_GUI_TITLE", getSort(false)));
+        Gui gui = new Gui(PAGE_HEIGHT, Messages.get("gui.visit.TITLE", getSort(false)));
         gui.setOnGlobalClick(event -> event.setCancelled(true));
 
         PaginatedPane pane = new PaginatedPane(0, 0, 9, PAGE_HEIGHT - 1);
