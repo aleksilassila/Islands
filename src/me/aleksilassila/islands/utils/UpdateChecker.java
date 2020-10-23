@@ -10,8 +10,8 @@ import java.util.Scanner;
 import java.util.function.Consumer;
 
 public class UpdateChecker {
-    private Islands plugin;
-    private int resourceId;
+    private final Islands plugin;
+    private final int resourceId;
 
     public UpdateChecker(Islands plugin, int resourceId) {
         this.plugin = plugin;
@@ -25,7 +25,7 @@ public class UpdateChecker {
                     consumer.accept(scanner.next());
                 }
             } catch (IOException exception) {
-                this.plugin.getLogger().info("[Islands] Cannot look for updates: " + exception.getMessage());
+                plugin.getLogger().info("Cannot look for updates: " + exception.getMessage());
             }
         });
     }

@@ -38,7 +38,7 @@ public class VisitGui implements IVisitGui {
         this.plugin = plugin;
 
          // Yes, it updates only on restarts. Good enough.
-        this.inventorySize = Math.min(plugin.layout.getPublicIslands().size() / 9 + 1, 6) * 9;
+        this.inventorySize = Math.min(plugin.layout.getPublicIslands().size() / 9 + 2, 6) * 9;
         this.islandsOnPage = inventorySize - WHITESPACE - 9;
     }
 

@@ -4,7 +4,6 @@ import me.aleksilassila.islands.Islands;
 import me.aleksilassila.islands.commands.Subcommand;
 import org.bukkit.ChatColor;
 
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.text.MessageFormat;
