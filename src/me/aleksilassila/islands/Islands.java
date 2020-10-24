@@ -300,7 +300,7 @@ public class Islands extends JavaPlugin {
         if (getServer().getPluginManager().getPlugin("Vault") == null) return false;
 
         RegisteredServiceProvider<Economy> rsp = getServer().getServicesManager().getRegistration(Economy.class);
-        getLogger().info("rsp null " + (rsp == null));
+
         if (rsp == null) {
             return false;
         }
@@ -310,7 +310,6 @@ public class Islands extends JavaPlugin {
 
         for (String size : Objects.requireNonNull(getConfig().getConfigurationSection("islandSizes")).getKeys(false)) {
             if (getConfig().getDouble("islandPrices." + size) > 0) {
-                getLogger().info("Added cost: " + getConfig().getInt("islandSizes." + size) + " for " + getConfig().getDouble("islandPrices." + size));
                 islandPrices.put(getConfig().getInt("islandSizes." + size), getConfig().getDouble("islandPrices." + size));
             }
         }
