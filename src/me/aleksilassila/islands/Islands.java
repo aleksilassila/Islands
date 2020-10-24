@@ -87,7 +87,9 @@ public class Islands extends JavaPlugin {
 
         islandsWorld = getIslandsWorld();
         islandsSourceWorld = getSourceWorld();
-        wildernessWorld = getWilderness();
+        if (!getConfig().getBoolean("disableWilderness")) {
+            wildernessWorld = getWilderness();
+        }
 
         // ISLANDS
         Messages.init(this);

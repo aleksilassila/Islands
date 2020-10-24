@@ -66,7 +66,7 @@ public class IslandsListener extends ChatUtils implements Listener {
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void onPortalEvent(PlayerPortalEvent event) {
-        if (event.getTo().getWorld().equals(plugin.islandsWorld)) {
+        if (event.getTo().getWorld().equals(plugin.islandsWorld) && plugin.wildernessWorld != null) {
             Location to = event.getTo();
             to.setWorld(plugin.wildernessWorld);
             event.setTo(to);
@@ -96,7 +96,13 @@ public class IslandsListener extends ChatUtils implements Listener {
             Player player = (Player) e.getEntity();
 
             if (e.getCause().equals(EntityDamageEvent.DamageCause.VOID) && player.getWorld().equals(plugin.islandsWorld) && voidTeleport) {
-                World targetWorld = plugin.wildernessWorld;
+                World targetWorld;
+
+                if (plugin.wildernessWorld == null) {
+                    targetWorld = plugin.getServer().getWorlds().get(0);
+                } else {
+                    targetWorld = plugin.wildernessWorld;
+                }
 
                 Location location = player.getLocation();
                 location.setWorld(targetWorld);

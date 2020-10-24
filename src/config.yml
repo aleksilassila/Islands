@@ -53,6 +53,6 @@ illegalIslandNames:                     # Blocked island names. Useful if you wa
 wildernessCoordinateMultiplier: 4       # Player's x and z coordinates gets multiplied by this value when they jump to wilderness.
 voidTeleport: true                      # If enabled, void kills again in islandsWorld
 islandDamage: false                     # Enable / disable damage on islands
-disableWilderness: false                # Do not generate or use wilderness
 restrictIslandBlockFlows: true          # Let water / lava only flow inside a sphere containing island
+disableWilderness: false                # Do not generate wilderness, do not touch unless you know what you are doing
 locale: en
