@@ -52,7 +52,7 @@ public class RecreateSubcommand extends Subcommand {
         }
 
         if (args.length < 1) {
-            new CreateGUI(plugin, player);
+            new CreateGUI(plugin, player, "recreate").open();
             return;
         }
 
@@ -120,8 +120,10 @@ public class RecreateSubcommand extends Subcommand {
         double cost = plugin.islandCosts.getOrDefault(islandSize, 0.0);
         cost += plugin.getConfig().getDouble("economy.recreateCost");
 
-        plugin.econ.withdrawPlayer(player, cost);
-        player.sendMessage(Messages.get("success.ISLAND_PURCHASED", cost));
+        if (cost > 0) {
+            plugin.econ.withdrawPlayer(player, cost);
+            player.sendMessage(Messages.get("success.ISLAND_PURCHASED", cost));
+        }
     }
 
     @Override

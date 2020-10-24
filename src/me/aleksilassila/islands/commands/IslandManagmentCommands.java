@@ -7,6 +7,7 @@ import me.aleksilassila.islands.utils.ChatUtils;
 import me.aleksilassila.islands.utils.ConfirmItem;
 import me.aleksilassila.islands.utils.Messages;
 import me.aleksilassila.islands.utils.Permissions;
+import org.bukkit.Bukkit;
 import org.bukkit.block.Biome;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -35,6 +36,7 @@ public class IslandManagmentCommands extends ChatUtils implements TabExecutor {
         subcommands.add(new SetSpawnSubcommand(plugin));
         subcommands.add(new SaveSubcommand(plugin));
         subcommands.add(new SetSpawnIslandSubcommand(plugin));
+        subcommands.add(new ConfirmSubcommand());
         subcommands.add(new HelpSubcommand(this));
     }
 
@@ -51,20 +53,6 @@ public class IslandManagmentCommands extends ChatUtils implements TabExecutor {
             return true;
         }
 
-        boolean confirmed = false;
-        String issuedCommand = String.join(" ", label, String.join(" ", args));
-
-        ConfirmItem item = plugin.confirmations.get(player.getUniqueId().toString());
-        if (item != null
-                && item.command.equals(issuedCommand)
-                && !item.expired()) {
-            plugin.confirmations.remove(player.getUniqueId().toString());
-
-            confirmed = true;
-        } else {
-            plugin.confirmations.put(player.getUniqueId().toString(), new ConfirmItem(issuedCommand, 8 * 1000));
-        }
-
         if (args.length >= 1) {
             Subcommand target = getSubcommand(args[0]);
 
@@ -77,6 +65,25 @@ public class IslandManagmentCommands extends ChatUtils implements TabExecutor {
             if (target.getPermission() != null && !player.hasPermission(target.getPermission())) {
                 player.sendMessage(Messages.get("error.NO_PERMISSION"));
                 return true;
+            }
+
+            boolean confirmed = false;
+
+            if (target.getName().equalsIgnoreCase("confirm")) {
+                if (!plugin.confirmations.containsKey(player.getUniqueId().toString())) {
+                    player.sendMessage(Messages.get("info.CONFIRM_ERROR"));
+                    return true;
+                }
+
+                String targetCommand = plugin.confirmations.get(player.getUniqueId().toString()).command;
+
+                target = getSubcommand(targetCommand);
+                plugin.confirmations.remove(player.getUniqueId().toString());
+                args = Arrays.copyOfRange(targetCommand.split(" "), 1, targetCommand.split(" ").length);
+                confirmed = true;
+            } else {
+                String issuedCommand = String.join(" ", label, String.join(" ", args));
+                plugin.confirmations.put(player.getUniqueId().toString(), new ConfirmItem(issuedCommand, 8 * 1000));
             }
 
             try {
@@ -95,6 +102,10 @@ public class IslandManagmentCommands extends ChatUtils implements TabExecutor {
 
     @Nullable
     private Subcommand getSubcommand(String name) {
+        if (name.split(" ").length > 1) {
+            name = name.split(" ")[1];
+        }
+
         for (Subcommand subcommand : subcommands) {
             if (subcommand.getName().equalsIgnoreCase(name)) return subcommand;
         }

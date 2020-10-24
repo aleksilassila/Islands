@@ -30,6 +30,7 @@ public class Permissions {
         public static final String makeSpawnIsland = "islands.command.setspawnisland";
         public static final String island = "islands.command";
         public static final String save = "islands.command.save";
+        public static final String confirm = "islands.command.confirm";
 
         public static final String home = "islands.command.home";
         public static final String listHomes = "islands.command.home.list";

@@ -48,7 +48,7 @@ public class CreateSubcommand extends Subcommand {
         HashMap<Biome, List<Location>> availableLocations = plugin.islandGeneration.biomes.availableLocations;
 
         if (args.length < 1) {
-            new CreateGUI(plugin, player).open();
+            new CreateGUI(plugin, player, "create").open();
 
             //            player.sendMessage(Messages.help.CREATE);
 //
@@ -131,8 +131,10 @@ public class CreateSubcommand extends Subcommand {
 
         double cost = plugin.islandCosts.getOrDefault(islandSize, 0.0);
 
-        plugin.econ.withdrawPlayer(player, cost);
-        player.sendMessage(Messages.get("success.ISLAND_PURCHASED", cost));
+        if (cost > 0) {
+            plugin.econ.withdrawPlayer(player, cost);
+            player.sendMessage(Messages.get("success.ISLAND_PURCHASED", cost));
+        }
     }
 
     @Override

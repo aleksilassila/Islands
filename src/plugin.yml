@@ -52,6 +52,7 @@ permissions:
       islands.command.create.custom: true
       islands.command.save: true
       islands.command.setspawnisland: true
+      islands.command.confirm: true
   islands.bypass.*:
     description: Access to all island bypasses
     children:
@@ -99,6 +100,9 @@ permissions:
     default: true
   islands.command.setspawn:
     description: Access to island setspawn command
+    default: true
+  islands.command.confirm:
+    description: Access to confirm command
     default: true
   islands.command.create.custom:
     description: Access to island create custom size command

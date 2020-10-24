@@ -21,12 +21,17 @@ public class CreateGUI extends PageGUI {
     private final Player player;
 
     private int sort = 1;
+    private String subcommand;
+    private double recreateCost;
 
     private final int PAGE_HEIGHT = 4; // < 1
 
-    public CreateGUI(Islands plugin, Player player) {
+    public CreateGUI(Islands plugin, Player player, String subcommand) {
         this.plugin = plugin;
         this.player = player;
+        this.subcommand = subcommand;
+
+        recreateCost = plugin.getConfig().getDouble("economy.recreateCost");
     }
 
     public void open() {
@@ -35,13 +40,6 @@ public class CreateGUI extends PageGUI {
 
     private Gui getGui() {
         Gui gui = createPaginatedGUI(PAGE_HEIGHT, Messages.get("gui.create.TITLE"), availableIslandPanes());
-        gui.setOnTopClick(inventoryClickEvent -> inventoryClickEvent.setCancelled(true));
-
-        return gui;
-    }
-
-    private Gui getSizeGui(Biome biome) {
-        Gui gui = createPaginatedGUI(2, Messages.get("gui.create.SIZE_TITLE"), availableSizePanes("island create " + biome.name()));
         gui.setOnTopClick(inventoryClickEvent -> inventoryClickEvent.setCancelled(true));
 
         return gui;
@@ -75,6 +73,19 @@ public class CreateGUI extends PageGUI {
         return panes;
     }
 
+    private Gui getSizeGui(Biome biome) {
+        Gui gui = createPaginatedGUI(2, Messages.get("gui.create.SIZE_TITLE"), availableSizePanes("island " + subcommand + " " + biome.name()));
+        gui.setOnTopClick(inventoryClickEvent -> inventoryClickEvent.setCancelled(true));
+
+        StaticPane balance = new StaticPane(0, 1, 1, 1);
+
+        balance.addItem(new GuiItem(createGuiItem(Material.EMERALD, Messages.get("gui.create.BALANCE"), true, Messages.get("gui.create.BALANCE_LORE", plugin.econ.getBalance(player)))), 0, 0); // FIXME test without vault
+
+        gui.addPane(balance);
+
+        return gui;
+    }
+
     private List<StaticPane> availableSizePanes(String createCommand) {
         List<StaticPane> panes = new ArrayList<>();
 
@@ -90,12 +101,14 @@ public class CreateGUI extends PageGUI {
             int islandSize = plugin.definedIslandSizes.get(key);
             if (!player.hasPermission(plugin.getCreatePermission(islandSize))) continue;
 
+            double cost = plugin.islandCosts.getOrDefault(islandSize, 0.0) + recreateCost;
+
             pane.addItem(
                     new GuiItem(
                         createGuiItem(
                                 Material.BOOK,
                                 Messages.get("gui.create.SIZE_NAME", key), false,
-                                Messages.get("gui.create.SIZE_LORE", islandSize, plugin.islandCosts.getOrDefault(islandSize, 0.0))),
+                                Messages.get("gui.create.SIZE_LORE", islandSize, cost)),
                         event -> {
                             event.getWhoClicked().closeInventory();
                             ((Player) event.getWhoClicked()).performCommand(createCommand + " " + key);
