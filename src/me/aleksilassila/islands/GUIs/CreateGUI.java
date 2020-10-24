@@ -3,6 +3,7 @@ package me.aleksilassila.islands.GUIs;
 import com.github.stefvanschie.inventoryframework.Gui;
 import com.github.stefvanschie.inventoryframework.GuiItem;
 import com.github.stefvanschie.inventoryframework.pane.StaticPane;
+import com.mysql.fabric.xmlrpc.base.Array;
 import me.aleksilassila.islands.Islands;
 import me.aleksilassila.islands.utils.BiomeMaterials;
 import me.aleksilassila.islands.utils.Messages;
@@ -13,6 +14,7 @@ import org.bukkit.block.Biome;
 import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 
@@ -56,10 +58,14 @@ public class CreateGUI extends PageGUI {
 
         HashMap<Biome, List<Location>> availableLocations = plugin.islandGeneration.biomes.availableLocations;
 
+        List<Biome> sortedSet = new ArrayList<>(availableLocations.keySet());
+
+        sortedSet.sort(Comparator.comparingDouble(a -> BiomeMaterials.valueOf(a.name()).getMaterial().name().charAt(0) + 1 / (double) BiomeMaterials.valueOf(a.name()).getMaterial().name().charAt(1)));
+
         StaticPane pane = new StaticPane(0, 0, 9, PAGE_HEIGHT - 1);
 
         int itemCount = 0;
-        for (Biome biome : availableLocations.keySet()) {
+        for (Biome biome : sortedSet) {
             if (pane.getItems().size() >= (PAGE_HEIGHT - 1) * 9) {
                 panes.add(pane);
                 pane = new StaticPane(0, 0, 9, PAGE_HEIGHT - 1);
