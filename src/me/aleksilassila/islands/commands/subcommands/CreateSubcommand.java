@@ -18,7 +18,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-public class CreateSubcommand extends CreationSubcommand {
+public class CreateSubcommand extends Subcommand {
     private final Islands plugin;
     private final IslandLayout layout;
     private final IslandManagmentCommands.Utils utils = new IslandManagmentCommands.Utils();
@@ -89,7 +89,10 @@ public class CreateSubcommand extends CreationSubcommand {
             return;
         }
 
-        if (!buy(player, islandSize)) return;
+        if (!hasFunds(player, islandSize)) {
+            player.sendMessage(Messages.get("error.INSUFFICIENT_FUNDS"));
+            return;
+        }
 
         if (!availableLocations.containsKey(targetBiome)) {
             player.sendMessage(Messages.get("error.NO_LOCATIONS_FOR_BIOME"));
@@ -111,7 +114,25 @@ public class CreateSubcommand extends CreationSubcommand {
             return;
         }
 
+        pay(player, islandSize);
         player.sendTitle(Messages.get("success.ISLAND_GEN_TITLE"), Messages.get("success.ISLAND_GEN_SUBTITLE"), 10, 20 * 7, 10);
+    }
+
+    private boolean hasFunds(Player player, int islandSize) {
+        if (plugin.econ == null) return true;
+
+        double cost = plugin.islandCosts.getOrDefault(islandSize, 0.0);
+
+        return plugin.econ.has(player, cost);
+    }
+
+    private void pay(Player player, int islandSize) {
+        if (plugin.econ == null) return;
+
+        double cost = plugin.islandCosts.getOrDefault(islandSize, 0.0);
+
+        plugin.econ.withdrawPlayer(player, cost);
+        player.sendMessage(Messages.get("success.ISLAND_PURCHASED", cost));
     }
 
     @Override
@@ -149,10 +170,5 @@ public class CreateSubcommand extends CreationSubcommand {
     @Override
     public String[] aliases() {
         return new String[0];
-    }
-
-    @Override
-    protected Islands getPlugin() {
-        return plugin;
     }
 }

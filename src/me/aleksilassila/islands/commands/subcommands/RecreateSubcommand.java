@@ -1,12 +1,12 @@
 package me.aleksilassila.islands.commands.subcommands;
 
+import me.aleksilassila.islands.GUIs.CreateGUI;
 import me.aleksilassila.islands.IslandLayout;
 import me.aleksilassila.islands.Islands;
 import me.aleksilassila.islands.commands.IslandManagmentCommands;
 import me.aleksilassila.islands.commands.Subcommand;
 import me.aleksilassila.islands.utils.Messages;
 import me.aleksilassila.islands.utils.Permissions;
-import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.block.Biome;
 import org.bukkit.entity.Player;
@@ -15,7 +15,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-public class RecreateSubcommand extends CreationSubcommand {
+public class RecreateSubcommand extends Subcommand {
     private final Islands plugin;
     private final IslandLayout layout;
 
@@ -52,19 +52,14 @@ public class RecreateSubcommand extends CreationSubcommand {
         }
 
         if (args.length < 1) {
-            player.sendMessage(Messages.help.RECREATE);
-
-            for (Biome biome : availableLocations.keySet()) {
-                if (availableLocations.get(biome).size() > 0) {
-                    player.sendMessage(ChatColor.GOLD + biome.toString() + ChatColor.GREEN +  " has " + ChatColor.GOLD
-                            +  availableLocations.get(biome).size() + ChatColor.GREEN +  " island variations available.");
-                }
-            }
-
+            new CreateGUI(plugin, player);
             return;
         }
 
-        if (!buy(player, islandSize)) return;
+        if (!hasFunds(player, islandSize)) {
+            player.sendMessage(Messages.get("error.INSUFFICIENT_FUNDS"));
+            return;
+        }
 
         islandId = layout.getIslandId(player.getLocation().getBlockX(), player.getLocation().getBlockZ());
 
@@ -102,10 +97,31 @@ public class RecreateSubcommand extends CreationSubcommand {
                 return;
             }
 
+            pay(player, islandSize);
+
             player.sendTitle(Messages.get("success.ISLAND_GEN_TITLE"), Messages.get("success.ISLAND_GEN_SUBTITLE"), 10, 20 * 7, 10);
         } catch (IllegalArgumentException e) {
             player.sendMessage(Messages.get("error.NO_LOCATIONS_FOR_BIOME"));
         }
+    }
+
+    private boolean hasFunds(Player player, int islandSize) {
+        if (plugin.econ == null) return true;
+
+        double cost = plugin.islandCosts.getOrDefault(islandSize, 0.0);
+        cost += plugin.getConfig().getDouble("economy.recreateCost");
+
+        return plugin.econ.has(player, cost);
+    }
+
+    private void pay(Player player, int islandSize) {
+        if (plugin.econ == null) return;
+
+        double cost = plugin.islandCosts.getOrDefault(islandSize, 0.0);
+        cost += plugin.getConfig().getDouble("economy.recreateCost");
+
+        plugin.econ.withdrawPlayer(player, cost);
+        player.sendMessage(Messages.get("success.ISLAND_PURCHASED", cost));
     }
 
     @Override
@@ -144,10 +160,5 @@ public class RecreateSubcommand extends CreationSubcommand {
     @Override
     public String[] aliases() {
         return new String[0];
-    }
-
-    @Override
-    protected Islands getPlugin() {
-        return plugin;
     }
 }

@@ -102,8 +102,6 @@ public class CreateGUI extends PageGUI {
                         }
                     ), itemCount % 9, itemCount / 9);
 
-            Bukkit.getLogger().info("Added cost " + Messages.get("gui.create.SIZE_LORE", islandSize, plugin.islandCosts.getOrDefault(islandSize, 0.0)));
-
             itemCount++;
         }
 

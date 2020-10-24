@@ -15,6 +15,9 @@ islandCost:
   NORMAL: 3000
   SMALL: 1000
 
+economy:
+  recreateCost: 0
+
 replaceOnGeneration:                    # Replace blocks when generating new island. Format: toReplace: replaceWith
   iron_ore: stone
   gold_ore: stone
