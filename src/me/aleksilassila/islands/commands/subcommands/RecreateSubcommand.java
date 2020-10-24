@@ -126,13 +126,13 @@ public class RecreateSubcommand extends Subcommand {
     }
 
     private boolean hasFunds(Player player, int islandSize, double cost) {
-        if (plugin.econ == null) return true;
+        if (plugin.econ == null || player.hasPermission(Permissions.bypass.economy)) return true;
 
         return plugin.econ.has(player, cost);
     }
 
     private void pay(Player player, int islandSize, double cost) {
-        if (plugin.econ == null) return;
+        if (plugin.econ == null || player.hasPermission(Permissions.bypass.economy)) return;
 
         if (cost > 0) {
             plugin.econ.withdrawPlayer(player, cost);

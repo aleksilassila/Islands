@@ -16,6 +16,9 @@ public class Permissions {
 
         public static final String interactEverywhere = "islands.bypass.protection";
         public static final String home = "islands.bypass.home";
+        public static final String economy = "islands.bypass.economy";
+        public static final String queue = "islands.bypass.queue";
+        public static final String queueLimit = "islands.bypass.queue.limit";
     }
 
     public static class command {

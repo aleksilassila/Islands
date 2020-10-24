@@ -6,6 +6,7 @@ import com.github.stefvanschie.inventoryframework.pane.StaticPane;
 import me.aleksilassila.islands.Islands;
 import me.aleksilassila.islands.utils.BiomeMaterials;
 import me.aleksilassila.islands.utils.Messages;
+import me.aleksilassila.islands.utils.Permissions;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Biome;
@@ -64,9 +65,14 @@ public class CreateGUI extends PageGUI {
                 pane = new StaticPane(0, 0, 9, PAGE_HEIGHT - 1);
             }
 
-            pane.addItem(new GuiItem(createGuiItem(BiomeMaterials.valueOf(biome.name()).getMaterial(),
-                Messages.get("gui.create.BIOME_NAME", biome.name()),
-                false),
+            pane.addItem(
+                new GuiItem(
+                    createGuiItem(
+                        BiomeMaterials.valueOf(biome.name()).getMaterial(),
+                        Messages.get("gui.create.BIOME_NAME", biome.name()),
+                        false,
+                        Messages.get("gui.create.BIOME_LORE")
+                    ),
                 event -> {
                     getSizeGui(biome).show(event.getWhoClicked());
                 }), (itemCount % (9 * (PAGE_HEIGHT - 1))) % 9, (itemCount % (9 * (PAGE_HEIGHT - 1))) / 9);
@@ -116,20 +122,23 @@ public class CreateGUI extends PageGUI {
                 if (oldCost != null) {
                     cost = Math.max(cost - oldCost, 0);
                 }
+                
+                if (player.hasPermission(Permissions.bypass.economy)) cost = 0;
             }
 
 
             pane.addItem(
-                    new GuiItem(
-                        createGuiItem(
-                                Material.BOOK,
-                                Messages.get("gui.create.SIZE_NAME", key), false,
-                                Messages.get("gui.create.SIZE_LORE", islandSize, cost)),
-                        event -> {
-                            event.getWhoClicked().closeInventory();
-                            ((Player) event.getWhoClicked()).performCommand(createCommand + " " + key);
-                        }
-                    ), itemCount % 9, itemCount / 9);
+                new GuiItem(
+                    createGuiItem(
+                        Material.BOOK,
+                        Messages.get("gui.create.SIZE_NAME", key), false,
+                        Messages.get("gui.create.SIZE_LORE", islandSize, cost)
+                    ),
+                    event -> {
+                        event.getWhoClicked().closeInventory();
+                        ((Player) event.getWhoClicked()).performCommand(createCommand + " " + key);
+                    }
+                ), itemCount % 9, itemCount / 9);
 
             itemCount++;
         }

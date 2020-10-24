@@ -1,5 +1,5 @@
 name: Islands
-version: 4.5.0
+version: 4.5.1
 author: Aleksi Lassila
 main: me.aleksilassila.islands.Islands
 api-version: 1.15
@@ -68,6 +68,9 @@ permissions:
       islands.bypass.protection: true
       islands.bypass.home: true
       islands.bypass.trust.list: true
+      islands.bypass.econonmy: true
+      islands.bypass.queue: true
+      islands.bypass.queue.limit: true
   islands.command.home.*:
     description: Access to home commands
     children:
@@ -170,4 +173,13 @@ permissions:
     default: "op"
   islands.bypass.home:
     description: Bypass home restrictions
+    default: "op"
+  islands.bypass.econonmy:
+    description: Bypass economy restrictions
+    default: "op"
+  islands.bypass.queue:
+    description: Allows creating queue items before all the others
+    default: "op"
+  islands.bypass.queue.limit:
+    description: Bypass queue limit
     default: "op"

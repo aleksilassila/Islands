@@ -14,6 +14,7 @@ import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -87,8 +88,13 @@ public class PageGUI {
 
         meta.setDisplayName(name);
 
-        meta.setLore(Arrays.asList(lore));
+        List<String> lores = new ArrayList<>();
 
+        for (String l : lore) {
+            lores.addAll(Arrays.asList(l.split("\n")));
+        }
+
+        meta.setLore(lores);
         item.setItemMeta(meta);
 
         return item;

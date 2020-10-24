@@ -108,7 +108,7 @@ public class CreateSubcommand extends Subcommand {
     }
 
     private boolean hasFunds(Player player, int islandSize) {
-        if (plugin.econ == null) return true;
+        if (plugin.econ == null || player.hasPermission(Permissions.bypass.economy)) return true;
 
         double cost = plugin.islandPrices.getOrDefault(islandSize, 0.0);
 
@@ -116,7 +116,7 @@ public class CreateSubcommand extends Subcommand {
     }
 
     private void pay(Player player, int islandSize) {
-        if (plugin.econ == null) return;
+        if (plugin.econ == null || player.hasPermission(Permissions.bypass.economy)) return;
 
         double cost = plugin.islandPrices.getOrDefault(islandSize, 0.0);
 
