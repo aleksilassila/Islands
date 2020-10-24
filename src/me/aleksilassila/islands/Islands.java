@@ -25,6 +25,7 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.util.Vector;
 
 import java.io.File;
 import java.io.IOException;
@@ -142,9 +143,11 @@ public class Islands extends JavaPlugin {
                     player,
                     biome,
                     islandSize,
-                    getIslandsConfig().getInt(islandId + ".x"),
-                    getIslandsConfig().getInt(islandId + ".y"),
-                    getIslandsConfig().getInt(islandId + ".z"),
+                    new Vector(
+                            getIslandsConfig().getInt(islandId + ".x"),
+                            getIslandsConfig().getInt(islandId + ".y"),
+                            getIslandsConfig().getInt(islandId + ".z")
+                    ),
                     false,
                     0,
                     0,
@@ -180,9 +183,11 @@ public class Islands extends JavaPlugin {
                     player,
                     biome,
                     islandSize,
-                    getIslandsConfig().getInt(islandId + ".x"),
-                    getIslandsConfig().getInt(islandId + ".y"),
-                    getIslandsConfig().getInt(islandId + ".z"),
+                    new Vector(
+                            getIslandsConfig().getInt(islandId + ".x"),
+                            getIslandsConfig().getInt(islandId + ".y"),
+                            getIslandsConfig().getInt(islandId + ".z")
+                    ),
                     true,
                     getIslandsConfig().getInt(islandId + ".xIndex"),
                     getIslandsConfig().getInt(islandId + ".zIndex"),

@@ -32,6 +32,7 @@ generation:
   islandGridVerticalSpacing: 50         # Vertical space between two islands next to each other.
   generationDelayInTicks: 0.3           # 2 Will generate 1 row per 2 ticks, 0.5 will generate 2 rows per 1 tick.
   maxVariationsPerBiome: 5              # Max locations generated for each biome, lower the value to speed up server startup.
+  clearSpeedMultiplier: 3               # Removing blocks should be faster than placing them, so you might swant to speed up clearing.
 
 biomeBlacklist:                         # These biomes do not get picked up by island generator.
   - DEEP_OCEAN                          # Ocean biomes work poorly with islands.

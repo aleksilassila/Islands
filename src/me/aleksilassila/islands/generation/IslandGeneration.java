@@ -5,26 +5,32 @@ import me.aleksilassila.islands.utils.Messages;
 import me.aleksilassila.islands.utils.Permissions;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.block.Biome;
 import org.bukkit.block.Block;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.util.Vector;
 
 import java.util.*;
 
 public class IslandGeneration {
 
     private final Islands plugin;
+    private final World islandsWorld;
+
     public Biomes biomes;
     public List<CopyTask> queue = new ArrayList<>();
     private final int buildDelay;
     private int rowsBuiltPerDelay = 1;
+    private int rowsClearedPerDelay = 2;
 
     private final Map<Material, Material> replacementMap;
 
     public IslandGeneration(Islands plugin) {
         this.plugin = plugin;
+        this.islandsWorld = plugin.islandsWorld;
         this.biomes = new Biomes(plugin, plugin.islandsSourceWorld);
 
         double delay = plugin.getConfig().getDouble("generation.generationDelayInTicks");
@@ -35,6 +41,7 @@ public class IslandGeneration {
         } else {
             this.buildDelay = (int) delay;
         }
+        this.rowsClearedPerDelay = rowsBuiltPerDelay * plugin.getConfig().getInt("generation.clearSpeedMultiplier");
 
         replacementMap = new HashMap<>();
 
@@ -61,6 +68,49 @@ public class IslandGeneration {
                 }
             }
         }
+    }
+
+    public boolean copyIsland(Player player, Biome biome, int islandSize, Vector target, boolean shouldClearArea, int xIndex, int zIndex, Shape shape) throws IllegalArgumentException {
+        List<Location> locations = biomes.availableLocations.get(biome);
+
+        if (locations == null) {
+            throw new IllegalArgumentException();
+        }
+
+        if (locations.size() == 0) {
+            throw new IllegalArgumentException();
+        }
+
+        Location sourceLocation = locations.get(new Random().nextInt(locations.size()));
+
+        int centerY = 100;
+        while (true) {
+            int centerX = (int) (sourceLocation.getBlockX() + ((double) islandSize) / 2.0);
+            int centerZ = (int) (sourceLocation.getBlockZ() + ((double) islandSize) / 2.0);
+
+            Material material = plugin.islandsSourceWorld.getBlockAt(centerX, centerY, centerZ).getBlockData().getMaterial();
+            if (shape != null && !material.isAir() && !material.isBurnable()) {
+                break;
+            } else if (Arrays.asList(Material.WATER, Material.SANDSTONE, Material.STONE).contains(material)) {
+                break;
+            }
+
+            centerY--;
+        }
+
+        int startX = sourceLocation.getBlockX();
+        int startY = centerY - islandSize / 2;
+        int startZ = sourceLocation.getBlockZ();
+
+        CopyTask task = new CopyTask(player, new Vector(startX, startY, startZ), target, islandSize, shouldClearArea, xIndex, zIndex, shape);
+
+        if (queue.size() == 0) {
+            task.runTaskTimer(plugin, 0, buildDelay);
+        }
+
+        addToQueue(task);
+
+        return true;
     }
 
     public void addToQueue(CopyTask task) {
@@ -101,49 +151,6 @@ public class IslandGeneration {
         return Math.max(queue.size() - 1, 0);
     }
 
-    public boolean copyIsland(Player player, Biome biome, int islandSize, int targetX, int targetY, int targetZ, boolean shouldClearArea, int xIndex, int zIndex, Shape shape) throws IllegalArgumentException {
-        List<Location> locations = biomes.availableLocations.get(biome);
-
-        if (locations == null) {
-            throw new IllegalArgumentException();
-        }
-
-        if (locations.size() == 0) {
-            throw new IllegalArgumentException();
-        }
-
-        Location sourceLocation = locations.get(new Random().nextInt(locations.size()));
-
-        int centerY = 100;
-        while (true) {
-            int centerX = (int) (sourceLocation.getBlockX() + ((double) islandSize) / 2.0);
-            int centerZ = (int) (sourceLocation.getBlockZ() + ((double) islandSize) / 2.0);
-
-            Material material = plugin.islandsSourceWorld.getBlockAt(centerX, centerY, centerZ).getBlockData().getMaterial();
-            if (shape != null && !material.isAir() && !material.isBurnable()) {
-                break;
-            } else if (Arrays.asList(Material.WATER, Material.SANDSTONE, Material.STONE).contains(material)) {
-                break;
-            }
-
-            centerY--;
-        }
-
-        int startX = sourceLocation.getBlockX();
-        int startY = centerY - islandSize / 2;
-        int startZ = sourceLocation.getBlockZ();
-
-        CopyTask task = new CopyTask(player, startX, startY, startZ, targetX, targetY, targetZ, islandSize, shouldClearArea, xIndex, zIndex, shape);
-
-        if (queue.size() == 0) {
-            task.runTaskTimer(plugin, 0, buildDelay);
-        }
-
-        addToQueue(task);
-
-        return true;
-    }
-
     private boolean queueContainsPlayer(Player player) {
         for (CopyTask item : queue) {
             if (item.player.getUniqueId().equals(player.getUniqueId())) return true;
@@ -167,7 +174,7 @@ public class IslandGeneration {
 
         private int index;
 
-        private boolean shouldClearArea;
+        private boolean shouldDoClearing;
         private int clearingIndex;
 
         private final int xIndex;
@@ -175,22 +182,22 @@ public class IslandGeneration {
 
         private final Shape shape;
 
-        public CopyTask(Player player, int startX, int startY, int startZ, int targetX, int targetY, int targetZ, int islandSize, boolean shouldClearArea, int xIndex, int zIndex, Shape shape) {
-            this.startX = startX;
+        public CopyTask(Player player, Vector start, Vector target, int islandSize, boolean shouldDoClearing, int xIndex, int zIndex, Shape shape) {
+            this.startX = start.getBlockX();
 
-            this.startY = shape != null ? startY - (shape.getHeight() - islandSize / 2) : startY;
+            this.startY = shape != null ? start.getBlockY() - (shape.getHeight() - islandSize / 2) : start.getBlockY();
 
-            this.startZ = startZ;
-            this.targetX = targetX;
-            this.targetY = targetY;
-            this.targetZ = targetZ;
+            this.startZ = start.getBlockZ();
+            this.targetX = target.getBlockX();
+            this.targetY = target.getBlockY();
+            this.targetZ = target.getBlockZ();
 
             this.islandSize = islandSize;
             this.islandHeight = shape != null ? shape.getHeight() + islandSize / 2 : islandSize;
 
             this.player = player;
 
-            this.shouldClearArea = shouldClearArea;
+            this.shouldDoClearing = shouldDoClearing;
             this.clearingIndex = 0;
             this.xIndex = xIndex;
             this.zIndex = zIndex;
@@ -202,26 +209,36 @@ public class IslandGeneration {
 
         @Override
         public void run() {
-            if (shouldClearArea) {
-                for (int count = 0; count < rowsBuiltPerDelay; count++) {
-                    for (int y = startY + plugin.layout.islandSpacing; y >= startY; y--) {
-                        int relativeX = clearingIndex / plugin.layout.islandSpacing;
-                        int relativeZ = clearingIndex - relativeX * plugin.layout.islandSpacing;
+            if (shouldDoClearing) {
+                for (int count = 0; count < rowsClearedPerDelay; count++) {
+                    int relativeX = clearingIndex / plugin.layout.islandSpacing;
+                    int relativeZ = clearingIndex - relativeX * plugin.layout.islandSpacing;
 
+                    int realX = xIndex * plugin.layout.islandSpacing + relativeX;
+                    int realZ = zIndex * plugin.layout.islandSpacing + relativeZ;
+
+                    boolean skipDelay = true;
+
+                    for (int y = startY + plugin.layout.islandSpacing; y >= startY; y--) {
                         Block target = plugin.islandsWorld.getBlockAt(
-                                xIndex * plugin.layout.islandSpacing + relativeX,
+                                realX,
                                 targetY + (y - startY),
-                                zIndex * plugin.layout.islandSpacing + relativeZ
+                                realZ
                         );
 
-                        target.setType(Material.AIR);
+                        if (!target.isEmpty()) {
+                            target.setType(Material.AIR);
+                            skipDelay = false;
+                        }
                         target.setBiome(Biome.PLAINS);
                     }
+
+                    if (skipDelay) count--;
 
                     if (clearingIndex >= plugin.layout.islandSpacing * plugin.layout.islandSpacing) {
                         Messages.send(player, "success.CLEARING_DONE");
 
-                        shouldClearArea = false;
+                        shouldDoClearing = false;
                         break;
                     } else if (clearingIndex == plugin.layout.islandSpacing * plugin.layout.islandSpacing / 4) {
                         Messages.send(player, "info.CLEARING_STATUS", 25);
