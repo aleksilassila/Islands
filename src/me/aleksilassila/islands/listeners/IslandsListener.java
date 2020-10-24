@@ -27,11 +27,19 @@ public class IslandsListener extends ChatUtils implements Listener {
     private final Islands plugin;
 
     private final boolean disableMobs;
+    private final boolean voidTeleport;
+    private final boolean islandDamage;
+    private final boolean restrictFlow;
 
     public IslandsListener(Islands plugin) {
         this.plugin = plugin;
 
+        this.voidTeleport = !plugin.getConfig().getKeys(false).contains("voidTeleport")
+                || plugin.getConfig().getBoolean("voidTeleport");
+        this.restrictFlow = plugin.getConfig().getKeys(false).contains("restrictIslandBlockFlows")
+                || plugin.getConfig().getBoolean("restrictIslandBlockFlows");
         this.disableMobs = plugin.getConfig().getBoolean("disableMobsOnIslands");
+        this.islandDamage = plugin.getConfig().getBoolean("islandDamage");
 
         plugin.getServer().getPluginManager().registerEvents(this, plugin);
     }
@@ -74,7 +82,7 @@ public class IslandsListener extends ChatUtils implements Listener {
 
     @EventHandler
     public void onBlockFromTo(BlockFromToEvent event) {
-        if (!event.getBlock().getWorld().equals(plugin.islandsWorld)) return;
+        if (!event.getBlock().getWorld().equals(plugin.islandsWorld) || !restrictFlow) return;
         boolean canFlow = plugin.layout.isBlockInIslandSphere(event.getBlock().getX(), event.getBlock().getY(), event.getBlock().getZ());
 
         if(!canFlow) {
@@ -87,7 +95,7 @@ public class IslandsListener extends ChatUtils implements Listener {
         if (e.getEntity() instanceof Player) {
             Player player = (Player) e.getEntity();
 
-            if (e.getCause().equals(EntityDamageEvent.DamageCause.VOID) && player.getWorld().equals(plugin.islandsWorld)) {
+            if (e.getCause().equals(EntityDamageEvent.DamageCause.VOID) && player.getWorld().equals(plugin.islandsWorld) && voidTeleport) {
                 World targetWorld = plugin.wildernessWorld;
 
                 Location location = player.getLocation();
@@ -110,7 +118,7 @@ public class IslandsListener extends ChatUtils implements Listener {
             } else if (e.getCause().equals(EntityDamageEvent.DamageCause.FALL) && plugin.playersWithNoFall.contains(player)) {
                 plugin.playersWithNoFall.remove(player);
                 e.setCancelled(true);
-            } else if (player.getWorld().equals(plugin.islandsWorld)) {
+            } else if (player.getWorld().equals(plugin.islandsWorld) && !islandDamage) {
                 e.setCancelled(true);
             } else {
                 plugin.teleportCooldowns.put(player.getUniqueId().toString(), new Date().getTime());
