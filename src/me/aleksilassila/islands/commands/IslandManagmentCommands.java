@@ -77,6 +77,11 @@ public class IslandManagmentCommands extends ChatUtils implements TabExecutor {
 
                 String targetCommand = plugin.confirmations.get(player.getUniqueId().toString()).command;
 
+                if (plugin.confirmations.get(player.getUniqueId().toString()).expired()) {
+                    player.sendMessage(Messages.get("info.CONFIRM_EXPIRED"));
+                    return true;
+                }
+
                 target = getSubcommand(targetCommand);
                 plugin.confirmations.remove(player.getUniqueId().toString());
                 args = Arrays.copyOfRange(targetCommand.split(" "), 1, targetCommand.split(" ").length);

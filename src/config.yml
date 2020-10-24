@@ -16,7 +16,8 @@ islandCost:
   SMALL: 1000
 
 economy:
-  recreateCost: 0
+  recreateCost: 0                       # Will be added to island prices when recreating island
+  recreateSum: true                     # When enabled, recreate price will be newIslandPrice - oldIslandPrice and > 0.
 
 replaceOnGeneration:                    # Replace blocks when generating new island. Format: toReplace: replaceWith
   iron_ore: stone

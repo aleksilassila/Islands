@@ -20,9 +20,9 @@ public class CreateGUI extends PageGUI {
     private final Islands plugin;
     private final Player player;
 
-    private int sort = 1;
-    private String subcommand;
-    private double recreateCost;
+    private final String subcommand;
+    private final double recreateCost;
+    private Double oldCost = null;
 
     private final int PAGE_HEIGHT = 4; // < 1
 
@@ -32,6 +32,12 @@ public class CreateGUI extends PageGUI {
         this.subcommand = subcommand;
 
         recreateCost = plugin.getConfig().getDouble("economy.recreateCost");
+    }
+
+    public CreateGUI setOldCost(double cost) {
+        oldCost = cost;
+
+        return this;
     }
 
     public void open() {
@@ -102,6 +108,10 @@ public class CreateGUI extends PageGUI {
             if (!player.hasPermission(plugin.getCreatePermission(islandSize))) continue;
 
             double cost = plugin.islandCosts.getOrDefault(islandSize, 0.0) + recreateCost;
+
+            if (oldCost != null) {
+                cost = Math.max(cost - oldCost, 0);
+            }
 
             pane.addItem(
                     new GuiItem(

@@ -51,16 +51,6 @@ public class RecreateSubcommand extends Subcommand {
             return;
         }
 
-        if (args.length < 1) {
-            new CreateGUI(plugin, player, "recreate").open();
-            return;
-        }
-
-        if (!hasFunds(player, islandSize)) {
-            player.sendMessage(Messages.get("error.INSUFFICIENT_FUNDS"));
-            return;
-        }
-
         islandId = layout.getIslandId(player.getLocation().getBlockX(), player.getLocation().getBlockZ());
 
         if (islandId == null) {
@@ -69,6 +59,32 @@ public class RecreateSubcommand extends Subcommand {
         } else if (!layout.getUUID(islandId).equals(player.getUniqueId().toString())
                 && !player.hasPermission(Permissions.bypass.recreate)) {
             player.sendMessage(Messages.get("error.UNAUTHORIZED"));
+            return;
+        }
+
+        if (args.length < 1) {
+            CreateGUI gui = new CreateGUI(plugin, player, "recreate");
+
+            if (plugin.getConfig().getBoolean("economy.recreateSum")) {
+                double oldCost = plugin.islandCosts.getOrDefault(plugin.getIslandsConfig().getInt(islandId + ".size"), 0.0);
+                gui.setOldCost(oldCost);
+            }
+
+            gui.open();
+            return;
+        }
+
+        double cost = plugin.islandCosts.getOrDefault(islandSize, 0.0);
+        cost += plugin.getConfig().getDouble("economy.recreateCost");
+
+        if (plugin.getConfig().getBoolean("economy.recreateSum")) {
+            double oldCost = plugin.islandCosts.getOrDefault(plugin.getIslandsConfig().getInt(islandId + ".size"), 0.0);
+
+            cost = Math.max(cost - oldCost, 0);
+        }
+
+        if (!hasFunds(player, islandSize, cost)) {
+            player.sendMessage(Messages.get("error.INSUFFICIENT_FUNDS"));
             return;
         }
 
@@ -97,7 +113,7 @@ public class RecreateSubcommand extends Subcommand {
                 return;
             }
 
-            pay(player, islandSize);
+            pay(player, islandSize, cost);
 
             player.sendTitle(Messages.get("success.ISLAND_GEN_TITLE"), Messages.get("success.ISLAND_GEN_SUBTITLE"), 10, 20 * 7, 10);
         } catch (IllegalArgumentException e) {
@@ -105,20 +121,14 @@ public class RecreateSubcommand extends Subcommand {
         }
     }
 
-    private boolean hasFunds(Player player, int islandSize) {
+    private boolean hasFunds(Player player, int islandSize, double cost) {
         if (plugin.econ == null) return true;
-
-        double cost = plugin.islandCosts.getOrDefault(islandSize, 0.0);
-        cost += plugin.getConfig().getDouble("economy.recreateCost");
 
         return plugin.econ.has(player, cost);
     }
 
-    private void pay(Player player, int islandSize) {
+    private void pay(Player player, int islandSize, double cost) {
         if (plugin.econ == null) return;
-
-        double cost = plugin.islandCosts.getOrDefault(islandSize, 0.0);
-        cost += plugin.getConfig().getDouble("economy.recreateCost");
 
         if (cost > 0) {
             plugin.econ.withdrawPlayer(player, cost);
