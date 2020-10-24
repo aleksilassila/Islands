@@ -51,7 +51,7 @@ Supports all overworld biomes.
 Islands are also protected by default. No more "I forgot to protect my base and got griefed".
 Players can trust other players to play together.
 
-![Biomes](screenshots/functionality/biomes.png?raw=true)
+![Biomes](screenshots/functionality/create_gui_biomes.png?raw=true)
 
 Queue system ensures that generating islands does not cause lag.
 Generation speed can also be adjusted.
@@ -75,6 +75,10 @@ Custom island shapes can be created to enhance the look of your islands!
 ![Island Shapes](screenshots/functionality/shapes.png?raw=true)
 
 ![Island Shapes](screenshots/islandTypes/shape_normal.png?raw=true)
+
+Economy integration allows you to set prices for different islands
+
+![Island Shapes](screenshots/functionality/create_gui_size.png?raw=true)
 
 ### Example Islands
 

@@ -23,9 +23,10 @@ replaceOnGeneration:                    # Replace blocks when generating new isl
   iron_ore: stone
   gold_ore: stone
   coal_ore: stone
+  gravel: stone
 
 generation:
-  searchJump: 8                         # How man blocks should be skipped when looking for biomes, bigger faster
+  searchJump: 6                         # How man blocks should be skipped when looking for biomes, bigger faster
   biomeSearchArea: 3500                 # Biome search area, smaller faster. Increase this if you want more biomes to be available.
   islandGridSpacing: 100                # At least the size of island.BIG + 4. Space between island centres.
   islandGridVerticalSpacing: 50         # Vertical space between two islands next to each other.
