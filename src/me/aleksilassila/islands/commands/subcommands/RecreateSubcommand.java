@@ -15,7 +15,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-public class RecreateSubcommand extends Subcommand {
+public class RecreateSubcommand extends CreationSubcommand {
     private final Islands plugin;
     private final IslandLayout layout;
 
@@ -63,6 +63,8 @@ public class RecreateSubcommand extends Subcommand {
 
             return;
         }
+
+        if (!buy(player, islandSize)) return;
 
         islandId = layout.getIslandId(player.getLocation().getBlockX(), player.getLocation().getBlockZ());
 
@@ -142,5 +144,10 @@ public class RecreateSubcommand extends Subcommand {
     @Override
     public String[] aliases() {
         return new String[0];
+    }
+
+    @Override
+    protected Islands getPlugin() {
+        return plugin;
     }
 }

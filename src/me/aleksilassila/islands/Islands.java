@@ -14,6 +14,7 @@ import me.aleksilassila.islands.utils.ConfirmItem;
 import me.aleksilassila.islands.utils.Messages;
 import me.aleksilassila.islands.utils.Permissions;
 import me.aleksilassila.islands.utils.UpdateChecker;
+import net.milkbowl.vault.economy.Economy;
 import net.milkbowl.vault.permission.Permission;
 import org.bukkit.*;
 import org.bukkit.block.Biome;
@@ -40,6 +41,7 @@ public class Islands extends JavaPlugin {
     private File biomesCacheFile;
 
     public Permission perms = null;
+    public Economy econ = null;
     public WorldEditPlugin worldEdit = null;
     public ShapesLoader shapesLoader = null;
 
@@ -49,18 +51,23 @@ public class Islands extends JavaPlugin {
     public Set<Player> playersWithNoFall = new HashSet<>();
     public HashMap<String, ConfirmItem> confirmations;
     public Map<String, Long> teleportCooldowns;
+    public Map<Integer, Double> islandCosts;
 
     public Map<String, Integer> definedIslandSizes;
     public Map<Integer, List<Shape>> definedIslandShapes;
 
     @Override
     public void onEnable() {
+        if (!setupEconomy()) {
+            getLogger().severe("No Vault or economy plugin found. Economy disabled.");
+        }
+
         if (!setupPermissions()) {
             getLogger().severe("No Vault found. Some permissions disabled.");
         }
 
         if (!setupWorldedit()) {
-            getLogger().severe("No WorldEdit found. Island molds disabled.");
+            getLogger().severe("No WorldEdit found. Island shapes disabled.");
         }
 
         new UpdateChecker(this, 84303).getVersion(version -> {
@@ -287,6 +294,28 @@ public class Islands extends JavaPlugin {
             return true;
         }
         return false;
+    }
+
+    private boolean setupEconomy() {
+        if (getServer().getPluginManager().getPlugin("Vault") == null) return false;
+
+        RegisteredServiceProvider<Economy> rsp = getServer().getServicesManager().getRegistration(Economy.class);
+        getLogger().info("rsp null " + (rsp == null));
+        if (rsp == null) {
+            return false;
+        }
+
+        econ = rsp.getProvider();
+        islandCosts = new HashMap<>();
+
+        for (String size : Objects.requireNonNull(getConfig().getConfigurationSection("islandSizes")).getKeys(false)) {
+            if (getConfig().getDouble("islandCost." + size) > 0) {
+                getLogger().info("Added cost: " + getConfig().getInt("islandSizes." + size) + " for " + getConfig().getDouble("islandCost." + size));
+                islandCosts.put(getConfig().getInt("islandSizes." + size), getConfig().getDouble("islandCost." + size));
+            }
+        }
+
+        return true;
     }
 
     private boolean setupWorldedit() {

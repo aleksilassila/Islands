@@ -1,5 +1,7 @@
 package me.aleksilassila.islands.commands.subcommands;
 
+import com.mojang.brigadier.Message;
+import me.aleksilassila.islands.GUIs.CreateGUI;
 import me.aleksilassila.islands.IslandLayout;
 import me.aleksilassila.islands.Islands;
 import me.aleksilassila.islands.commands.IslandManagmentCommands;
@@ -16,7 +18,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-public class CreateSubcommand extends Subcommand {
+public class CreateSubcommand extends CreationSubcommand {
     private final Islands plugin;
     private final IslandLayout layout;
     private final IslandManagmentCommands.Utils utils = new IslandManagmentCommands.Utils();
@@ -46,14 +48,16 @@ public class CreateSubcommand extends Subcommand {
         HashMap<Biome, List<Location>> availableLocations = plugin.islandGeneration.biomes.availableLocations;
 
         if (args.length < 1) {
-            player.sendMessage(Messages.help.CREATE);
+            new CreateGUI(plugin, player).open();
 
-            for (Biome biome : availableLocations.keySet()) {
-                if (availableLocations.get(biome).size() > 0) {
-                    player.sendMessage(ChatColor.GOLD + biome.toString() + ChatColor.GREEN +  " has " + ChatColor.GOLD
-                            +  availableLocations.get(biome).size() + ChatColor.GREEN +  " island variations available.");
-                }
-            }
+            //            player.sendMessage(Messages.help.CREATE);
+//
+//            for (Biome biome : availableLocations.keySet()) {
+//                if (availableLocations.get(biome).size() > 0) {
+//                    player.sendMessage(ChatColor.GOLD + biome.toString() + ChatColor.GREEN +  " has " + ChatColor.GOLD
+//                            +  availableLocations.get(biome).size() + ChatColor.GREEN +  " island variations available.");
+//                }
+//            }
 
             return;
         }
@@ -84,6 +88,8 @@ public class CreateSubcommand extends Subcommand {
             player.sendMessage(Messages.get("error.NO_BIOME_FOUND"));
             return;
         }
+
+        if (!buy(player, islandSize)) return;
 
         if (!availableLocations.containsKey(targetBiome)) {
             player.sendMessage(Messages.get("error.NO_LOCATIONS_FOR_BIOME"));
@@ -143,5 +149,10 @@ public class CreateSubcommand extends Subcommand {
     @Override
     public String[] aliases() {
         return new String[0];
+    }
+
+    @Override
+    protected Islands getPlugin() {
+        return plugin;
     }
 }

@@ -10,6 +10,11 @@ islandSizes:                            # Island sizing. You can add or remove a
   NORMAL: 64
   SMALL: 32
 
+islandCost:
+  BIG: 5000
+  NORMAL: 3000
+  SMALL: 1000
+
 replaceOnGeneration:                    # Replace blocks when generating new island. Format: toReplace: replaceWith
   iron_ore: stone
   gold_ore: stone
