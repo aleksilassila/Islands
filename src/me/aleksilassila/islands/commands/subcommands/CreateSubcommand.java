@@ -1,6 +1,5 @@
 package me.aleksilassila.islands.commands.subcommands;
 
-import com.mojang.brigadier.Message;
 import me.aleksilassila.islands.GUIs.CreateGUI;
 import me.aleksilassila.islands.IslandLayout;
 import me.aleksilassila.islands.Islands;
@@ -8,7 +7,6 @@ import me.aleksilassila.islands.commands.IslandManagmentCommands;
 import me.aleksilassila.islands.commands.Subcommand;
 import me.aleksilassila.islands.utils.Messages;
 import me.aleksilassila.islands.utils.Permissions;
-import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.block.Biome;
 import org.bukkit.configuration.ConfigurationSection;
@@ -50,15 +48,6 @@ public class CreateSubcommand extends Subcommand {
         if (args.length < 1) {
             new CreateGUI(plugin, player, "create").open();
 
-            //            player.sendMessage(Messages.help.CREATE);
-//
-//            for (Biome biome : availableLocations.keySet()) {
-//                if (availableLocations.get(biome).size() > 0) {
-//                    player.sendMessage(ChatColor.GOLD + biome.toString() + ChatColor.GREEN +  " has " + ChatColor.GOLD
-//                            +  availableLocations.get(biome).size() + ChatColor.GREEN +  " island variations available.");
-//                }
-//            }
-
             return;
         }
 
@@ -89,7 +78,7 @@ public class CreateSubcommand extends Subcommand {
             return;
         }
 
-        if (!hasFunds(player, islandSize)) {
+        if (plugin.econ != null && !hasFunds(player, islandSize)) {
             player.sendMessage(Messages.get("error.INSUFFICIENT_FUNDS"));
             return;
         }
@@ -114,14 +103,14 @@ public class CreateSubcommand extends Subcommand {
             return;
         }
 
-        pay(player, islandSize);
+        if (plugin.econ != null) pay(player, islandSize);
         player.sendTitle(Messages.get("success.ISLAND_GEN_TITLE"), Messages.get("success.ISLAND_GEN_SUBTITLE"), 10, 20 * 7, 10);
     }
 
     private boolean hasFunds(Player player, int islandSize) {
         if (plugin.econ == null) return true;
 
-        double cost = plugin.islandCosts.getOrDefault(islandSize, 0.0);
+        double cost = plugin.islandPrices.getOrDefault(islandSize, 0.0);
 
         return plugin.econ.has(player, cost);
     }
@@ -129,7 +118,7 @@ public class CreateSubcommand extends Subcommand {
     private void pay(Player player, int islandSize) {
         if (plugin.econ == null) return;
 
-        double cost = plugin.islandCosts.getOrDefault(islandSize, 0.0);
+        double cost = plugin.islandPrices.getOrDefault(islandSize, 0.0);
 
         if (cost > 0) {
             plugin.econ.withdrawPlayer(player, cost);

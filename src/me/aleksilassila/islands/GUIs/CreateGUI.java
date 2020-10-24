@@ -6,7 +6,6 @@ import com.github.stefvanschie.inventoryframework.pane.StaticPane;
 import me.aleksilassila.islands.Islands;
 import me.aleksilassila.islands.utils.BiomeMaterials;
 import me.aleksilassila.islands.utils.Messages;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Biome;
@@ -83,11 +82,13 @@ public class CreateGUI extends PageGUI {
         Gui gui = createPaginatedGUI(2, Messages.get("gui.create.SIZE_TITLE"), availableSizePanes("island " + subcommand + " " + biome.name()));
         gui.setOnTopClick(inventoryClickEvent -> inventoryClickEvent.setCancelled(true));
 
-        StaticPane balance = new StaticPane(0, 1, 1, 1);
+        if (plugin.econ != null) {
+            StaticPane balance = new StaticPane(0, 1, 1, 1);
 
-        balance.addItem(new GuiItem(createGuiItem(Material.EMERALD, Messages.get("gui.create.BALANCE"), true, Messages.get("gui.create.BALANCE_LORE", plugin.econ.getBalance(player)))), 0, 0); // FIXME test without vault
+            balance.addItem(new GuiItem(createGuiItem(Material.EMERALD, Messages.get("gui.create.BALANCE"), true, Messages.get("gui.create.BALANCE_LORE", plugin.econ.getBalance(player)))), 0, 0); // FIXME test without vault
 
-        gui.addPane(balance);
+            gui.addPane(balance);
+        }
 
         return gui;
     }
@@ -107,11 +108,16 @@ public class CreateGUI extends PageGUI {
             int islandSize = plugin.definedIslandSizes.get(key);
             if (!player.hasPermission(plugin.getCreatePermission(islandSize))) continue;
 
-            double cost = plugin.islandCosts.getOrDefault(islandSize, 0.0) + recreateCost;
+            double cost = 0.0;
 
-            if (oldCost != null) {
-                cost = Math.max(cost - oldCost, 0);
+            if (plugin.econ != null) {
+                cost = plugin.islandPrices.getOrDefault(islandSize, 0.0) + recreateCost;
+
+                if (oldCost != null) {
+                    cost = Math.max(cost - oldCost, 0);
+                }
             }
+
 
             pane.addItem(
                     new GuiItem(

@@ -7,10 +7,10 @@ groupLimits:                            # Requires vault to work, all limits can
 
 islandSizes:                            # Island sizing. You can add or remove as many sizes as you want.
   BIG: 80                               # NORMAL is the fallback size. At least 1 size has to be defined.
-  NORMAL: 64
-  SMALL: 32
+  NORMAL: 64                            # For now due to bukkit api, the default sizes here can be disabled only by
+  SMALL: 32                             # setting their size as 0.
 
-islandCost:
+islandPrices:                           # If vault has been enabled, you can set island creation prices here
   BIG: 5000
   NORMAL: 3000
   SMALL: 1000

@@ -65,8 +65,8 @@ public class RecreateSubcommand extends Subcommand {
         if (args.length < 1) {
             CreateGUI gui = new CreateGUI(plugin, player, "recreate");
 
-            if (plugin.getConfig().getBoolean("economy.recreateSum")) {
-                double oldCost = plugin.islandCosts.getOrDefault(plugin.getIslandsConfig().getInt(islandId + ".size"), 0.0);
+            if (plugin.econ != null && plugin.getConfig().getBoolean("economy.recreateSum")) {
+                double oldCost = plugin.islandPrices.getOrDefault(plugin.getIslandsConfig().getInt(islandId + ".size"), 0.0);
                 gui.setOldCost(oldCost);
             }
 
@@ -74,18 +74,22 @@ public class RecreateSubcommand extends Subcommand {
             return;
         }
 
-        double cost = plugin.islandCosts.getOrDefault(islandSize, 0.0);
-        cost += plugin.getConfig().getDouble("economy.recreateCost");
+        double cost = 0.0;
 
-        if (plugin.getConfig().getBoolean("economy.recreateSum")) {
-            double oldCost = plugin.islandCosts.getOrDefault(plugin.getIslandsConfig().getInt(islandId + ".size"), 0.0);
+        if (plugin.econ != null) {
+            cost = plugin.islandPrices.getOrDefault(islandSize, 0.0);
+            cost += plugin.getConfig().getDouble("economy.recreateCost");
 
-            cost = Math.max(cost - oldCost, 0);
-        }
+            if (plugin.getConfig().getBoolean("economy.recreateSum")) {
+                double oldCost = plugin.islandPrices.getOrDefault(plugin.getIslandsConfig().getInt(islandId + ".size"), 0.0);
 
-        if (!hasFunds(player, islandSize, cost)) {
-            player.sendMessage(Messages.get("error.INSUFFICIENT_FUNDS"));
-            return;
+                cost = Math.max(cost - oldCost, 0);
+            }
+
+            if (!hasFunds(player, islandSize, cost)) {
+                player.sendMessage(Messages.get("error.INSUFFICIENT_FUNDS"));
+                return;
+            }
         }
 
         targetBiome = utils.getTargetBiome(args[0]);
@@ -113,7 +117,7 @@ public class RecreateSubcommand extends Subcommand {
                 return;
             }
 
-            pay(player, islandSize, cost);
+            if (plugin.econ != null) pay(player, islandSize, cost);
 
             player.sendTitle(Messages.get("success.ISLAND_GEN_TITLE"), Messages.get("success.ISLAND_GEN_SUBTITLE"), 10, 20 * 7, 10);
         } catch (IllegalArgumentException e) {

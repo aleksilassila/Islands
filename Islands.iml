@@ -8,9 +8,9 @@
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" exported="" name="spigot-1.16.2" level="project" />
-    <orderEntry type="library" name="Vault" level="project" />
     <orderEntry type="library" name="spigot" level="project" />
     <orderEntry type="library" name="WorldEdit" level="project" />
     <orderEntry type="library" name="IF-0.7.2" level="project" />
+    <orderEntry type="library" name="Vault" level="project" />
   </component>
 </module>

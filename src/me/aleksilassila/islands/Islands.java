@@ -51,7 +51,7 @@ public class Islands extends JavaPlugin {
     public Set<Player> playersWithNoFall = new HashSet<>();
     public HashMap<String, ConfirmItem> confirmations;
     public Map<String, Long> teleportCooldowns;
-    public Map<Integer, Double> islandCosts;
+    public Map<Integer, Double> islandPrices;
 
     public Map<String, Integer> definedIslandSizes;
     public Map<Integer, List<Shape>> definedIslandShapes;
@@ -306,12 +306,12 @@ public class Islands extends JavaPlugin {
         }
 
         econ = rsp.getProvider();
-        islandCosts = new HashMap<>();
+        islandPrices = new HashMap<>();
 
         for (String size : Objects.requireNonNull(getConfig().getConfigurationSection("islandSizes")).getKeys(false)) {
-            if (getConfig().getDouble("islandCost." + size) > 0) {
-                getLogger().info("Added cost: " + getConfig().getInt("islandSizes." + size) + " for " + getConfig().getDouble("islandCost." + size));
-                islandCosts.put(getConfig().getInt("islandSizes." + size), getConfig().getDouble("islandCost." + size));
+            if (getConfig().getDouble("islandPrices." + size) > 0) {
+                getLogger().info("Added cost: " + getConfig().getInt("islandSizes." + size) + " for " + getConfig().getDouble("islandPrices." + size));
+                islandPrices.put(getConfig().getInt("islandSizes." + size), getConfig().getDouble("islandPrices." + size));
             }
         }
 
