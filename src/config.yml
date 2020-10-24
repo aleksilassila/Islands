@@ -54,5 +54,5 @@ wildernessCoordinateMultiplier: 4       # Player's x and z coordinates gets mult
 voidTeleport: true                      # If enabled, void kills again in islandsWorld
 islandDamage: false                     # Enable / disable damage on islands
 restrictIslandBlockFlows: true          # Let water / lava only flow inside a sphere containing island
-disableWilderness: false                # Do not generate wilderness, do not touch unless you know what you are doing
+disableWilderness: false                # Disable wilderness, do not touch unless you know what you are doing
 locale: en
