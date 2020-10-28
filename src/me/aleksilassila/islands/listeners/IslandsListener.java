@@ -36,7 +36,7 @@ public class IslandsListener extends ChatUtils implements Listener {
 
         this.voidTeleport = !plugin.getConfig().getKeys(false).contains("voidTeleport")
                 || plugin.getConfig().getBoolean("voidTeleport");
-        this.restrictFlow = plugin.getConfig().getKeys(false).contains("restrictIslandBlockFlows")
+        this.restrictFlow = !plugin.getConfig().getKeys(false).contains("restrictIslandBlockFlows")
                 || plugin.getConfig().getBoolean("restrictIslandBlockFlows");
         this.disableMobs = plugin.getConfig().getBoolean("disableMobsOnIslands");
         this.islandDamage = plugin.getConfig().getBoolean("islandDamage");
