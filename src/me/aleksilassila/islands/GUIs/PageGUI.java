@@ -21,7 +21,7 @@ import java.util.List;
 public class PageGUI {
     protected Gui createPaginatedGUI(int pageHeight, String title, List<StaticPane> pages) {
         Gui gui = new Gui(pageHeight, title);
-        gui.setOnGlobalClick(event -> event.setCancelled(true));
+        gui.setOnTopClick(event -> event.setCancelled(true));
 
         PaginatedPane pane = new PaginatedPane(0, 0, 9, pageHeight - 1);
 

@@ -4,18 +4,12 @@ import me.aleksilassila.islands.GUIs.CreateGUI;
 import me.aleksilassila.islands.IslandLayout;
 import me.aleksilassila.islands.Islands;
 import me.aleksilassila.islands.commands.IslandManagmentCommands;
-import me.aleksilassila.islands.commands.Subcommand;
 import me.aleksilassila.islands.utils.Messages;
 import me.aleksilassila.islands.utils.Permissions;
-import org.bukkit.Location;
 import org.bukkit.block.Biome;
 import org.bukkit.entity.Player;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-
-public class RecreateSubcommand extends Subcommand {
+public class RecreateSubcommand extends GenerationSubcommands {
     private final Islands plugin;
     private final IslandLayout layout;
 
@@ -28,30 +22,16 @@ public class RecreateSubcommand extends Subcommand {
 
     @Override
     public void onCommand(Player player, String[] args, boolean confirmed) {
-        HashMap<Biome, List<Location>> availableLocations = plugin.islandGeneration.biomes.availableLocations;
-        String islandId;
-        Biome targetBiome;
-
         int islandSize = args.length == 2 ? plugin.parseIslandSize(args[1]) : plugin.parseIslandSize("");
 
-        String permissionRequired = plugin.getCreatePermission(islandSize);
-
-        if (!player.hasPermission(permissionRequired)) {
-            player.sendMessage(Messages.get("error.NO_PERMISSION"));
-            return;
-        }
-
-        if (islandSize < plugin.getSmallestIslandSize() || islandSize + 4 >= layout.islandSpacing) {
-            player.sendMessage(Messages.get("error.INVALID_ISLAND_SIZE"));
-            return;
-        }
+        if (!validateCommand(player, islandSize)) return;
 
         if (!player.getWorld().equals(plugin.islandsWorld)) {
             player.sendMessage(Messages.get("error.WRONG_WORLD"));
             return;
         }
 
-        islandId = layout.getIslandId(player.getLocation().getBlockX(), player.getLocation().getBlockZ());
+        String islandId = layout.getIslandId(player.getLocation().getBlockX(), player.getLocation().getBlockZ());
 
         if (islandId == null) {
             player.sendMessage(Messages.get("error.NOT_ON_ISLAND"));
@@ -86,13 +66,13 @@ public class RecreateSubcommand extends Subcommand {
                 cost = Math.max(cost - oldCost, 0);
             }
 
-            if (!hasFunds(player, islandSize, cost)) {
+            if (!hasFunds(player, cost)) {
                 player.sendMessage(Messages.get("error.INSUFFICIENT_FUNDS"));
                 return;
             }
         }
 
-        targetBiome = utils.getTargetBiome(args[0]);
+        Biome targetBiome = utils.getTargetBiome(args[0]);
 
         if (targetBiome == null) {
             player.sendMessage(Messages.get("error.NO_BIOME_FOUND"));
@@ -117,7 +97,7 @@ public class RecreateSubcommand extends Subcommand {
                 return;
             }
 
-            if (plugin.econ != null) pay(player, islandSize, cost);
+            if (plugin.econ != null) pay(player, cost);
 
             player.sendTitle(Messages.get("success.ISLAND_GEN_TITLE"), Messages.get("success.ISLAND_GEN_SUBTITLE"), 10, 20 * 7, 10);
         } catch (IllegalArgumentException e) {
@@ -125,37 +105,9 @@ public class RecreateSubcommand extends Subcommand {
         }
     }
 
-    private boolean hasFunds(Player player, int islandSize, double cost) {
-        if (plugin.econ == null || player.hasPermission(Permissions.bypass.economy)) return true;
-
-        return plugin.econ.has(player, cost);
-    }
-
-    private void pay(Player player, int islandSize, double cost) {
-        if (plugin.econ == null || player.hasPermission(Permissions.bypass.economy)) return;
-
-        if (cost > 0) {
-            plugin.econ.withdrawPlayer(player, cost);
-            player.sendMessage(Messages.get("success.ISLAND_PURCHASED", cost));
-        }
-    }
-
     @Override
-    public List<String> onTabComplete(Player player, String[] args) {
-        List<String> availableArgs = new ArrayList<>();
-
-        if (args.length == 1) {
-            HashMap<Biome, List<Location>> availableLocations = plugin.islandGeneration.biomes.availableLocations;
-
-            for (Biome biome : availableLocations.keySet()) {
-                availableArgs.add(biome.name());
-            }
-
-        } else if (args.length == 2) {
-            availableArgs.addAll(plugin.definedIslandSizes.keySet());
-        }
-
-        return availableArgs;
+    Islands getPlugin() {
+        return plugin;
     }
 
     @Override

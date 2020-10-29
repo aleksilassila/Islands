@@ -4,7 +4,6 @@ import me.aleksilassila.islands.GUIs.CreateGUI;
 import me.aleksilassila.islands.IslandLayout;
 import me.aleksilassila.islands.Islands;
 import me.aleksilassila.islands.commands.IslandManagmentCommands;
-import me.aleksilassila.islands.commands.Subcommand;
 import me.aleksilassila.islands.utils.Messages;
 import me.aleksilassila.islands.utils.Permissions;
 import org.bukkit.Location;
@@ -12,11 +11,10 @@ import org.bukkit.block.Biome;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-public class CreateSubcommand extends Subcommand {
+public class CreateSubcommand extends GenerationSubcommands {
     private final Islands plugin;
     private final IslandLayout layout;
     private final IslandManagmentCommands.Utils utils = new IslandManagmentCommands.Utils();
@@ -31,17 +29,7 @@ public class CreateSubcommand extends Subcommand {
     public void onCommand(Player player, String[] args, boolean confirmed) {
         int islandSize = args.length == 2 ? plugin.parseIslandSize(args[1]) : plugin.parseIslandSize("");
 
-        String permissionRequired = plugin.getCreatePermission(islandSize);
-
-        if (!player.hasPermission(permissionRequired)) {
-            player.sendMessage(Messages.get("error.NO_PERMISSION"));
-            return;
-        }
-
-        if (islandSize < plugin.getSmallestIslandSize() || islandSize + 4 >= layout.islandSpacing) {
-            player.sendMessage(Messages.get("error.INVALID_ISLAND_SIZE"));
-            return;
-        }
+        if (!validateCommand(player, islandSize)) return;
 
         HashMap<Biome, List<Location>> availableLocations = plugin.islandGeneration.biomes.availableLocations;
 
@@ -50,7 +38,6 @@ public class CreateSubcommand extends Subcommand {
 
             return;
         }
-
 
         int previousIslands = layout.getIslandIds(player.getUniqueId()).size();
 
@@ -78,7 +65,7 @@ public class CreateSubcommand extends Subcommand {
             return;
         }
 
-        if (plugin.econ != null && !hasFunds(player, islandSize)) {
+        if (plugin.econ != null && !hasFunds(player, plugin.islandPrices.getOrDefault(islandSize, 0.0))) {
             player.sendMessage(Messages.get("error.INSUFFICIENT_FUNDS"));
             return;
         }
@@ -103,44 +90,13 @@ public class CreateSubcommand extends Subcommand {
             return;
         }
 
-        if (plugin.econ != null) pay(player, islandSize);
+        if (plugin.econ != null) pay(player, plugin.islandPrices.getOrDefault(islandSize, 0.0));
         player.sendTitle(Messages.get("success.ISLAND_GEN_TITLE"), Messages.get("success.ISLAND_GEN_SUBTITLE"), 10, 20 * 7, 10);
     }
 
-    private boolean hasFunds(Player player, int islandSize) {
-        if (plugin.econ == null || player.hasPermission(Permissions.bypass.economy)) return true;
-
-        double cost = plugin.islandPrices.getOrDefault(islandSize, 0.0);
-
-        return plugin.econ.has(player, cost);
-    }
-
-    private void pay(Player player, int islandSize) {
-        if (plugin.econ == null || player.hasPermission(Permissions.bypass.economy)) return;
-
-        double cost = plugin.islandPrices.getOrDefault(islandSize, 0.0);
-
-        if (cost > 0) {
-            plugin.econ.withdrawPlayer(player, cost);
-            player.sendMessage(Messages.get("success.ISLAND_PURCHASED", cost));
-        }
-    }
-
     @Override
-    public List<String> onTabComplete(Player player, String[] args) {
-        List<String> availableArgs = new ArrayList<>();
-
-        if (args.length == 1) {
-            HashMap<Biome, List<Location>> availableLocations = plugin.islandGeneration.biomes.availableLocations;
-
-            for (Biome biome : availableLocations.keySet()) {
-                availableArgs.add(biome.name());
-            }
-        } else if (args.length == 2) {
-            availableArgs.addAll(plugin.definedIslandSizes.keySet());
-        }
-
-        return availableArgs;
+    Islands getPlugin() {
+        return plugin;
     }
 
     @Override
