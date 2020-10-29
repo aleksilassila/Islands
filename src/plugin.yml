@@ -53,6 +53,7 @@ permissions:
       islands.command.save: true
       islands.command.setspawnisland: true
       islands.command.confirm: true
+      islands.command.info: true
   islands.bypass.*:
     description: Access to all island bypasses
     children:
@@ -71,6 +72,7 @@ permissions:
       islands.bypass.econonmy: true
       islands.bypass.queue: true
       islands.bypass.queue.limit: true
+      islands.bypass.info: true
   islands.command.home.*:
     description: Access to home commands
     children:
@@ -106,6 +108,9 @@ permissions:
     default: true
   islands.command.confirm:
     description: Access to confirm command
+    default: true
+  islands.command.info:
+    description: Access to island info command with limited functionality
     default: true
   islands.command.create.custom:
     description: Access to island create custom size command
@@ -158,6 +163,9 @@ permissions:
     default: "op"
   islands.bypass.setspawn:
     description: Bypass setspawn restrictions
+    default: "op"
+  islands.bypass.info:
+    description: Bypass island info command restrictions
     default: "op"
   islands.bypass.trust:
     description: Bypass trust restrictions

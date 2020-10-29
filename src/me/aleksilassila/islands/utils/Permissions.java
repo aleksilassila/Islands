@@ -19,6 +19,7 @@ public class Permissions {
         public static final String economy = "islands.bypass.economy";
         public static final String queue = "islands.bypass.queue";
         public static final String queueLimit = "islands.bypass.queue.limit";
+        public static final String info = "islands.bypass.info";
     }
 
     public static class command {
@@ -34,6 +35,7 @@ public class Permissions {
         public static final String island = "islands.command";
         public static final String save = "islands.command.save";
         public static final String confirm = "islands.command.confirm";
+        public static final String info = "islands.command.info";
 
         public static final String home = "islands.command.home";
         public static final String listHomes = "islands.command.home.list";

@@ -38,6 +38,7 @@ public class IslandManagmentCommands extends ChatUtils implements TabExecutor {
         subcommands.add(new SetSpawnIslandSubcommand(plugin));
         subcommands.add(new ConfirmSubcommand());
         subcommands.add(new HelpSubcommand(this));
+        subcommands.add(new InfoSubcommand(plugin));
     }
 
     @Override

@@ -213,6 +213,15 @@ public class Islands extends JavaPlugin {
         }
     }
 
+    @Nullable
+    public String parseIslandSize(int size) {
+        for (String definedSize : definedIslandSizes.keySet()) {
+            if (definedIslandSizes.get(definedSize) == size) return definedSize;
+        }
+
+        return null;
+    }
+
     @NotNull
     public int getSmallestIslandSize() {
         int smallestSize = layout.islandSpacing;
