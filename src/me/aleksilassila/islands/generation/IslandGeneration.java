@@ -122,10 +122,14 @@ public class IslandGeneration {
         if (task.player.hasPermission(Permissions.bypass.queue)) {
             int index = getBypassIndex(task.player);
             queue.add(index, task);
-            Messages.send(task.player, "info.QUEUE_STATUS", index);
+            if (queue.size() > 1) {
+                Messages.send(task.player, "info.QUEUE_STATUS", index);
+            }
         } else {
             queue.add(task);
-            Messages.send(task.player, "info.QUEUE_STATUS", queue.size() - 1);
+            if (queue.size() > 1) { // FIXME test without queue skip
+                Messages.send(task.player, "info.QUEUE_STATUS", queue.size() - 1);
+            }
         }
     }
 
@@ -142,13 +146,15 @@ public class IslandGeneration {
     }
 
     public int getBypassIndex(Player player) {
-        for (int index = 0; index < queue.size(); index++) {
-            if (!queue.get(index).player.getUniqueId().equals(player.getUniqueId())) {
-                return index;
+        if (queue.size() == 1) return 1;
+        else {
+            for (int index = 1; index < queue.size(); index++) {
+                if (!queue.get(index).player.getUniqueId().equals(player.getUniqueId()))
+                    return index;
             }
-        }
 
-        return Math.max(queue.size() - 1, 0);
+            return Math.max(queue.size(), 0);
+        }
     }
 
     private boolean queueContainsPlayer(Player player) {
