@@ -9,12 +9,10 @@ import me.aleksilassila.islands.IslandLayout;
 import me.aleksilassila.islands.Islands;
 import me.aleksilassila.islands.utils.BiomeMaterials;
 import me.aleksilassila.islands.utils.Messages;
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.Location;
-import org.bukkit.Material;
+import org.bukkit.*;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.SkullMeta;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -123,18 +121,28 @@ public class AdminGUI extends PageGUI {
                 pane = new StaticPane(0, 0, 9, PAGE_HEIGHT - 1);
             }
 
-            String displayName = Bukkit.getOfflinePlayer(UUID.fromString(uuid)).getName();
+            OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(UUID.fromString(uuid));
+
+            String displayName = offlinePlayer.getName();
             if (displayName == null) continue;
 
-            pane.addItem(new GuiItem(createGuiItem(Material.PLAYER_HEAD,
-                        Messages.get("gui.admin.PLAYER_NAME", displayName),
-                        false,
-                        Messages.get("gui.admin.PLAYER_LORE", players.get(uuid))),
-                        event -> {
-                            if (!(event.getWhoClicked() instanceof Player)) return; // Dunno if this is necessary in practice, cows don't click inventories
+            ItemStack skull = createGuiItem(Material.PLAYER_HEAD,
+                    Messages.get("gui.admin.PLAYER_NAME", displayName),
+                    false,
+                    Messages.get("gui.admin.PLAYER_LORE", players.get(uuid)));
 
-                            showPlayerIslandsGui(uuid);
-                        }), (itemCount % (9 * (PAGE_HEIGHT - 1))) % 9, (itemCount % (9 * (PAGE_HEIGHT - 1))) / 9);
+            SkullMeta meta = (SkullMeta) skull.getItemMeta();
+            if (meta != null) {
+                meta.setOwningPlayer(offlinePlayer);
+                skull.setItemMeta(meta);
+            }
+
+            pane.addItem(new GuiItem(skull,
+                    event -> {
+                        if (!(event.getWhoClicked() instanceof Player)) return; // Dunno if this is necessary in practice, cows don't click inventories
+
+                        showPlayerIslandsGui(uuid);
+                    }), (itemCount % (9 * (PAGE_HEIGHT - 1))) % 9, (itemCount % (9 * (PAGE_HEIGHT - 1))) / 9);
             itemCount++;
         }
 
