@@ -6,19 +6,27 @@ import com.github.stefvanschie.inventoryframework.pane.OutlinePane;
 import com.github.stefvanschie.inventoryframework.pane.PaginatedPane;
 import com.github.stefvanschie.inventoryframework.pane.Pane;
 import com.github.stefvanschie.inventoryframework.pane.StaticPane;
+import me.aleksilassila.islands.utils.BiomeMaterials;
 import me.aleksilassila.islands.utils.Messages;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
-public class PageGUI {
+public abstract class PageGUI {
+    abstract Gui getGui();
+    abstract Player getPlayer();
+
+    public void open() {
+        getGui().show(getPlayer());
+    }
+
     protected Gui createPaginatedGUI(int pageHeight, String title, List<StaticPane> pages) {
         Gui gui = new Gui(pageHeight, title);
         gui.setOnTopClick(event -> event.setCancelled(true));

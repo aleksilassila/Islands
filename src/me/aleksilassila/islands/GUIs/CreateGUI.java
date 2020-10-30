@@ -42,15 +42,14 @@ public class CreateGUI extends PageGUI {
         return this;
     }
 
-    public void open() {
-        getGui().show(player);
+    @Override
+    Gui getGui() {
+        return createPaginatedGUI(PAGE_HEIGHT, Messages.get("gui.create.TITLE"), availableIslandPanes());
     }
 
-    private Gui getGui() {
-        Gui gui = createPaginatedGUI(PAGE_HEIGHT, Messages.get("gui.create.TITLE"), availableIslandPanes());
-        gui.setOnTopClick(inventoryClickEvent -> inventoryClickEvent.setCancelled(true));
-
-        return gui;
+    @Override
+    Player getPlayer() {
+        return player;
     }
 
     private List<StaticPane> availableIslandPanes() {

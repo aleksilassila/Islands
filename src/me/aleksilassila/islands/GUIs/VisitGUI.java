@@ -2,7 +2,6 @@ package me.aleksilassila.islands.GUIs;
 
 import com.github.stefvanschie.inventoryframework.Gui;
 import com.github.stefvanschie.inventoryframework.GuiItem;
-import com.github.stefvanschie.inventoryframework.pane.PaginatedPane;
 import com.github.stefvanschie.inventoryframework.pane.StaticPane;
 import me.aleksilassila.islands.IslandLayout;
 import me.aleksilassila.islands.Islands;
@@ -27,11 +26,8 @@ public class VisitGUI extends PageGUI {
         this.player = player;
     }
 
-    public void open() {
-        getGui().show(player);
-    }
-
-    private Gui getGui() {
+    @Override
+    Gui getGui() {
         Gui gui = createPaginatedGUI(PAGE_HEIGHT, Messages.get("gui.visit.TITLE", getSort(false)), getPanes());
 
         StaticPane sort = new StaticPane(4, PAGE_HEIGHT - 1, 1, 1);
@@ -47,10 +43,15 @@ public class VisitGUI extends PageGUI {
         return gui;
     }
 
+    @Override
+    Player getPlayer() {
+        return player;
+    }
+
     private List<StaticPane> getPanes() {
         List<StaticPane> panes = new ArrayList<>();
 
-        Map<String, Map<String, String>> publicIslands = plugin.layout.getPublicIslands();
+        Map<String, Map<String, String>> publicIslands = plugin.layout.getIslandsInfo(true);
 
         List<String> sortedSet = new ArrayList<>(publicIslands.keySet());
 
@@ -74,7 +75,7 @@ public class VisitGUI extends PageGUI {
             String displayName;
 
             try {
-                displayName = Bukkit.getPlayer(UUID.fromString(publicIslands.get(islandId).get("owner"))).getDisplayName();
+                displayName = Bukkit.getOfflinePlayer(UUID.fromString(publicIslands.get(islandId).get("owner"))).getName();
             } catch (Exception e) {
                 displayName = "Server";
             }

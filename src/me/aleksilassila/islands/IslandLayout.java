@@ -103,15 +103,15 @@ public class IslandLayout {
     }
 
     @NotNull
-    public Map<String, Map<String, String>> getPublicIslands() {
-        Map<String, Map<String, String>> islands = new HashMap<String, Map<String, String>>();
+    public Map<String, Map<String, String>> getIslandsInfo(boolean publicOnly) {
+        Map<String, Map<String, String>> islands = new HashMap<>();
 
         for (String islandId : getIslandsConfig().getKeys(false)) {
-            if (getIslandsConfig().getBoolean(islandId + ".public")) {
-                String name = getIslandsConfig().getString(islandId + ".name");
-                String ownerUUID = getIslandsConfig().getString(islandId + ".UUID");
+            boolean isPublic = getIslandsConfig().getBoolean(islandId + ".public");
 
-                if (name == null) continue;
+            if (!publicOnly || isPublic) {
+                String name = isPublic ? getIslandsConfig().getString(islandId + ".name") : islandId;
+                String ownerUUID = getIslandsConfig().getString(islandId + ".UUID");
 
                 Map<String, String> values = new HashMap<>();
                 values.put("name", name);
@@ -131,10 +131,57 @@ public class IslandLayout {
         return islands;
     }
 
+    @NotNull
+    public Map<String, Map<String, String>> getIslandsInfo(String uuid) {
+        Map<String, Map<String, String>> islands = new HashMap<>();
+
+        for (String islandId : getIslandsConfig().getKeys(false)) {
+            String ownerUUID = getIslandsConfig().getString(islandId + ".UUID");
+            if (!uuid.equalsIgnoreCase(ownerUUID)) continue;
+
+            String name = getIslandsConfig().getBoolean(islandId + ".public")
+                    ? getIslandsConfig().getString(islandId + ".name")
+                    : islandId;
+
+            Map<String, String> values = new HashMap<>();
+            values.put("name", name);
+
+            try {
+                String biome = getIslandsConfig().getString(islandId + ".biome");
+                values.put("material", BiomeMaterials.valueOf(biome).name());
+            } catch (Exception e) {
+                values.put("material", BiomeMaterials.DEFAULT.name());
+            }
+
+            islands.put(islandId, values);
+        }
+
+        return islands;
+    }
+
+    @NotNull
+    public Map<String, Integer> getPlayers() {
+        Map<String, Integer> players = new HashMap<>();
+
+        for (String islandId : getIslandsConfig().getKeys(false)) {
+            String uuid = getIslandsConfig().getString(islandId + ".UUID");
+
+            if (uuid != null) {
+                if (players.containsKey(uuid)) {
+                    players.put(uuid, players.get(uuid) + 1);
+                } else {
+                    players.put(uuid, 1);
+                }
+            }
+        }
+
+        return players;
+    }
+
     @Nullable
     public String getIslandByName(String name) {
         for (String islandId : getIslandsConfig().getKeys(false)) {
-            if (getIslandsConfig().getString(islandId + ".name").equalsIgnoreCase(name) && getIslandsConfig().getBoolean(islandId + ".public")) {
+            if (name.equalsIgnoreCase(getIslandsConfig().getString(islandId + ".name")) && getIslandsConfig().getBoolean(islandId + ".public")) {
                 return islandId;
             }
         }

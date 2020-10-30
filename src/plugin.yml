@@ -54,6 +54,7 @@ permissions:
       islands.command.setspawnisland: true
       islands.command.confirm: true
       islands.command.info: true
+      islands.command.moderate: true
   islands.bypass.*:
     description: Access to all island bypasses
     children:
@@ -126,6 +127,9 @@ permissions:
     default: "op"
   islands.command.unname:
     description: Access to island unname command
+    default: "op"
+  islands.command.moderate:
+    description: Access moderate GUI
     default: "op"
   islands.command.trust:
     description: Access to trust command
