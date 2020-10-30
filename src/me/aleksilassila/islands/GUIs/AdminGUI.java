@@ -47,18 +47,14 @@ public class AdminGUI extends PageGUI {
                 false,
                 Messages.get("gui.admin.PLAYERS_LINK_LORE"));
 
-        navigationPane.addItem(new GuiItem(players, event -> {
-            showPlayersGui();
-        }), 1, 0);
+        navigationPane.addItem(new GuiItem(players, event -> showPlayersGui()), 1, 0);
 
         ItemStack islands = createGuiItem(Material.GRASS_BLOCK,
                 Messages.get("gui.admin.ISLANDS_LINK"),
                 false,
                 Messages.get("gui.admin.ISLANDS_LINK_LORE"));
 
-        navigationPane.addItem(new GuiItem(islands, event -> {
-            showIslandsGui();
-        }), 3, 0);
+        navigationPane.addItem(new GuiItem(islands, event -> showIslandsGui()), 3, 0);
 
         gui.addPane(navigationPane);
 
@@ -91,7 +87,7 @@ public class AdminGUI extends PageGUI {
 
             pane.addItem(new GuiItem(createGuiItem(BiomeMaterials.valueOf(publicIslands.get(islandId).get("material")).getMaterial(),
                         Messages.get("gui.admin.ISLANDS_NAME", publicIslands.get(islandId).get("name")),
-                        displayName.equals("Server"),
+                        "Server".equals(displayName),
                         Messages.get("gui.admin.ISLANDS_LORE", displayName)),
                         event -> {
                             if (!(event.getWhoClicked() instanceof Player)) return; // Dunno if this is necessary in practice, cows don't click inventories
@@ -190,9 +186,7 @@ public class AdminGUI extends PageGUI {
         back.addItem(new GuiItem(createGuiItem(Material.BARRIER,
                 Messages.get("gui.BACK"),
                 false),
-                inventoryClickEvent -> {
-                    showPlayersGui();
-                }), 0, 0);
+                inventoryClickEvent -> showPlayersGui()), 0, 0);
 
         gui.addPane(back);
 

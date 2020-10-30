@@ -127,7 +127,7 @@ public class IslandGeneration {
             }
         } else {
             queue.add(task);
-            if (queue.size() > 1) { // FIXME test without queue skip
+            if (queue.size() > 1) {
                 Messages.send(task.player, "info.QUEUE_STATUS", queue.size() - 1);
             }
         }

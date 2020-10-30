@@ -96,7 +96,7 @@ public class CreateGUI extends PageGUI {
         if (plugin.econ != null) {
             StaticPane balance = new StaticPane(0, 1, 1, 1);
 
-            balance.addItem(new GuiItem(createGuiItem(Material.EMERALD, Messages.get("gui.create.BALANCE"), true, Messages.get("gui.create.BALANCE_LORE", plugin.econ.getBalance(player)))), 0, 0); // FIXME test without vault
+            balance.addItem(new GuiItem(createGuiItem(Material.EMERALD, Messages.get("gui.create.BALANCE"), true, Messages.get("gui.create.BALANCE_LORE", plugin.econ.getBalance(player)))), 0, 0);
 
             gui.addPane(balance);
         }
