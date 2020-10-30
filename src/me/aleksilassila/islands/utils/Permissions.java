@@ -4,7 +4,7 @@ public class Permissions {
     public static class bypass {
         public static final String create = "islands.bypass.islandLimit";       // Create unlimited islands
         public static final String recreate = "islands.bypass.recreate";        // Recreate any island
-        public static final String delete = "islands.bypass.delete";            // Delete any island
+        public static final String clear = "islands.bypass.clear";              // Delete any island
         public static final String give = "islands.bypass.give";                // Transfer any island ownership
         public static final String name = "islands.bypass.name";                // Name any island
         public static final String unname = "islands.bypass.unname";            // Unname any island

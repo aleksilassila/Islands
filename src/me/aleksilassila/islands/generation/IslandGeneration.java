@@ -10,7 +10,9 @@ import org.bukkit.block.Biome;
 import org.bukkit.block.Block;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
+import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.util.Vector;
 
 import java.util.*;
@@ -21,7 +23,7 @@ public class IslandGeneration {
     private final World islandsWorld;
 
     public Biomes biomes;
-    public List<CopyTask> queue = new ArrayList<>();
+    public List<Task> queue = new ArrayList<>();
     private final int buildDelay;
     private int rowsBuiltPerDelay = 1;
     private int rowsClearedPerDelay = 2;
@@ -73,13 +75,14 @@ public class IslandGeneration {
     public boolean copyIsland(Player player, Biome biome, int islandSize, Vector target, boolean shouldClearArea, int xIndex, int zIndex, Shape shape) throws IllegalArgumentException {
         List<Location> locations = biomes.availableLocations.get(biome);
 
-        if (locations == null) {
+        if (locations == null)
             throw new IllegalArgumentException();
-        }
 
-        if (locations.size() == 0) {
+        if (locations.size() == 0)
             throw new IllegalArgumentException();
-        }
+
+        if (!canAddQueueItem(player))
+            throw new IllegalArgumentException();
 
         Location sourceLocation = locations.get(new Random().nextInt(locations.size()));
 
@@ -113,30 +116,50 @@ public class IslandGeneration {
         return true;
     }
 
-    public void addToQueue(CopyTask task) {
-        if (queueContainsPlayer(task.player) && !task.player.hasPermission(Permissions.bypass.queueLimit)) {
-            removeFromQueue(task.player);
+    public boolean clearIsland(Player player, int xIndex, int zIndex) {
+        if (!canAddQueueItem(player))
+            return false;
+
+        ClearTask task = new ClearTask(player, xIndex, zIndex);
+
+        if (queue.size() == 0) {
+            task.runTaskTimer(plugin, 0, buildDelay);
+        }
+
+        addToQueue(task);
+        return true;
+    }
+
+
+    public void addToQueue(Task task) {
+        if (queueContainsPlayer(task.getPlayer()) && !task.getPlayer().hasPermission(Permissions.bypass.queueLimit)) {
+            removeFromQueue(task.getPlayer());
         }
 
 
-        if (task.player.hasPermission(Permissions.bypass.queue)) {
-            int index = getBypassIndex(task.player);
+        if (task.getPlayer().hasPermission(Permissions.bypass.queue)) {
+            int index = getBypassIndex(task.getPlayer());
             queue.add(index, task);
             if (queue.size() > 1) {
-                Messages.send(task.player, "info.QUEUE_STATUS", index);
+                Messages.send(task.getPlayer(), "info.QUEUE_STATUS", index);
             }
         } else {
             queue.add(task);
             if (queue.size() > 1) {
-                Messages.send(task.player, "info.QUEUE_STATUS", queue.size() - 1);
+                Messages.send(task.getPlayer(), "info.QUEUE_STATUS", queue.size() - 1);
             }
         }
     }
 
+    public boolean canAddQueueItem(Player player) {
+        if (queue.size() == 0) return true;
+        return !queue.get(0).getPlayer().equals(player) || !player.hasPermission(Permissions.bypass.queueLimit);
+    }
+
     public void removeFromQueue(Player player) {
         int index = 0;
-        for (CopyTask task : queue) {
-            if (index != 0 && task.player.getUniqueId().equals(player.getUniqueId())) {
+        for (Task task : queue) {
+            if (index != 0 && task.getPlayer().getUniqueId().equals(player.getUniqueId())) {
                 queue.remove(task);
 
                 return;
@@ -149,7 +172,7 @@ public class IslandGeneration {
         if (queue.size() == 1) return 1;
         else {
             for (int index = 1; index < queue.size(); index++) {
-                if (!queue.get(index).player.getUniqueId().equals(player.getUniqueId()))
+                if (!queue.get(index).getPlayer().getUniqueId().equals(player.getUniqueId()))
                     return index;
             }
 
@@ -158,14 +181,96 @@ public class IslandGeneration {
     }
 
     private boolean queueContainsPlayer(Player player) {
-        for (CopyTask item : queue) {
-            if (item.player.getUniqueId().equals(player.getUniqueId())) return true;
+        for (Task item : queue) {
+            if (item.getPlayer().getUniqueId().equals(player.getUniqueId())) return true;
         }
 
         return false;
     }
 
-    class CopyTask extends BukkitRunnable {
+    abstract static class Task extends BukkitRunnable {
+        public abstract Player getPlayer();
+
+        @Override
+        public synchronized BukkitTask runTaskTimer(Plugin plugin, long delay, long period) throws IllegalArgumentException, IllegalStateException {
+            Messages.send(getPlayer(), "info.GENERATION_STARTED");
+
+            return super.runTaskTimer(plugin, delay, period);
+        }
+    }
+
+    class ClearTask extends Task {
+        private Player player;
+        private int xIndex;
+        private int zIndex;
+
+        private int index = 0;
+
+        public ClearTask(Player player, int xIndex, int zIndex) {
+            this.player = player;
+            this.xIndex = xIndex;
+            this.zIndex = zIndex;
+        }
+
+
+        @Override
+        public Player getPlayer() {
+            return player;
+        }
+
+        @Override
+        public void run() {
+            for (int count = 0; count < rowsClearedPerDelay; count++) {
+                int relativeX = index / plugin.layout.islandSpacing;
+                int relativeZ = index - relativeX * plugin.layout.islandSpacing;
+
+                int realX = xIndex * plugin.layout.islandSpacing + relativeX;
+                int realZ = zIndex * plugin.layout.islandSpacing + relativeZ;
+
+                boolean skipDelay = true;
+
+                for (int y = 256; y >= 0; y--) {
+                    Block target = plugin.islandsWorld.getBlockAt(
+                            realX,
+                            y,
+                            realZ
+                    );
+
+                    if (!target.isEmpty()) {
+                        target.setType(Material.AIR);
+                        skipDelay = false;
+                    }
+                    target.setBiome(Biome.PLAINS);
+                }
+
+                if (skipDelay) count--;
+
+                if (index >= plugin.layout.islandSpacing * plugin.layout.islandSpacing) {
+                    Messages.send(player, "success.CLEARING_DONE");
+
+                    queue.remove(this);
+
+                    if (queue.size() > 0) {
+                        Task nextTask = queue.get(0);
+                        nextTask.runTaskTimer(plugin, 0, buildDelay);
+                    }
+
+                    this.cancel();
+                    break;
+                } else if (index == plugin.layout.islandSpacing * plugin.layout.islandSpacing / 4) {
+                    Messages.send(player, "info.CLEARING_STATUS", 25);
+                } else if (index == plugin.layout.islandSpacing * plugin.layout.islandSpacing / 2) {
+                    Messages.send(player, "info.CLEARING_STATUS", 50);
+                } else if (index == plugin.layout.islandSpacing * plugin.layout.islandSpacing / 4 * 3) {
+                    Messages.send(player, "info.CLEARING_STATUS", 75);
+                }
+
+                index++;
+            }
+        }
+    }
+
+    class CopyTask extends Task {
         private final Player player;
 
         private final int startX;
@@ -211,6 +316,11 @@ public class IslandGeneration {
             this.shape = shape;
 
             this.index = 0;
+        }
+
+        @Override
+        public Player getPlayer() {
+            return player;
         }
 
         @Override
@@ -307,9 +417,8 @@ public class IslandGeneration {
                     queue.remove(this);
 
                     if (queue.size() > 0) {
-                        CopyTask nextTask = queue.get(0);
+                        Task nextTask = queue.get(0);
                         nextTask.runTaskTimer(plugin, 0, buildDelay);
-                        nextTask.player.sendMessage(Messages.get("info.GENERATION_STARTED", nextTask.islandSize * nextTask.islandSize / 20.0));
                     }
 
                     this.cancel();

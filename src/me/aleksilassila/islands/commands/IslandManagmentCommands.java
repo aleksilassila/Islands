@@ -7,7 +7,6 @@ import me.aleksilassila.islands.utils.ChatUtils;
 import me.aleksilassila.islands.utils.ConfirmItem;
 import me.aleksilassila.islands.utils.Messages;
 import me.aleksilassila.islands.utils.Permissions;
-import org.bukkit.Bukkit;
 import org.bukkit.block.Biome;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -29,7 +28,7 @@ public class IslandManagmentCommands extends ChatUtils implements TabExecutor {
 
         subcommands.add(new CreateSubcommand(plugin));
         subcommands.add(new RecreateSubcommand(plugin));
-        subcommands.add(new DeleteSubcommand(plugin));
+        subcommands.add(new ClearSubcommand(plugin));
         subcommands.add(new NameSubcommand(plugin));
         subcommands.add(new UnnameSubcommand(plugin));
         subcommands.add(new GiveSubcommand(plugin));

@@ -41,7 +41,7 @@ permissions:
       islands.command: true
       islands.command.create: true
       islands.command.recreate: true
-      islands.command.delete: true
+      islands.command.clear: true
       islands.command.give: true
       islands.command.name: true
       islands.command.unname: true
@@ -60,7 +60,7 @@ permissions:
     children:
       islands.bypass.islandLimit: true
       islands.bypass.recreate: true
-      islands.bypass.delete: true
+      islands.bypass.clear: true
       islands.bypass.give: true
       islands.bypass.name: true
       islands.bypass.unname: true
@@ -116,8 +116,8 @@ permissions:
   islands.command.create.custom:
     description: Access to island create custom size command
     default: "op"
-  islands.command.delete:
-    description: Access to island delete command
+  islands.command.clear:
+    description: Access to island clear command
     default: "op"
   islands.command.give:
     description: Access to island command
@@ -153,8 +153,8 @@ permissions:
   islands.bypass.recreate:
     description: Bypass recreate restrictions
     default: "op"
-  islands.bypass.delete:
-    description: Bypass delete restrictions
+  islands.bypass.clear:
+    description: Bypass clear restrictions
     default: "op"
   islands.bypass.give:
     description: Bypass give restrictions
