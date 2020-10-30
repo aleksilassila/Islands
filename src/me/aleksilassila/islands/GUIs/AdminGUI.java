@@ -22,12 +22,10 @@ import java.util.Map;
 import java.util.UUID;
 
 public class AdminGUI extends PageGUI {
-    private final Islands plugin;
     private final Player player;
     private final IslandLayout layout;
 
     public AdminGUI(Islands plugin, Player player) {
-        this.plugin = plugin;
         this.player = player;
         this.layout = plugin.layout;
     }
@@ -96,7 +94,7 @@ public class AdminGUI extends PageGUI {
             pane.addItem(new GuiItem(createGuiItem(BiomeMaterials.valueOf(publicIslands.get(islandId).get("material")).getMaterial(),
                         Messages.get("gui.admin.ISLANDS_NAME", publicIslands.get(islandId).get("name")),
                         displayName.equals("Server"),
-                        Messages.get("gui.visit.ISLANDS_LORE", displayName)),
+                        Messages.get("gui.admin.ISLANDS_LORE", displayName)),
                         event -> {
                             if (!(event.getWhoClicked() instanceof Player)) return; // Dunno if this is necessary in practice, cows don't click inventories
 
@@ -107,7 +105,7 @@ public class AdminGUI extends PageGUI {
 
         if (pane.getItems().size() > 0) pages.add(pane);
 
-        createPaginatedGUI(5, Messages.get("gui.admin.ISLANDS_TITLE"), pages).show(player);
+        addMainMenuButton(createPaginatedGUI(5, Messages.get("gui.admin.ISLANDS_TITLE"), pages)).show(player);
     }
 
     private void showPlayersGui() {
@@ -131,7 +129,7 @@ public class AdminGUI extends PageGUI {
             pane.addItem(new GuiItem(createGuiItem(Material.PLAYER_HEAD,
                         Messages.get("gui.admin.PLAYER_NAME", displayName),
                         false,
-                        Messages.get("gui.visit.PLAYER_LORE", players.get(uuid))),
+                        Messages.get("gui.admin.PLAYER_LORE", players.get(uuid))),
                         event -> {
                             if (!(event.getWhoClicked() instanceof Player)) return; // Dunno if this is necessary in practice, cows don't click inventories
 
@@ -142,7 +140,7 @@ public class AdminGUI extends PageGUI {
 
         if (pane.getItems().size() > 0) pages.add(pane);
 
-        createPaginatedGUI(5, Messages.get("gui.admin.PLAYERS_TITLE"), pages).show(player);
+        addMainMenuButton(createPaginatedGUI(5, Messages.get("gui.admin.PLAYERS_TITLE"), pages)).show(player);
     }
 
     private void showPlayerIslandsGui(String uuid) {
@@ -163,10 +161,10 @@ public class AdminGUI extends PageGUI {
                 pane = new StaticPane(0, 0, 9, PAGE_HEIGHT - 1);
             }
 
-            pane.addItem(new GuiItem(createGuiItem(Material.PLAYER_HEAD,
+            pane.addItem(new GuiItem(createGuiItem(BiomeMaterials.valueOf(islands.get(islandId).get("material")).getMaterial(),
                         Messages.get("gui.admin.ISLAND_NAME", islands.get(islandId).get("name")),
                         false,
-                        Messages.get("gui.visit.ISLAND_LORE", islandId)),
+                        Messages.get("gui.admin.ISLAND_LORE", islandId)),
                         event -> {
                             if (!(event.getWhoClicked() instanceof Player)) return; // Dunno if this is necessary in practice, cows don't click inventories
 
@@ -177,7 +175,37 @@ public class AdminGUI extends PageGUI {
 
         if (pane.getItems().size() > 0) pages.add(pane);
 
-        createPaginatedGUI(5, Messages.get("gui.admin.PLAYER_TITLE", displayName), pages).show(player);
+        Gui gui = createPaginatedGUI(5, Messages.get("gui.admin.PLAYER_TITLE", displayName), pages);
+
+        StaticPane back = new StaticPane(4, gui.getRows() - 1, 1, 1);
+
+        back.addItem(new GuiItem(createGuiItem(Material.BARRIER,
+                Messages.get("gui.BACK"),
+                false),
+                inventoryClickEvent -> {
+                    showPlayersGui();
+                }), 0, 0);
+
+        gui.addPane(back);
+
+        gui.show(player);
+    }
+
+    private Gui addMainMenuButton(Gui gui) {
+        StaticPane pane = new StaticPane(4, gui.getRows() - 1, 1, 1);
+
+        pane.addItem(new GuiItem(createGuiItem(Material.BARRIER,
+                        Messages.get("gui.BACK"),
+                        false),
+                        event -> {
+                            if (!(event.getWhoClicked() instanceof Player)) return; // Dunno if this is necessary in practice, cows don't click inventories
+
+                            open();
+                        }), 0, 0);
+
+        gui.addPane(pane);
+
+        return gui;
     }
 
     private void teleportIsland(String islandId) {

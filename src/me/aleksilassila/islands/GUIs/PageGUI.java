@@ -52,7 +52,7 @@ public abstract class PageGUI {
         StaticPane back = new StaticPane(2, pageHeight - 1, 1, 1);
         StaticPane forward = new StaticPane(6, pageHeight - 1, 1, 1);
 
-        back.addItem(new GuiItem(createGuiItem(Material.ARROW, Messages.get("gui.visit.PREVIOUS_PAGE"), false), event -> {
+        back.addItem(new GuiItem(createGuiItem(Material.ARROW, Messages.get("gui.PREVIOUS_PAGE"), false), event -> {
             pane.setPage(pane.getPage() - 1);
 
             if (pane.getPage() == 0) {
@@ -65,7 +65,7 @@ public abstract class PageGUI {
 
         back.setVisible(false);
 
-        forward.addItem(new GuiItem(createGuiItem(Material.ARROW, Messages.get("gui.visit.NEXT_PAGE"), false), event -> {
+        forward.addItem(new GuiItem(createGuiItem(Material.ARROW, Messages.get("gui.NEXT_PAGE"), false), event -> {
 
         pane.setPage(pane.getPage() + 1);
 
