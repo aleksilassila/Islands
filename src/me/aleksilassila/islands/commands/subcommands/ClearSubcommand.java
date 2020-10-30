@@ -69,7 +69,7 @@ public class ClearSubcommand extends Subcommand {
 
     @Override
     public String getPermission() {
-        return Permissions.command.delete;
+        return Permissions.command.clear;
     }
 
     @Override

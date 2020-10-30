@@ -32,10 +32,12 @@ public class SetSpawnIslandSubcommand extends Subcommand {
             return;
         }
 
+        boolean removedSpawn = plugin.getIslandsConfig().getBoolean(islandId + ".isSpawn");
+
         if (!layout.setSpawnIsland(islandId))
             player.sendMessage(Messages.get("error.NOT_ON_ISLAND"));
         else
-            player.sendMessage(Messages.get("success.SPAWN_ISLAND_CHANGED"));
+            player.sendMessage(Messages.get(removedSpawn ? "success.SPAWN_ISLAND_REMOVED" : "success.SPAWN_ISLAND_CHANGED"));
     }
 
     @Override

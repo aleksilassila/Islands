@@ -26,7 +26,7 @@ public class Permissions {
         public static final String create = "islands.command.create";
         public static final String createCustom = "islands.command.create.custom";
         public static final String recreate = "islands.command.recreate";
-        public static final String delete = "islands.command.delete";
+        public static final String clear = "islands.command.clear";
         public static final String give = "islands.command.give";
         public static final String name = "islands.command.name";
         public static final String unname = "islands.command.unname";

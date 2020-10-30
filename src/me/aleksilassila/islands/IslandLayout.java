@@ -382,6 +382,11 @@ public class IslandLayout {
     public boolean setSpawnIsland(String islandId) {
         if (getIslandsConfig().getConfigurationSection(islandId) == null) return false;
 
+        if (getIslandsConfig().getBoolean(islandId + ".isSpawn")) {
+            getIslandsConfig().set(islandId + ".isSpawn", false);
+            return true;
+        }
+
         for (String island : getIslandsConfig().getKeys(false)) {
             if (getIslandsConfig().getBoolean(island + ".isSpawn")) {
                 getIslandsConfig().set(island + ".isSpawn", false);
