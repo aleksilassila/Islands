@@ -4,6 +4,9 @@ Optimized for survival gamemode. **This is not a skyblock plugin!**
 Jumping down from an island teleports player to survival "wilderness", 
 that can be reset often without losing players' progress.
 
+This plugin is designed to function as your server's core plugin:
+For example it handles protection, homes, teleports / warps and has economy integration with handy GUIs for performing tasks.
+
 If you want to experience the plugin in game, you can hop on blucraft.mc.gg! (1.16.3)
 
 ## Features
@@ -13,21 +16,24 @@ If you want to experience the plugin in game, you can hop on blucraft.mc.gg! (1.
 Every island is protected by default.
 The owner can `/trust` other players so that they can also interact with blocks and entities. 
 
-**"Base managment."**
+**Resources.**
+Everyone hates monuments that are already raided by another player.
+This plugin allows resetting the survival world whenever you feel like it without losing your progress.
+Your islands and inventory are saved in a separate world, that you can access from anywhere.
+
+**"Project managment."**
 Want to start a new base? Just create a new island. Tired of creating a new world multiple times
 to find the biome of your liking? Well, this plugin lets you choose that too. Personally I just
 like the idea of placing individual creations of mine on their own islands.
 It also makes saving them in a schematic file a lot easier. (The plugin has a command for that)
 
-**Resources.**
-Everyone hates monuments that are already raided by another player.
-This plugin allows resetting the survival world whenever you feel like it without losing your progress.
-Your islands and inventory are saved in a separate world. 
-
 **Community.** Players can easily visit each other's islands with `/visit` command.
-The plugin has gui menu for browsing public islands. It is also possible to set up
+The plugin has a GUI menu for browsing public islands. It is also possible to set up
 "official" islands like spawn island that are owned by the server.
 *Tip for admins: `/island name spawn` for accessing spawn via `/vi spawn`*
+
+Other cool features include homes, warp / spawn management, tools for moderation and
+great configurability and permissions, to name a few.
 
 ## Getting Started
 
@@ -80,6 +86,10 @@ Economy integration allows you to set prices for different islands
 
 ![Island Shapes](screenshots/functionality/create_gui_size.png?raw=true)
 
+Admin tools help admins moderate their servers by giving them access to all islands via GUI
+
+![Island Moderation](screenshots/functionality/moderation_gui.png?raw=true)
+
 ### Example Islands
 
 ![Big Badlands Island](screenshots/islandTypes/badlands_big.png?raw=true)
@@ -87,3 +97,5 @@ Economy integration allows you to set prices for different islands
 ![Small Bamboo Island](screenshots/islandTypes/bamboo_small.png?raw=true)
 
 ![Landscape](screenshots/islandTypes/landscape.png?raw=true)
+
+All screenshots can be found [here](screenshots)

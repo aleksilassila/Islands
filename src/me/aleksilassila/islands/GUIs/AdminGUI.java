@@ -127,11 +127,11 @@ public class AdminGUI extends PageGUI {
                     false,
                     Messages.get("gui.admin.PLAYER_LORE", players.get(uuid)));
 
-            SkullMeta meta = (SkullMeta) skull.getItemMeta();
-            if (meta != null) {
-                meta.setOwningPlayer(offlinePlayer);
-                skull.setItemMeta(meta);
-            }
+//            SkullMeta meta = (SkullMeta) skull.getItemMeta();
+//            if (meta != null) {
+//                meta.setOwningPlayer(offlinePlayer);
+//                skull.setItemMeta(meta);
+//            }
 
             pane.addItem(new GuiItem(skull,
                     event -> {
