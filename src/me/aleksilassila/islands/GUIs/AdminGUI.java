@@ -67,7 +67,7 @@ public class AdminGUI extends PageGUI {
         return gui;
     }
 
-    private void showIslandsGui() {
+    public void showIslandsGui() {
         int PAGE_HEIGHT = 4;
 
         List<StaticPane> pages = new ArrayList<>();
@@ -108,7 +108,7 @@ public class AdminGUI extends PageGUI {
         addMainMenuButton(createPaginatedGUI(5, Messages.get("gui.admin.ISLANDS_TITLE"), pages)).show(player);
     }
 
-    private void showPlayersGui() {
+    public void showPlayersGui() {
         int PAGE_HEIGHT = 4;
 
         List<StaticPane> pages = new ArrayList<>();
@@ -143,7 +143,7 @@ public class AdminGUI extends PageGUI {
         addMainMenuButton(createPaginatedGUI(5, Messages.get("gui.admin.PLAYERS_TITLE"), pages)).show(player);
     }
 
-    private void showPlayerIslandsGui(String uuid) {
+    public void showPlayerIslandsGui(String uuid) {
         int PAGE_HEIGHT = 4;
 
         String displayName = Bukkit.getOfflinePlayer(UUID.fromString(uuid)).getName();

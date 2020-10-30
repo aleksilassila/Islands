@@ -44,7 +44,6 @@ public class Messages extends ChatUtils {
             plugin.getLogger().info("Using " + locale.getDisplayName() + " locales");
 
             return instance;
-
         }
 
         public static void send(Player player, final String string, final Object... objects) {
