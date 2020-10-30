@@ -34,7 +34,7 @@ public class AdminGUI extends PageGUI {
         gui.setOnTopClick(inventoryClickEvent -> inventoryClickEvent.setCancelled(true));
 
         // Background
-        OutlinePane background = new OutlinePane(0, 0, 9, 3, Pane.Priority.LOWEST);
+        OutlinePane background = new OutlinePane(0, 0, 9, gui.getRows(), Pane.Priority.LOWEST);
         background.addItem(new GuiItem(createGuiItem(Material.GRAY_STAINED_GLASS_PANE, "" + ChatColor.RESET, false)));
         background.setRepeat(true);
 
@@ -88,7 +88,7 @@ public class AdminGUI extends PageGUI {
             pane.addItem(new GuiItem(createGuiItem(BiomeMaterials.valueOf(publicIslands.get(islandId).get("material")).getMaterial(),
                         Messages.get("gui.admin.ISLANDS_NAME", publicIslands.get(islandId).get("name")),
                         "Server".equals(displayName),
-                        Messages.get("gui.admin.ISLANDS_LORE", displayName)),
+                        Messages.get("gui.admin.ISLANDS_LORE", displayName, Integer.parseInt(publicIslands.get(islandId).get("public")))),
                         event -> {
                             if (!(event.getWhoClicked() instanceof Player)) return; // Dunno if this is necessary in practice, cows don't click inventories
 
@@ -99,7 +99,7 @@ public class AdminGUI extends PageGUI {
 
         if (pane.getItems().size() > 0) pages.add(pane);
 
-        addMainMenuButton(createPaginatedGUI(5, Messages.get("gui.admin.ISLANDS_TITLE"), pages)).show(player);
+        addMainMenuButton(createPaginatedGUI(PAGE_HEIGHT, Messages.get("gui.admin.ISLANDS_TITLE"), pages)).show(player);
     }
 
     public void showPlayersGui() {
@@ -144,7 +144,7 @@ public class AdminGUI extends PageGUI {
 
         if (pane.getItems().size() > 0) pages.add(pane);
 
-        addMainMenuButton(createPaginatedGUI(5, Messages.get("gui.admin.PLAYERS_TITLE"), pages)).show(player);
+        addMainMenuButton(createPaginatedGUI(PAGE_HEIGHT, Messages.get("gui.admin.PLAYERS_TITLE"), pages)).show(player);
     }
 
     public void showPlayerIslandsGui(String uuid) {
@@ -179,7 +179,7 @@ public class AdminGUI extends PageGUI {
 
         if (pane.getItems().size() > 0) pages.add(pane);
 
-        Gui gui = createPaginatedGUI(5, Messages.get("gui.admin.PLAYER_TITLE", displayName), pages);
+        Gui gui = createPaginatedGUI(PAGE_HEIGHT, Messages.get("gui.admin.PLAYER_TITLE", displayName), pages);
 
         StaticPane back = new StaticPane(4, gui.getRows() - 1, 1, 1);
 

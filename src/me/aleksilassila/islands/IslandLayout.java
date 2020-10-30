@@ -124,6 +124,8 @@ public class IslandLayout {
                     values.put("material", BiomeMaterials.DEFAULT.name());
                 }
 
+                values.put("public", String.valueOf(isPublic ? 1 : 0));
+
                 islands.put(islandId, values);
             }
         }

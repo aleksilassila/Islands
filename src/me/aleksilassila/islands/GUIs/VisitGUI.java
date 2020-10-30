@@ -17,7 +17,7 @@ public class VisitGUI extends PageGUI {
     private final Islands plugin;
     private final Player player;
 
-    private int sort = 1;
+    private int sort = 0;
 
     private final int PAGE_HEIGHT = 4; // < 1
 
@@ -28,11 +28,11 @@ public class VisitGUI extends PageGUI {
 
     @Override
     Gui getGui() {
-        Gui gui = createPaginatedGUI(PAGE_HEIGHT, Messages.get("gui.visit.TITLE", getSort(false)), getPanes());
+        Gui gui = createPaginatedGUI(PAGE_HEIGHT, Messages.get("gui.visit.TITLE", sort), getPanes());
 
         StaticPane sort = new StaticPane(4, PAGE_HEIGHT - 1, 1, 1);
 
-        sort.addItem(new GuiItem(createGuiItem(Material.REDSTONE, Messages.get("gui.visit.SORT", getSort(true)), false), event -> {
+        sort.addItem(new GuiItem(createGuiItem(Material.REDSTONE, Messages.get("gui.visit.SORT", this.sort == 1 ? 0 : 1), false), event -> {
             toggleSort();
             event.getWhoClicked().closeInventory();
             getGui().show(event.getWhoClicked());
@@ -56,7 +56,7 @@ public class VisitGUI extends PageGUI {
         List<String> sortedSet = new ArrayList<>(publicIslands.keySet());
 
         // Sort islands
-        if (sort == 1) { // Sort by date, oldest first
+        if (sort == 0) { // Sort by date, oldest first
             sortedSet.sort(Comparator.comparingInt(a ->
                     IslandLayout.placement.getIslandIndex(new int[]{Integer.parseInt(a.split("x")[0]), Integer.parseInt(a.split("x")[1])})));
         } else { // Sort by name
@@ -99,11 +99,5 @@ public class VisitGUI extends PageGUI {
 
     public void toggleSort() {
         sort = sort == 0 ? 1 : 0;
-    }
-
-    public String getSort(boolean invert) { // yuk
-        int test = sort;
-        if (invert) test = test == 0 ? 1 : 0;
-        return test == 0 ? "name" : "date";
     }
 }

@@ -60,6 +60,7 @@ public class IslandCommands {
 
             if (islandId != null) {
                 player.teleport(plugin.layout.getIslandSpawn(islandId));
+                player.sendTitle(Messages.get("success.VISIT_TITLE", args[0]), "", 10, 20 * 5, 10);
             } else {
                 player.sendMessage(Messages.get("error.ISLAND_NOT_FOUND"));
             }
