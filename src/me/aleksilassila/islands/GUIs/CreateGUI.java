@@ -65,22 +65,36 @@ public class CreateGUI extends PageGUI {
 
         int itemCount = 0;
         for (Biome biome : sortedSet) {
+            if (itemCount == 0 && !plugin.getConfig().getBoolean("disableRandomBiome")) {
+                pane.addItem(new GuiItem(
+                        createGuiItem(
+                                Material.COMPASS,
+                                Messages.get("gui.create.BIOME_NAME", "RANDOM"),
+                                true,
+                                Messages.get("gui.create.BIOME_LORE", 0)
+                        ),
+                        inventoryClickEvent -> {
+                            getSizeGui(null).show(inventoryClickEvent.getWhoClicked());
+                        }), 0, 0);
+
+                itemCount++;
+            }
+
             if (pane.getItems().size() >= (PAGE_HEIGHT - 1) * 9) {
                 panes.add(pane);
                 pane = new StaticPane(0, 0, 9, PAGE_HEIGHT - 1);
             }
 
-            pane.addItem(
-                new GuiItem(
+            pane.addItem(new GuiItem(
                     createGuiItem(
-                        BiomeMaterials.valueOf(biome.name()).getMaterial(),
-                        Messages.get("gui.create.BIOME_NAME", biome.name()),
-                        false,
-                        Messages.get("gui.create.BIOME_LORE", availableLocations.get(biome).size())
+                            BiomeMaterials.valueOf(biome.name()).getMaterial(),
+                            Messages.get("gui.create.BIOME_NAME", biome.name()),
+                            false,
+                            Messages.get("gui.create.BIOME_LORE", availableLocations.get(biome).size())
                     ),
-                event -> {
-                    getSizeGui(biome).show(event.getWhoClicked());
-                }), (itemCount % (9 * (PAGE_HEIGHT - 1))) % 9, (itemCount % (9 * (PAGE_HEIGHT - 1))) / 9);
+                    event -> {
+                        getSizeGui(biome).show(event.getWhoClicked());
+                    }), (itemCount % (9 * (PAGE_HEIGHT - 1))) % 9, (itemCount % (9 * (PAGE_HEIGHT - 1))) / 9);
             itemCount++;
         }
 
@@ -90,7 +104,7 @@ public class CreateGUI extends PageGUI {
     }
 
     private Gui getSizeGui(Biome biome) {
-        Gui gui = createPaginatedGUI(2, Messages.get("gui.create.SIZE_TITLE"), availableSizePanes("island " + subcommand + " " + biome.name()));
+        Gui gui = createPaginatedGUI(2, Messages.get("gui.create.SIZE_TITLE"), availableSizePanes("island " + subcommand + " " + (biome == null ? "RANDOM" : biome.name())));
         gui.setOnTopClick(inventoryClickEvent -> inventoryClickEvent.setCancelled(true));
 
         if (plugin.econ != null) {

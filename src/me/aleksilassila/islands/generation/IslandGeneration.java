@@ -72,19 +72,25 @@ public class IslandGeneration {
         }
     }
 
-    public boolean copyIsland(Player player, Biome biome, int islandSize, Vector target, boolean shouldClearArea, String islandId, Shape shape) throws IllegalArgumentException {
-        List<Location> locations = biomes.availableLocations.get(biome);
+    public boolean copyIsland(Player player, Biome biome, int islandSize, Vector target, boolean shouldClearArea, String islandId, Shape shape, boolean random) throws IllegalArgumentException {
+        Location sourceLocation;
 
-        if (locations == null)
-            throw new IllegalArgumentException();
+        if (random) {
+            sourceLocation = plugin.islandGeneration.biomes.getRandomLocation(biome, islandSize);
+        } else {
+            List<Location> locations = biomes.availableLocations.get(biome);
 
-        if (locations.size() == 0)
-            throw new IllegalArgumentException();
+            if (locations == null)
+                throw new IllegalArgumentException();
 
-        if (!canAddQueueItem(player))
-            throw new IllegalArgumentException();
+            if (locations.size() == 0)
+                throw new IllegalArgumentException();
 
-        Location sourceLocation = locations.get(new Random().nextInt(locations.size()));
+            if (!canAddQueueItem(player))
+                throw new IllegalArgumentException();
+
+            sourceLocation = locations.get(new Random().nextInt(locations.size()));
+        }
 
         int centerY = 100;
         while (true) {

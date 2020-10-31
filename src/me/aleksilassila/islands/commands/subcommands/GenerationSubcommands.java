@@ -15,6 +15,10 @@ import java.util.List;
 public abstract class GenerationSubcommands extends Subcommand {
     abstract Islands getPlugin();
 
+    boolean isRandomBiomeDisabled() {
+        return getPlugin().getConfig().getBoolean("disableRandomBiome");
+    }
+
     boolean validateCommand(Player player, int islandSize) {
         if (!player.hasPermission(getPlugin().getCreatePermission(islandSize))) {
             player.sendMessage(Messages.get("error.NO_PERMISSION"));
@@ -50,6 +54,9 @@ public abstract class GenerationSubcommands extends Subcommand {
 
         if (args.length == 1) {
             HashMap<Biome, List<Location>> availableLocations = getPlugin().islandGeneration.biomes.availableLocations;
+
+            if (!isRandomBiomeDisabled())
+                availableArgs.add("RANDOM");
 
             for (Biome biome : availableLocations.keySet()) {
                 availableArgs.add(biome.name());

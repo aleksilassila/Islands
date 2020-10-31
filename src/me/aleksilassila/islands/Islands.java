@@ -139,6 +139,12 @@ public class Islands extends JavaPlugin {
                 ? shape.getHeight() + islandSize / 2
                 : islandSize;
 
+        boolean random = biome == null;
+
+        if (biome == null) {
+            biome = islandGeneration.biomes.getRandomBiome(islandSize);
+        }
+
         String islandId = layout.createIsland(player.getUniqueId(), islandSize, height, biome);
         try {
             boolean success = islandGeneration.copyIsland(
@@ -152,7 +158,8 @@ public class Islands extends JavaPlugin {
                     ),
                     false,
                     islandId,
-                    shape
+                    shape,
+                    random
             );
 
             if (!success) {
@@ -177,6 +184,12 @@ public class Islands extends JavaPlugin {
                 ? shape.getHeight() + islandSize / 2
                 : islandSize;
 
+        boolean random = biome == null;
+
+        if (biome == null) {
+            biome = islandGeneration.biomes.getRandomBiome(islandSize);
+        }
+
         layout.updateIsland(islandId, islandSize, height, biome);
 
         try {
@@ -191,7 +204,8 @@ public class Islands extends JavaPlugin {
                     ),
                     true,
                     islandId,
-                    shape
+                    shape,
+                    random
             );
         } catch (IllegalArgumentException e) {
             throw new IllegalArgumentException();

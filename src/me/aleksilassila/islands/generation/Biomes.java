@@ -21,9 +21,11 @@ public class Biomes {
     final int maxLocationsPerBiome;
     final List<String> biomeBlacklist;
 
+    private final Map<Biome, Location> randomLocations;
+
     public Biomes(Islands plugin, World world) {
         this.world = world;
-        this.biggestIslandSize = plugin.getConfig().getInt("generation.maxBiomeSize");
+        this.biggestIslandSize = plugin.getConfig().getInt("generation.minBiomeSize");
         this.plugin = plugin;
 
         this.biomeSearchJumpBlocks = plugin.getConfig().getInt("generation.searchJump");
@@ -32,6 +34,7 @@ public class Biomes {
         this.biomeBlacklist = plugin.getConfig().getStringList("biomeBlacklist");
 
         this.availableLocations = new HashMap<>();
+        randomLocations = new HashMap<>();
 
         // Generate biomes and save them to config
         if (plugin.getBiomesCache().getString("seed") == null || !plugin.getBiomesCache().getString("seed").equals(String.valueOf(plugin.islandsSourceWorld.getSeed()))) {
@@ -182,5 +185,36 @@ public class Biomes {
             }
         }
         return true;
+    }
+
+    public Biome getRandomBiome(int islandSize) {
+        while (true) {
+            int x = (int) (Math.random() * biomeSearchSize);
+            int z = (int) (Math.random() * biomeSearchSize);
+            int y = plugin.islandsWorld.getHighestBlockYAt(x, z);
+
+            Biome biome = plugin.islandsSourceWorld.getBiome(x, y, z);
+
+            if (isBlacklisted(biome))
+                continue;
+
+            randomLocations.put(biome, new Location(plugin.islandsSourceWorld,
+                    x - islandSize / 2.0,
+                    y,
+                    z - islandSize / 2.0));
+
+            return biome;
+        }
+    }
+
+    public Location getRandomLocation(Biome biome, int islandSize) {
+        int x = (int) (Math.random() * biomeSearchSize);
+        int z = (int) (Math.random() * biomeSearchSize);
+        int y = plugin.islandsWorld.getHighestBlockYAt(x, z);
+
+        return randomLocations.getOrDefault(biome, new Location(plugin.islandsSourceWorld,
+                x - islandSize / 2.0,
+                y,
+                z - islandSize / 2.0));
     }
 }

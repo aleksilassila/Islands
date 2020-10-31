@@ -58,21 +58,28 @@ public class CreateSubcommand extends GenerationSubcommands {
             return;
         }
 
-        Biome targetBiome = utils.getTargetBiome(args[0]);
-
-        if (targetBiome == null) {
-            player.sendMessage(Messages.get("error.NO_BIOME_FOUND"));
-            return;
-        }
-
         if (plugin.econ != null && !hasFunds(player, plugin.islandPrices.getOrDefault(islandSize, 0.0))) {
             player.sendMessage(Messages.get("error.INSUFFICIENT_FUNDS"));
             return;
         }
 
-        if (!availableLocations.containsKey(targetBiome)) {
-            player.sendMessage(Messages.get("error.NO_LOCATIONS_FOR_BIOME"));
-            return;
+        Biome targetBiome;
+
+        if (args[0].equalsIgnoreCase("random") && !isRandomBiomeDisabled()) {
+            targetBiome = null;
+        } else {
+            targetBiome = utils.getTargetBiome(args[0]);
+
+            if (targetBiome == null) {
+                player.sendMessage(Messages.get("error.NO_BIOME_FOUND"));
+                return;
+            }
+
+
+            if (!availableLocations.containsKey(targetBiome)) {
+                player.sendMessage(Messages.get("error.NO_LOCATIONS_FOR_BIOME"));
+                return;
+            }
         }
 
         String islandId = null;

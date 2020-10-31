@@ -72,16 +72,23 @@ public class RecreateSubcommand extends GenerationSubcommands {
             }
         }
 
-        Biome targetBiome = utils.getTargetBiome(args[0]);
+        Biome targetBiome;
 
-        if (targetBiome == null) {
-            player.sendMessage(Messages.get("error.NO_BIOME_FOUND"));
-            return;
-        }
+        if (args[0].equalsIgnoreCase("random") && !isRandomBiomeDisabled()) {
+            targetBiome = null;
+        } else {
+            targetBiome = utils.getTargetBiome(args[0]);
 
-        if (!plugin.islandGeneration.biomes.availableLocations.containsKey(targetBiome)) {
-            player.sendMessage(Messages.get("error.NO_LOCATIONS_FOR_BIOME"));
-            return;
+            if (targetBiome == null) {
+                player.sendMessage(Messages.get("error.NO_BIOME_FOUND"));
+                return;
+            }
+
+
+            if (!plugin.islandGeneration.biomes.availableLocations.containsKey(targetBiome)) {
+                player.sendMessage(Messages.get("error.NO_LOCATIONS_FOR_BIOME"));
+                return;
+            }
         }
 
         if (!confirmed) {
