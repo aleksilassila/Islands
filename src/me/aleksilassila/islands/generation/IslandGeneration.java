@@ -72,7 +72,7 @@ public class IslandGeneration {
         }
     }
 
-    public boolean copyIsland(Player player, Biome biome, int islandSize, Vector target, boolean shouldClearArea, int xIndex, int zIndex, Shape shape) throws IllegalArgumentException {
+    public boolean copyIsland(Player player, Biome biome, int islandSize, Vector target, boolean shouldClearArea, String islandId, Shape shape) throws IllegalArgumentException {
         List<Location> locations = biomes.availableLocations.get(biome);
 
         if (locations == null)
@@ -105,7 +105,7 @@ public class IslandGeneration {
         int startY = centerY - islandSize / 2;
         int startZ = sourceLocation.getBlockZ();
 
-        CopyTask task = new CopyTask(player, new Vector(startX, startY, startZ), target, islandSize, shouldClearArea, xIndex, zIndex, shape);
+        CopyTask task = new CopyTask(player, new Vector(startX, startY, startZ), target, islandSize, shouldClearArea, islandId, shape);
 
         if (queue.size() == 0) {
             task.runTaskTimer(plugin, 0, buildDelay);
@@ -116,11 +116,11 @@ public class IslandGeneration {
         return true;
     }
 
-    public boolean clearIsland(Player player, int xIndex, int zIndex) {
+    public boolean clearIsland(Player player, String islandId) {
         if (!canAddQueueItem(player))
             return false;
 
-        ClearTask task = new ClearTask(player, xIndex, zIndex);
+        ClearTask task = new ClearTask(player, islandId);
 
         if (queue.size() == 0) {
             task.runTaskTimer(plugin, 0, buildDelay);
@@ -169,14 +169,14 @@ public class IslandGeneration {
     }
 
     public int getBypassIndex(Player player) {
-        if (queue.size() == 1) return 1;
+        if (queue.size() < 2) return queue.size();
         else {
             for (int index = 1; index < queue.size(); index++) {
                 if (!queue.get(index).getPlayer().getUniqueId().equals(player.getUniqueId()))
                     return index;
             }
 
-            return Math.max(queue.size(), 0);
+            return queue.size();
         }
     }
 
@@ -188,8 +188,9 @@ public class IslandGeneration {
         return false;
     }
 
-    abstract static class Task extends BukkitRunnable {
+    public abstract static class Task extends BukkitRunnable {
         public abstract Player getPlayer();
+        public abstract String getIslandId();
 
         @Override
         public synchronized BukkitTask runTaskTimer(Plugin plugin, long delay, long period) throws IllegalArgumentException, IllegalStateException {
@@ -200,22 +201,29 @@ public class IslandGeneration {
     }
 
     class ClearTask extends Task {
-        private Player player;
-        private int xIndex;
-        private int zIndex;
+        private final Player player;
+        private final int xIndex;
+        private final int zIndex;
+        private final String islandId;
 
         private int index = 0;
 
-        public ClearTask(Player player, int xIndex, int zIndex) {
+        public ClearTask(Player player, String islandId) {
             this.player = player;
-            this.xIndex = xIndex;
-            this.zIndex = zIndex;
+            this.xIndex = Integer.parseInt(islandId.split("x")[0]);
+            this.zIndex = Integer.parseInt(islandId.split("x")[1]);
+            this.islandId = islandId;
         }
 
 
         @Override
         public Player getPlayer() {
             return player;
+        }
+
+        @Override
+        public String getIslandId() {
+            return islandId;
         }
 
         @Override
@@ -291,9 +299,11 @@ public class IslandGeneration {
         private final int xIndex;
         private final int zIndex;
 
+        private final String islandId;
+
         private final Shape shape;
 
-        public CopyTask(Player player, Vector start, Vector target, int islandSize, boolean shouldDoClearing, int xIndex, int zIndex, Shape shape) {
+        public CopyTask(Player player, Vector start, Vector target, int islandSize, boolean shouldDoClearing, String islandId, Shape shape) {
             this.startX = start.getBlockX();
 
             this.startY = shape != null ? start.getBlockY() - (shape.getHeight() - islandSize / 2) : start.getBlockY();
@@ -310,8 +320,10 @@ public class IslandGeneration {
 
             this.shouldDoClearing = shouldDoClearing;
             this.clearingIndex = 0;
-            this.xIndex = xIndex;
-            this.zIndex = zIndex;
+            this.xIndex = Integer.parseInt(islandId.split("x")[0]);
+            this.zIndex = Integer.parseInt(islandId.split("x")[1]);
+
+            this.islandId = islandId;
 
             this.shape = shape;
 
@@ -321,6 +333,11 @@ public class IslandGeneration {
         @Override
         public Player getPlayer() {
             return player;
+        }
+
+        @Override
+        public String getIslandId() {
+            return islandId;
         }
 
         @Override

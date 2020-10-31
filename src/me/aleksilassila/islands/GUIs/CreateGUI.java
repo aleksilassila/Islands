@@ -76,7 +76,7 @@ public class CreateGUI extends PageGUI {
                         BiomeMaterials.valueOf(biome.name()).getMaterial(),
                         Messages.get("gui.create.BIOME_NAME", biome.name()),
                         false,
-                        Messages.get("gui.create.BIOME_LORE")
+                        Messages.get("gui.create.BIOME_LORE", availableLocations.get(biome).size())
                     ),
                 event -> {
                     getSizeGui(biome).show(event.getWhoClicked());

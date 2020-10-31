@@ -20,6 +20,7 @@ public class Permissions {
         public static final String queue = "islands.bypass.queue";
         public static final String queueLimit = "islands.bypass.queue.limit";
         public static final String info = "islands.bypass.info";
+        public static final String neutralTeleport = "islands.bypass.neutralTeleport";
     }
 
     public static class command {

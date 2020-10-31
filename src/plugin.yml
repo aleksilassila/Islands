@@ -1,5 +1,5 @@
 name: Islands
-version: 4.6.0
+version: 4.6.1
 author: Aleksi Lassila
 main: me.aleksilassila.islands.Islands
 api-version: 1.15
@@ -58,6 +58,7 @@ permissions:
   islands.bypass.*:
     description: Access to all island bypasses
     children:
+      islands.bypass.neutralTeleport: true
       islands.bypass.islandLimit: true
       islands.bypass.recreate: true
       islands.bypass.clear: true
@@ -147,6 +148,9 @@ permissions:
     description: Access to island setspawn command
     default: "op"
 
+  islands.bypass.neutralTeleport:
+    description: Allow players to teleport neutrals in their islands
+    default: true
   islands.bypass.islandLimit:
     description: Bypass island limit restrictions
     default: "op"

@@ -23,7 +23,7 @@ public class Biomes {
 
     public Biomes(Islands plugin, World world) {
         this.world = world;
-        this.biggestIslandSize = plugin.getConfig().getInt("island.BIG");
+        this.biggestIslandSize = plugin.getConfig().getInt("generation.maxBiomeSize");
         this.plugin = plugin;
 
         this.biomeSearchJumpBlocks = plugin.getConfig().getInt("generation.searchJump");
@@ -72,7 +72,7 @@ public class Biomes {
 
     private void generateAndSaveBiomes() {
         plugin.clearBiomesCache();
-        this.availableLocations = generateIslandLocations(biggestIslandSize);
+        this.availableLocations = generateIslandLocations();
 
         plugin.getBiomesCache().set("seed", String.valueOf(plugin.islandsSourceWorld.getSeed()));
 
@@ -118,17 +118,17 @@ public class Biomes {
     }
 
     @NotNull
-    public HashMap<Biome, List<Location>> generateIslandLocations(int maxIslandSize) {
+    public HashMap<Biome, List<Location>> generateIslandLocations() {
         HashMap<Biome, List<Location>> locations = new HashMap<>();
         List<int[]> usedPositions = new ArrayList<int[]>();
 
         plugin.getLogger().info("Generating biomes...");
 
-        for (int x = 0; x < biomeSearchSize - maxIslandSize; x += biomeSearchJumpBlocks) {
-            zLoop: for (int z = 0; z < biomeSearchSize - maxIslandSize; z += biomeSearchJumpBlocks) {
+        for (int x = 0; x < biomeSearchSize - biggestIslandSize; x += biomeSearchJumpBlocks) {
+            zLoop: for (int z = 0; z < biomeSearchSize - biggestIslandSize; z += biomeSearchJumpBlocks) {
                 for (int[] pos : usedPositions) {
-                    if (pos[0] <= x && x <= pos[0] + maxIslandSize && pos[1] <= z && z <= pos[1] + maxIslandSize) {
-                        z += maxIslandSize;
+                    if (pos[0] <= x && x <= pos[0] + biggestIslandSize && pos[1] <= z && z <= pos[1] + biggestIslandSize) {
+                        z += biggestIslandSize;
                         continue zLoop;
                     }
                 }
@@ -140,7 +140,7 @@ public class Biomes {
                     continue;
                 }
 
-                if (isSuitableLocation(x, z, maxIslandSize, biome)) {
+                if (isSuitableLocation(x, z, biggestIslandSize, biome)) {
                     Location location = new Location(world, x, 0, z);
 
                     if (locations.containsKey(biome)) {
@@ -152,7 +152,7 @@ public class Biomes {
                     }
 
                     usedPositions.add(new int[]{x, z});
-                    z += maxIslandSize;
+                    z += biggestIslandSize;
                 }
 
             }

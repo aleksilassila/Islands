@@ -3,7 +3,7 @@ package me.aleksilassila.islands;
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import com.sun.istack.internal.NotNull;
 import com.sun.istack.internal.Nullable;
-import me.aleksilassila.islands.commands.IslandCommands;
+import me.aleksilassila.islands.commands.TeleportCommands;
 import me.aleksilassila.islands.commands.IslandManagmentCommands;
 import me.aleksilassila.islands.commands.TrustCommands;
 import me.aleksilassila.islands.generation.IslandGeneration;
@@ -105,7 +105,7 @@ public class Islands extends JavaPlugin {
 
         new IslandManagmentCommands(this);
 
-        IslandCommands islandCommands = new IslandCommands(this);
+        TeleportCommands islandCommands = new TeleportCommands(this);
 
         islandCommands.new HomeCommand();
         islandCommands.new VisitCommand();
@@ -151,8 +151,7 @@ public class Islands extends JavaPlugin {
                             getIslandsConfig().getInt(islandId + ".z")
                     ),
                     false,
-                    0,
-                    0,
+                    islandId,
                     shape
             );
 
@@ -191,8 +190,7 @@ public class Islands extends JavaPlugin {
                             getIslandsConfig().getInt(islandId + ".z")
                     ),
                     true,
-                    getIslandsConfig().getInt(islandId + ".xIndex"),
-                    getIslandsConfig().getInt(islandId + ".zIndex"),
+                    islandId,
                     shape
             );
         } catch (IllegalArgumentException e) {

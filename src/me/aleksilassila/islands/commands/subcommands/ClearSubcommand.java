@@ -43,7 +43,7 @@ public class ClearSubcommand extends Subcommand {
             return;
         }
 
-        if (!plugin.islandGeneration.clearIsland(player, Integer.parseInt(islandId.split("x")[0]), Integer.parseInt(islandId.split("x")[1]))) {
+        if (!plugin.islandGeneration.clearIsland(player, islandId)) {
             player.sendMessage(Messages.get("error.ONGOING_QUEUE_EVENT"));
             return;
         }

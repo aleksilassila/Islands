@@ -7,19 +7,24 @@ import me.aleksilassila.islands.utils.Messages;
 import me.aleksilassila.islands.utils.Permissions;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Animals;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.Monster;
 import org.bukkit.entity.Player;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
-public class IslandCommands {
+public class TeleportCommands {
     private final Islands plugin;
     private final IslandLayout layout;
 
-    public IslandCommands(Islands plugin) {
+    public TeleportCommands(Islands plugin) {
         this.plugin = plugin;
         this.layout = plugin.layout;
     }
@@ -70,9 +75,19 @@ public class IslandCommands {
     }
 
     public class HomeCommand implements CommandExecutor {
+        private final boolean allowHomeOnlyFromOverworld;
+        private final boolean disableNeutralTeleports;
+        private final int neutralTeleportRange;
+        private final boolean unfinishedIslandTeleports;
+
         public HomeCommand() {
             plugin.getCommand("home").setExecutor(this);
             plugin.getCommand("homes").setExecutor(this);
+
+            this.allowHomeOnlyFromOverworld = plugin.getConfig().getBoolean("allowHomeOnlyFromOverworld");
+            this.disableNeutralTeleports = plugin.getConfig().getBoolean("disableNeutralTeleports");
+            this.neutralTeleportRange = plugin.getConfig().getInt("neutralTeleportRange");
+            this.unfinishedIslandTeleports = plugin.getConfig().getBoolean("unfinishedIslandTeleports");
         }
 
         @Override
@@ -102,33 +117,34 @@ public class IslandCommands {
                 }
 
                 return true;
-            } else {
-                if (!player.hasPermission(Permissions.command.home)) {
-                    player.sendMessage(Messages.get("error.NO_PERMISSION"));
-                    return true;
-                }
-
-                if (!canTeleport(player) && !player.hasPermission(Permissions.bypass.home)) {
-                    player.sendMessage(Messages.get("error.COOLDOWN", teleportCooldown(player)));
-                    return true;
-                }
-
-                try {
-                    if (args.length != 0) {
-                        Integer.parseInt(args[0]);
-                    }
-                } catch (NumberFormatException e) {
-                    player.sendMessage(Messages.help.HOME);
-                    return true;
-                }
             }
 
-            if (player.getWorld().getName().equals("world_nether") && !player.hasPermission(Permissions.bypass.home)) {
+            if (!player.hasPermission(Permissions.command.home)) {
+                player.sendMessage(Messages.get("error.NO_PERMISSION"));
+                return true;
+            }
+
+            if (!canTeleport(player) && !player.hasPermission(Permissions.bypass.home)) {
+                player.sendMessage(Messages.get("error.COOLDOWN", teleportCooldown(player)));
+                return true;
+            }
+
+            try {
+                if (args.length != 0) {
+                    Integer.parseInt(args[0]);
+                }
+            } catch (NumberFormatException e) {
+                player.sendMessage(Messages.help.HOME);
+                return true;
+            }
+
+            if (allowHomeOnlyFromOverworld && !player.getWorld().getEnvironment().equals(World.Environment.NORMAL)
+                    && !player.hasPermission(Permissions.bypass.home)) {
                 player.sendMessage(Messages.get("info.IN_OVERWORLD"));
                 return true;
             }
 
-            if (player.getWorld().getName().equals("world") && !player.hasPermission(Permissions.bypass.home)) {
+            if (!player.hasPermission(Permissions.bypass.home)) {
                 // Check if is on surface
                 Location playerLocation = player.getLocation();
 
@@ -149,9 +165,33 @@ public class IslandCommands {
                 homeId = 1;
             }
 
-            Location location = layout.getIslandSpawn(layout.getHomeIsland(player.getUniqueId(), homeId));
+            String islandId = layout.getHomeIsland(player.getUniqueId(), homeId);
+
+            if (plugin.islandGeneration.queue.size() > 0
+                    && plugin.islandGeneration.queue.get(0).getIslandId().equals(islandId)
+                    && !unfinishedIslandTeleports) {
+                Messages.send(player, "error.ISLAND_UNFINISHED");
+                return true;
+            }
+
+            if (plugin.islandGeneration.queue.size() != 0)
+                System.out.println("IslanId " + islandId + " and " + plugin.islandGeneration.queue.get(0).getIslandId());
+
+            Location location = layout.getIslandSpawn(islandId);
 
             if (location != null) {
+                if (!disableNeutralTeleports && player.hasPermission(Permissions.bypass.neutralTeleport)) {
+                    List<Entity> entities = player.getNearbyEntities(neutralTeleportRange, neutralTeleportRange, neutralTeleportRange);
+                    entities.removeIf(entity -> entity instanceof Monster || !entity.getType().isAlive());
+
+                    Location animalLocation = location.clone();
+                    animalLocation.setY(plugin.islandsWorld.getHighestBlockYAt(location) + 1);
+
+                    for (Entity entity : entities) {
+                        entity.teleport(animalLocation);
+                    }
+                }
+
                 player.teleport(location);
             } else {
                 player.sendMessage(Messages.get("error.HOME_NOT_FOUND"));
