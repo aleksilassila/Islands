@@ -20,6 +20,7 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerPortalEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
+import org.bukkit.event.world.TimeSkipEvent;
 
 import java.util.Date;
 
@@ -30,16 +31,16 @@ public class IslandsListener extends ChatUtils implements Listener {
     private final boolean voidTeleport;
     private final boolean islandDamage;
     private final boolean restrictFlow;
+    private final boolean syncTime;
 
     public IslandsListener(Islands plugin) {
         this.plugin = plugin;
 
-        this.voidTeleport = !plugin.getConfig().getKeys(false).contains("voidTeleport")
-                || plugin.getConfig().getBoolean("voidTeleport");
-        this.restrictFlow = !plugin.getConfig().getKeys(false).contains("restrictIslandBlockFlows")
-                || plugin.getConfig().getBoolean("restrictIslandBlockFlows");
+        this.voidTeleport = plugin.getConfig().getBoolean("voidTeleport");
+        this.restrictFlow = plugin.getConfig().getBoolean("restrictIslandBlockFlows");
         this.disableMobs = plugin.getConfig().getBoolean("disableMobsOnIslands");
         this.islandDamage = plugin.getConfig().getBoolean("islandDamage");
+        this.syncTime = plugin.getConfig().getBoolean("syncTime");
 
         plugin.getServer().getPluginManager().registerEvents(this, plugin);
     }
@@ -199,6 +200,21 @@ public class IslandsListener extends ChatUtils implements Listener {
                 if (ownerUUID != null) event.getPlayer().sendMessage(Messages.get("error.NOT_TRUSTED"));
             }
 
+        }
+    }
+
+    // Sync clocks
+    @EventHandler
+    private void onTimeSkip(TimeSkipEvent event) {
+        if (!syncTime) return;
+        if (!event.getSkipReason().equals(TimeSkipEvent.SkipReason.NIGHT_SKIP)) return;
+
+        long targetTime = event.getWorld().getTime() + event.getSkipAmount();
+
+        if (event.getWorld().equals(plugin.islandsWorld)) {
+            plugin.wildernessWorld.setTime(targetTime);
+        } else if (event.getWorld().equals(plugin.wildernessWorld)) {
+            plugin.islandsWorld.setTime(targetTime);
         }
     }
 }

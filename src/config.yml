@@ -58,8 +58,9 @@ islandDamage: false                     # Enable / disable damage on islands
 restrictIslandBlockFlows: true          # Let water / lava only flow inside a sphere containing island
 disableWilderness: false                # Disable wilderness, do not touch unless you know what you are doing
 allowHomeOnlyFromOverworld: true        # Disable /home in nether and end
-disableNeutralTeleports: false          # Disable teleporting neutrals to islands with /home command
+disableNeutralTeleports: false          # Disable teleporting neutrals from wilderness to islands with /home command
 neutralTeleportRange: 2                 # How far neutrals are being teleported around the player
 unfinishedIslandTeleports: true         # Deny teleports to island that are still being generated.
 disableRandomBiome: false               # Disable RANDOM biome in island creation
+syncTime: true                          # Night skips will be synced between islands world and wilderness.
 locale: en

@@ -174,13 +174,10 @@ public class TeleportCommands {
                 return true;
             }
 
-            if (plugin.islandGeneration.queue.size() != 0)
-                System.out.println("IslanId " + islandId + " and " + plugin.islandGeneration.queue.get(0).getIslandId());
-
             Location location = layout.getIslandSpawn(islandId);
 
             if (location != null) {
-                if (!disableNeutralTeleports && player.hasPermission(Permissions.bypass.neutralTeleport)) {
+                if (!disableNeutralTeleports && player.hasPermission(Permissions.bypass.neutralTeleport) && player.getWorld().equals(plugin.wildernessWorld)) {
                     List<Entity> entities = player.getNearbyEntities(neutralTeleportRange, neutralTeleportRange, neutralTeleportRange);
                     entities.removeIf(entity -> entity instanceof Monster || !entity.getType().isAlive());
 
