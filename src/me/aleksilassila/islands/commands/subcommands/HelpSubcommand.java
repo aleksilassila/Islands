@@ -1,6 +1,6 @@
 package me.aleksilassila.islands.commands.subcommands;
 
-import me.aleksilassila.islands.commands.IslandManagmentCommands;
+import me.aleksilassila.islands.commands.IslandCommands;
 import me.aleksilassila.islands.commands.Subcommand;
 import me.aleksilassila.islands.utils.Messages;
 import org.bukkit.entity.Player;
@@ -8,9 +8,9 @@ import org.bukkit.entity.Player;
 import java.util.List;
 
 public class HelpSubcommand extends Subcommand {
-    IslandManagmentCommands commands;
+    IslandCommands commands;
 
-    public HelpSubcommand(IslandManagmentCommands commands) {
+    public HelpSubcommand(IslandCommands commands) {
         this.commands = commands;
     }
 

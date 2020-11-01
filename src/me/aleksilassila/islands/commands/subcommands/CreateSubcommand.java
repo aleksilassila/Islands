@@ -3,7 +3,7 @@ package me.aleksilassila.islands.commands.subcommands;
 import me.aleksilassila.islands.GUIs.CreateGUI;
 import me.aleksilassila.islands.IslandLayout;
 import me.aleksilassila.islands.Islands;
-import me.aleksilassila.islands.commands.IslandManagmentCommands;
+import me.aleksilassila.islands.commands.IslandCommands;
 import me.aleksilassila.islands.utils.Messages;
 import me.aleksilassila.islands.utils.Permissions;
 import org.bukkit.Location;
@@ -17,7 +17,7 @@ import java.util.List;
 public class CreateSubcommand extends GenerationSubcommands {
     private final Islands plugin;
     private final IslandLayout layout;
-    private final IslandManagmentCommands.Utils utils = new IslandManagmentCommands.Utils();
+    private final IslandCommands.Utils utils = new IslandCommands.Utils();
 
     public CreateSubcommand(Islands plugin) {
         this.plugin = plugin;

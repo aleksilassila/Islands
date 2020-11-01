@@ -15,11 +15,11 @@ import org.bukkit.entity.Player;
 
 import java.util.*;
 
-public class IslandManagmentCommands extends ChatUtils implements TabExecutor {
+public class IslandCommands extends ChatUtils implements TabExecutor {
     private final Islands plugin;
     public final Set<Subcommand> subcommands;
 
-    public IslandManagmentCommands(Islands plugin) {
+    public IslandCommands(Islands plugin) {
         this.plugin = plugin;
 
         plugin.getCommand("island").setExecutor(this);
@@ -39,6 +39,20 @@ public class IslandManagmentCommands extends ChatUtils implements TabExecutor {
         subcommands.add(new HelpSubcommand(this));
         subcommands.add(new InfoSubcommand(plugin));
         subcommands.add(new ModerateSubcommand(plugin));
+
+        TeleportCommands teleportCommands = new TeleportCommands(plugin);
+
+        boolean homePrefix = plugin.getConfig().getBoolean("homeSubcommand");
+
+        TeleportCommands.HomeCommand homeCommand = teleportCommands.new HomeCommand(homePrefix);
+        TeleportCommands.HomesCommand homesCommand = teleportCommands.new HomesCommand(homePrefix);
+
+        if (homePrefix) {
+            subcommands.add(homeCommand);
+            subcommands.add(homesCommand);
+        }
+
+        new TrustCommands(plugin);
     }
 
     @Override

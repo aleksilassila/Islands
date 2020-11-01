@@ -4,7 +4,7 @@ import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import com.sun.istack.internal.NotNull;
 import com.sun.istack.internal.Nullable;
 import me.aleksilassila.islands.commands.TeleportCommands;
-import me.aleksilassila.islands.commands.IslandManagmentCommands;
+import me.aleksilassila.islands.commands.IslandCommands;
 import me.aleksilassila.islands.commands.TrustCommands;
 import me.aleksilassila.islands.generation.IslandGeneration;
 import me.aleksilassila.islands.generation.Shape;
@@ -103,18 +103,7 @@ public class Islands extends JavaPlugin {
         islandGeneration = new IslandGeneration(this);
         layout = new IslandLayout(this);
 
-        new IslandManagmentCommands(this);
-
-        TeleportCommands islandCommands = new TeleportCommands(this);
-
-        islandCommands.new HomeCommand();
-        islandCommands.new VisitCommand();
-
-        TrustCommands trustCommands = new TrustCommands(this);
-
-        trustCommands.new UntrustCommand();
-        trustCommands.new TrustCommand();
-        trustCommands.new ListTrustedCommand();
+        new IslandCommands(this);
 
         new IslandsListener(this);
 

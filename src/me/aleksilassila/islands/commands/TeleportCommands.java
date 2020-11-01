@@ -16,6 +16,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Monster;
 import org.bukkit.entity.Player;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -27,6 +28,8 @@ public class TeleportCommands {
     public TeleportCommands(Islands plugin) {
         this.plugin = plugin;
         this.layout = plugin.layout;
+
+        new VisitCommand();
     }
 
     public class VisitCommand implements CommandExecutor {
@@ -74,15 +77,83 @@ public class TeleportCommands {
         }
     }
 
-    public class HomeCommand implements CommandExecutor {
+    public class HomesCommand extends Subcommand implements CommandExecutor {
+        public HomesCommand(boolean subcommand) {
+            if (!subcommand) {
+                plugin.getCommand("homes").setExecutor(this);
+            }
+        }
+
+        @Override
+        public void onCommand(Player player, String[] args, boolean confirmed) {
+            onCommand(player, null, "homes", args);
+        }
+
+        @Override
+        public List<String> onTabComplete(Player player, String[] args) {
+            return new ArrayList<>();
+        }
+
+        @Override
+        public String getName() {
+            return "homes";
+        }
+
+        @Override
+        public String help() {
+            return null;
+        }
+
+        @Override
+        public String getPermission() {
+            return Permissions.command.listHomes;
+        }
+
+        @Override
+        public String[] aliases() {
+            return new String[0];
+        }
+
+        @Override
+        public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+            if (!(sender instanceof Player)) {
+                sender.sendMessage("This is for players only.");
+                return false;
+            }
+
+            Player player = (Player) sender;
+
+            plugin.confirmations.remove(player.getUniqueId().toString());
+
+            if (!player.hasPermission(Permissions.command.listHomes)) {
+                player.sendMessage(Messages.get("error.NO_PERMISSION"));
+                return true;
+            }
+
+            List<String> ids = plugin.layout.getIslandIds(player.getUniqueId());
+
+            player.sendMessage(Messages.get("success.HOMES_FOUND", ids.size()));
+            for (String islandId : ids) {
+                String name = plugin.getIslandsConfig().getString(islandId + ".name");
+                String homeNumber = plugin.getIslandsConfig().getString(islandId + ".home");
+                Messages.send(player, "success.HOME_ITEM", name, homeNumber);
+            }
+
+            return true;
+        }
+    }
+
+
+    public class HomeCommand extends Subcommand implements CommandExecutor {
         private final boolean allowHomeOnlyFromOverworld;
         private final boolean disableNeutralTeleports;
         private final int neutralTeleportRange;
         private final boolean unfinishedIslandTeleports;
 
-        public HomeCommand() {
-            plugin.getCommand("home").setExecutor(this);
-            plugin.getCommand("homes").setExecutor(this);
+        public HomeCommand(boolean subcommand) {
+            if (!subcommand) {
+                plugin.getCommand("home").setExecutor(this);
+            }
 
             this.allowHomeOnlyFromOverworld = plugin.getConfig().getBoolean("allowHomeOnlyFromOverworld");
             this.disableNeutralTeleports = plugin.getConfig().getBoolean("disableNeutralTeleports");
@@ -100,24 +171,6 @@ public class TeleportCommands {
             Player player = (Player) sender;
 
             plugin.confirmations.remove(player.getUniqueId().toString());
-
-            if (args.length == 1 && args[0].equalsIgnoreCase("list") || label.equalsIgnoreCase("homes")) {
-                if (!player.hasPermission(Permissions.command.listHomes)) {
-                    player.sendMessage(Messages.get("error.NO_PERMISSION"));
-                    return true;
-                }
-
-                List<String> ids = plugin.layout.getIslandIds(player.getUniqueId());
-
-                player.sendMessage(Messages.get("success.HOMES_FOUND", ids.size()));
-                for (String islandId : ids) {
-                    String name = plugin.getIslandsConfig().getString(islandId + ".name");
-                    String homeNumber = plugin.getIslandsConfig().getString(islandId + ".home");
-                    player.sendMessage(Messages.get("success.HOME_ITEM", name, homeNumber));
-                }
-
-                return true;
-            }
 
             if (!player.hasPermission(Permissions.command.home)) {
                 player.sendMessage(Messages.get("error.NO_PERMISSION"));
@@ -195,6 +248,36 @@ public class TeleportCommands {
             }
 
             return true;
+        }
+
+        @Override
+        public void onCommand(Player player, String[] args, boolean confirmed) {
+            onCommand(player, null, "home", args);
+        }
+
+        @Override
+        public List<String> onTabComplete(Player player, String[] args) {
+            return new ArrayList<>();
+        }
+
+        @Override
+        public String getName() {
+            return "home";
+        }
+
+        @Override
+        public String help() {
+            return null;
+        }
+
+        @Override
+        public String getPermission() {
+            return Permissions.command.home;
+        }
+
+        @Override
+        public String[] aliases() {
+            return new String[0];
         }
     }
 

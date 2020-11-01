@@ -13,10 +13,14 @@ import java.util.List;
 import java.util.UUID;
 
 public class TrustCommands {
-    private Islands plugin;
+    private final Islands plugin;
 
     public TrustCommands(Islands plugin) {
         this.plugin = plugin;
+
+        new UntrustCommand();
+        new TrustCommand();
+        new ListTrustedCommand();
     }
 
     public class UntrustCommand implements CommandExecutor {
