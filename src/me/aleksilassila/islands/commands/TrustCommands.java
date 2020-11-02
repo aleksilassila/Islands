@@ -3,6 +3,7 @@ package me.aleksilassila.islands.commands;
 import me.aleksilassila.islands.Islands;
 import me.aleksilassila.islands.utils.Messages;
 import me.aleksilassila.islands.utils.Permissions;
+import me.aleksilassila.islands.utils.Utils;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.Command;
@@ -42,12 +43,10 @@ public class TrustCommands {
                 return true;
             }
 
-
             if (!player.getWorld().equals(plugin.islandsWorld)) {
-                player.sendMessage(Messages.get("error.WRONG_WORLD"));
+                Messages.send(player, "error.WRONG_WORLD");
                 return true;
             }
-
 
             if (args.length != 1) {
                 player.sendMessage(Messages.help.UNTRUST);
@@ -67,7 +66,7 @@ public class TrustCommands {
                 return true;
             }
 
-            Player targetPlayer = Bukkit.getPlayer(args[0]);
+            OfflinePlayer targetPlayer = Utils.getOfflinePlayer(args[0]);
 
             if (targetPlayer == null) {
                 player.sendMessage(Messages.get("error.PLAYER_NOT_FOUND"));
@@ -100,6 +99,11 @@ public class TrustCommands {
                 return true;
             }
 
+            if (!player.getWorld().equals(plugin.islandsWorld)) {
+                Messages.send(player, "error.WRONG_WORLD");
+                return true;
+            }
+
             if (args.length != 1) {
                 player.sendMessage(Messages.help.TRUST);
                 return true;
@@ -118,7 +122,7 @@ public class TrustCommands {
                 return true;
             }
 
-            Player targetPlayer = Bukkit.getPlayer(args[0]);
+            OfflinePlayer targetPlayer = Utils.getOfflinePlayer(args[0]);
 
             if (targetPlayer == null) {
                 player.sendMessage(Messages.get("error.PLAYER_NOT_FOUND"));
@@ -151,6 +155,11 @@ public class TrustCommands {
                 return true;
             }
 
+            if (!player.getWorld().equals(plugin.islandsWorld)) {
+                Messages.send(player, "error.WRONG_WORLD");
+                return true;
+            }
+
             String ownerUUID = plugin.layout.getBlockOwnerUUID(player.getLocation().getBlockX(), player.getLocation().getBlockZ());
             String islandId = plugin.layout.getIslandId(player.getLocation().getBlockX(), player.getLocation().getBlockZ());
 
@@ -170,7 +179,8 @@ public class TrustCommands {
             for (String uuid : trustedList) {
                 OfflinePlayer trustedPlayer = Bukkit.getOfflinePlayer(UUID.fromString(uuid));
 
-                Messages.send(player, "info.TRUSTED_PLAYER", trustedPlayer.getName());
+                if (trustedPlayer.getName() != null)
+                    Messages.send(player, "info.TRUSTED_PLAYER", trustedPlayer.getName());
             }
 
             return true;

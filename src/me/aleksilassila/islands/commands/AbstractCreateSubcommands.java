@@ -1,7 +1,6 @@
-package me.aleksilassila.islands.commands.subcommands;
+package me.aleksilassila.islands.commands;
 
 import me.aleksilassila.islands.Islands;
-import me.aleksilassila.islands.commands.Subcommand;
 import me.aleksilassila.islands.utils.Messages;
 import me.aleksilassila.islands.utils.Permissions;
 import org.bukkit.Location;
@@ -12,34 +11,44 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-public abstract class GenerationSubcommands extends Subcommand {
-    abstract Islands getPlugin();
+public abstract class AbstractCreateSubcommands extends Subcommand {
+    protected abstract Islands getPlugin();
+    protected abstract void openGui(Player player);
+    abstract protected void runCommand(Player player, String[] args, boolean confirmed, int islandSize);
 
-    boolean isRandomBiomeDisabled() {
+    protected boolean isRandomBiomeDisabled() {
         return getPlugin().getConfig().getBoolean("disableRandomBiome");
     }
 
-    boolean validateCommand(Player player, int islandSize) {
-        if (!player.hasPermission(getPlugin().getCreatePermission(islandSize))) {
+    @Override
+    public void onCommand(Player player, String[] args, boolean confirmed) {
+        if (args.length == 0) {
+            openGui(player);
+            return;
+        }
+
+        int islandSize = args.length == 2 ? getPlugin().parseIslandSize(args[1]) : getPlugin().parseIslandSize("");
+
+        if (!player.hasPermission(getPlugin().getCreatePermission(islandSize)) && !player.hasPermission(Permissions.command.createAny)) { // Fixme test if this was necessary
             player.sendMessage(Messages.get("error.NO_PERMISSION"));
-            return false;
+            return;
         }
 
         if (islandSize < getPlugin().getSmallestIslandSize() || islandSize + 4 >= getPlugin().layout.islandSpacing) {
             player.sendMessage(Messages.get("error.INVALID_ISLAND_SIZE"));
-            return false;
+            return;
         }
 
-        return true;
+        runCommand(player, args, confirmed, islandSize);
     }
 
-    boolean hasFunds(Player player, double cost) {
+    protected boolean hasFunds(Player player, double cost) {
         if (getPlugin().econ == null || player.hasPermission(Permissions.bypass.economy)) return true;
 
         return getPlugin().econ.has(player, cost);
     }
 
-    void pay(Player player, double cost) {
+    protected void pay(Player player, double cost) {
         if (getPlugin().econ == null || player.hasPermission(Permissions.bypass.economy)) return;
 
         if (cost > 0) {

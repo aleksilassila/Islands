@@ -1,5 +1,5 @@
 name: Islands
-version: 4.7.2
+version: 4.7.3
 author: Aleksi Lassila
 main: me.aleksilassila.islands.Islands
 api-version: 1.15
@@ -39,8 +39,7 @@ permissions:
     description: Access to all island commands
     children:
       islands.command: true
-      islands.command.create: true
-      islands.command.recreate: true
+      islands.command.create.*: true
       islands.command.clear: true
       islands.command.give: true
       islands.command.name: true
@@ -49,7 +48,6 @@ permissions:
       islands.command.trust.*: true
       islands.command.visit: true
       islands.command.setspawn: true
-      islands.command.create.custom: true
       islands.command.save: true
       islands.command.setspawnisland: true
       islands.command.confirm: true
@@ -75,6 +73,12 @@ permissions:
       islands.bypass.queue: true
       islands.bypass.queue.limit: true
       islands.bypass.info: true
+  islands.command.create.*:
+    description: Create any island size (including defined sizes)
+    children:
+      islands.command.create: true
+      islands.command.recreate: true
+      islands.command.create.custom: true
   islands.command.home.*:
     description: Access to home commands
     children:

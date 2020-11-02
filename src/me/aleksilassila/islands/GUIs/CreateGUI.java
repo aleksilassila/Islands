@@ -33,7 +33,7 @@ public class CreateGUI extends PageGUI {
         this.player = player;
         this.subcommand = subcommand;
 
-        recreateCost = plugin.getConfig().getDouble("economy.recreateCost");
+        recreateCost = subcommand.equalsIgnoreCase("recreate") ? plugin.getConfig().getDouble("economy.recreateCost") : 0;
     }
 
     public CreateGUI setOldCost(double cost) {

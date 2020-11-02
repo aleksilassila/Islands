@@ -3,9 +3,7 @@ package me.aleksilassila.islands;
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import com.sun.istack.internal.NotNull;
 import com.sun.istack.internal.Nullable;
-import me.aleksilassila.islands.commands.TeleportCommands;
 import me.aleksilassila.islands.commands.IslandCommands;
-import me.aleksilassila.islands.commands.TrustCommands;
 import me.aleksilassila.islands.generation.IslandGeneration;
 import me.aleksilassila.islands.generation.Shape;
 import me.aleksilassila.islands.generation.ShapesLoader;
@@ -111,11 +109,6 @@ public class Islands extends JavaPlugin {
         new Metrics(this, pluginId);
 
         getLogger().info("Islands enabled!");
-    }
-
-    @Override
-    public void onDisable() {
-        super.onDisable();
     }
 
     @Nullable

@@ -72,13 +72,9 @@ public class VisitGUI extends PageGUI {
                 pane = new StaticPane(0, 0, 9, PAGE_HEIGHT - 1);
             }
 
-            String displayName;
-
-            try {
-                displayName = Bukkit.getOfflinePlayer(UUID.fromString(publicIslands.get(islandId).get("owner"))).getName();
-            } catch (Exception e) {
-                displayName = "Server";
-            }
+            String displayName = Optional.ofNullable(
+                    Bukkit.getOfflinePlayer(UUID.fromString(publicIslands.get(islandId).get("owner"))).getName())
+                    .orElse("Server");
 
             pane.addItem(new GuiItem(createGuiItem(BiomeMaterials.valueOf(publicIslands.get(islandId).get("material")).getMaterial(),
                         Messages.get("gui.visit.ISLAND_NAME", publicIslands.get(islandId).get("name")),

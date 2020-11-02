@@ -5,6 +5,7 @@ import com.sun.istack.internal.Nullable;
 import me.aleksilassila.islands.generation.IslandGeneration;
 import me.aleksilassila.islands.utils.BiomeMaterials;
 import org.bukkit.Location;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.block.Biome;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
@@ -257,7 +258,7 @@ public class IslandLayout {
 
         if (!isInside) return null;
 
-        return getIslandsConfig().getString(posToIslandId(xIndex, zIndex) + ".UUID");
+        return Optional.ofNullable(getIslandsConfig().getString(posToIslandId(xIndex, zIndex) + ".UUID")).orElse("Server");
     }
 
     public int getNewHomeId(UUID uuid) {
@@ -323,10 +324,12 @@ public class IslandLayout {
 
     public void addTrusted(String islandId, String UUID) {
         List<String> trusted = getIslandsConfig().getStringList(islandId + ".trusted");
-        trusted.add(UUID);
-        getIslandsConfig().set(islandId + ".trusted", trusted);
+        if (!trusted.contains(UUID)) {
+            trusted.add(UUID);
+            getIslandsConfig().set(islandId + ".trusted", trusted);
 
-        plugin.saveIslandsConfig();
+            plugin.saveIslandsConfig();
+        }
     }
 
     public void removeTrusted(String islandId, String UUID) {
@@ -359,7 +362,7 @@ public class IslandLayout {
             plugin.saveIslandsConfig();
     }
 
-    public void giveIsland(String islandId, Player player) {
+    public void giveIsland(String islandId, OfflinePlayer player) {
         getIslandsConfig().set(islandId + ".home", getNewHomeId(player.getUniqueId()));
         getIslandsConfig().set(islandId + ".UUID", player.getUniqueId().toString());
 

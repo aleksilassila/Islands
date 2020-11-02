@@ -3,6 +3,7 @@ package me.aleksilassila.islands.utils;
 import me.aleksilassila.islands.Islands;
 import me.aleksilassila.islands.commands.Subcommand;
 import org.bukkit.ChatColor;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 
 import java.net.URL;
@@ -46,8 +47,9 @@ public class Messages extends ChatUtils {
             return instance;
         }
 
-        public static void send(Player player, final String string, final Object... objects) {
-            player.sendMessage(Messages.get(string, objects));
+        public static void send(OfflinePlayer player, final String string, final Object... objects) {
+            if (player.getPlayer() != null)
+                player.getPlayer().sendMessage(Messages.get(string, objects));
         }
 
         public static String get(final String string, final Object... objects) {

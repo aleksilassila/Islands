@@ -3,13 +3,14 @@ package me.aleksilassila.islands.commands.subcommands;
 import me.aleksilassila.islands.GUIs.CreateGUI;
 import me.aleksilassila.islands.IslandLayout;
 import me.aleksilassila.islands.Islands;
+import me.aleksilassila.islands.commands.AbstractCreateSubcommands;
 import me.aleksilassila.islands.commands.IslandCommands;
 import me.aleksilassila.islands.utils.Messages;
 import me.aleksilassila.islands.utils.Permissions;
 import org.bukkit.block.Biome;
 import org.bukkit.entity.Player;
 
-public class RecreateSubcommand extends GenerationSubcommands {
+public class RecreateSubcommand extends AbstractCreateSubcommands {
     private final Islands plugin;
     private final IslandLayout layout;
 
@@ -21,38 +22,49 @@ public class RecreateSubcommand extends GenerationSubcommands {
     }
 
     @Override
-    public void onCommand(Player player, String[] args, boolean confirmed) {
-        int islandSize = args.length == 2 ? plugin.parseIslandSize(args[1]) : plugin.parseIslandSize("");
+    protected Islands getPlugin() {
+        return plugin;
+    }
 
-        if (!validateCommand(player, islandSize)) return;
+    @Override
+    protected void openGui(Player player) {
+        String islandId = getIslandId(player);
+        if (islandId == null) return;
 
+        CreateGUI gui = new CreateGUI(plugin, player, "recreate");
+
+        if (plugin.econ != null && plugin.getConfig().getBoolean("economy.recreateSum")) {
+            double oldCost = plugin.islandPrices.getOrDefault(plugin.getIslandsConfig().getInt(islandId + ".size"), 0.0);
+            gui.setOldCost(oldCost);
+        }
+
+        gui.open();
+    }
+
+    private String getIslandId(Player player) {
         if (!player.getWorld().equals(plugin.islandsWorld)) {
             player.sendMessage(Messages.get("error.WRONG_WORLD"));
-            return;
+            return null;
         }
 
         String islandId = layout.getIslandId(player.getLocation().getBlockX(), player.getLocation().getBlockZ());
 
         if (islandId == null) {
             player.sendMessage(Messages.get("error.NOT_ON_ISLAND"));
-            return;
+            return null;
         } else if (!layout.getUUID(islandId).equals(player.getUniqueId().toString())
                 && !player.hasPermission(Permissions.bypass.recreate)) {
             player.sendMessage(Messages.get("error.UNAUTHORIZED"));
-            return;
+            return null;
         }
 
-        if (args.length < 1) {
-            CreateGUI gui = new CreateGUI(plugin, player, "recreate");
+        return islandId;
+    }
 
-            if (plugin.econ != null && plugin.getConfig().getBoolean("economy.recreateSum")) {
-                double oldCost = plugin.islandPrices.getOrDefault(plugin.getIslandsConfig().getInt(islandId + ".size"), 0.0);
-                gui.setOldCost(oldCost);
-            }
-
-            gui.open();
-            return;
-        }
+    @Override
+    protected void runCommand(Player player, String[] args, boolean confirmed, int islandSize) {
+        String islandId = getIslandId(player);
+        if (islandId == null) return;
 
         double cost = 0.0;
 
@@ -110,11 +122,6 @@ public class RecreateSubcommand extends GenerationSubcommands {
         } catch (IllegalArgumentException e) {
             player.sendMessage(Messages.get("error.NO_LOCATIONS_FOR_BIOME"));
         }
-    }
-
-    @Override
-    Islands getPlugin() {
-        return plugin;
     }
 
     @Override

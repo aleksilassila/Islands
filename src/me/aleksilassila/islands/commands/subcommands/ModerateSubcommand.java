@@ -5,8 +5,9 @@ import me.aleksilassila.islands.Islands;
 import me.aleksilassila.islands.commands.Subcommand;
 import me.aleksilassila.islands.utils.Messages;
 import me.aleksilassila.islands.utils.Permissions;
-import org.bukkit.Bukkit;
+import me.aleksilassila.islands.utils.Utils;
 import org.bukkit.Location;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
@@ -35,9 +36,9 @@ public class ModerateSubcommand extends Subcommand {
                 player.sendMessage(Messages.get("error.ISLAND_NOT_FOUND"));
             }
         } else if (args[0].equalsIgnoreCase("player")) {
-            Player targetPlayer = Bukkit.getPlayer(args[1]);
+            OfflinePlayer targetPlayer = Utils.getOfflinePlayer(args[1]);
             if (targetPlayer != null)
-                new AdminGUI(plugin, player).showPlayerIslandsGui(player.getUniqueId().toString());
+                new AdminGUI(plugin, player).showPlayerIslandsGui(targetPlayer.getUniqueId().toString());
             else
                 Messages.send(player, "error.PLAYER_NOT_FOUND");
         }

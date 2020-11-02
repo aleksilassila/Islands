@@ -3,6 +3,7 @@ package me.aleksilassila.islands.commands.subcommands;
 import me.aleksilassila.islands.GUIs.CreateGUI;
 import me.aleksilassila.islands.IslandLayout;
 import me.aleksilassila.islands.Islands;
+import me.aleksilassila.islands.commands.AbstractCreateSubcommands;
 import me.aleksilassila.islands.commands.IslandCommands;
 import me.aleksilassila.islands.utils.Messages;
 import me.aleksilassila.islands.utils.Permissions;
@@ -14,7 +15,7 @@ import org.bukkit.entity.Player;
 import java.util.HashMap;
 import java.util.List;
 
-public class CreateSubcommand extends GenerationSubcommands {
+public class CreateSubcommand extends AbstractCreateSubcommands {
     private final Islands plugin;
     private final IslandLayout layout;
     private final IslandCommands.Utils utils = new IslandCommands.Utils();
@@ -26,18 +27,18 @@ public class CreateSubcommand extends GenerationSubcommands {
     }
 
     @Override
-    public void onCommand(Player player, String[] args, boolean confirmed) {
-        int islandSize = args.length == 2 ? plugin.parseIslandSize(args[1]) : plugin.parseIslandSize("");
+    protected Islands getPlugin() {
+        return plugin;
+    }
 
-        if (!validateCommand(player, islandSize)) return;
-
-        HashMap<Biome, List<Location>> availableLocations = plugin.islandGeneration.biomes.availableLocations;
-
-        if (args.length < 1) {
+    @Override
+    protected void openGui(Player player) {
             new CreateGUI(plugin, player, "create").open();
+    }
 
-            return;
-        }
+    @Override
+    protected void runCommand(Player player, String[] args, boolean confirmed, int islandSize) {
+        HashMap<Biome, List<Location>> availableLocations = plugin.islandGeneration.biomes.availableLocations;
 
         int previousIslands = layout.getIslandIds(player.getUniqueId()).size();
 
@@ -101,10 +102,6 @@ public class CreateSubcommand extends GenerationSubcommands {
         player.sendTitle(Messages.get("success.ISLAND_GEN_TITLE"), Messages.get("success.ISLAND_GEN_SUBTITLE"), 10, 20 * 7, 10);
     }
 
-    @Override
-    Islands getPlugin() {
-        return plugin;
-    }
 
     @Override
     public String getName() {

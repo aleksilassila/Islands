@@ -1,7 +1,7 @@
 package me.aleksilassila.islands.commands.subcommands;
 
 import me.aleksilassila.islands.Islands;
-import me.aleksilassila.islands.commands.Subcommand;
+import me.aleksilassila.islands.commands.AbstractIslandsWorldSubcommand;
 import me.aleksilassila.islands.utils.Messages;
 import me.aleksilassila.islands.utils.Permissions;
 import me.aleksilassila.islands.utils.SaveHandler;
@@ -12,7 +12,7 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 
-public class SaveSubcommand extends Subcommand {
+public class SaveSubcommand extends AbstractIslandsWorldSubcommand {
     private final Islands plugin;
     private final String SAVE_DIRECTORY = "plugins/Islands/saves/";
 
@@ -21,19 +21,12 @@ public class SaveSubcommand extends Subcommand {
     }
 
     @Override
-    public void onCommand(Player player, String[] args, boolean confirmed) {
-        if (!player.getWorld().equals(plugin.islandsWorld)) {
-            player.sendMessage(Messages.get("error.WRONG_WORLD"));
-            return;
-        }
+    protected Islands getPlugin() {
+        return plugin;
+    }
 
-        String islandId = plugin.layout.getIslandId(player.getLocation().getBlockX(), player.getLocation().getBlockZ());
-
-        if (islandId == null) {
-            player.sendMessage(Messages.get("error.NOT_ON_ISLAND"));
-            return;
-        }
-
+    @Override
+    protected void runCommand(Player player, String[] args, boolean confirmed, String islandId) {
         if (plugin.worldEdit != null) {
             String name = plugin.getIslandsConfig().getBoolean(islandId + ".public")
                     ? plugin.getIslandsConfig().getString(islandId + ".name")

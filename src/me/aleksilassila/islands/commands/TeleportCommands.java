@@ -5,6 +5,7 @@ import me.aleksilassila.islands.IslandLayout;
 import me.aleksilassila.islands.Islands;
 import me.aleksilassila.islands.utils.Messages;
 import me.aleksilassila.islands.utils.Permissions;
+import me.aleksilassila.islands.utils.Utils;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -13,13 +14,11 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Animals;
 import org.bukkit.entity.Entity;
-import org.bukkit.entity.Monster;
 import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Optional;
 
 public class TeleportCommands {
     private final Islands plugin;
@@ -232,10 +231,10 @@ public class TeleportCommands {
             if (location != null) {
                 if (!disableNeutralTeleports && player.hasPermission(Permissions.bypass.neutralTeleport) && player.getWorld().equals(plugin.wildernessWorld)) {
                     List<Entity> entities = player.getNearbyEntities(neutralTeleportRange, neutralTeleportRange, neutralTeleportRange);
-                    entities.removeIf(entity -> entity instanceof Monster || !entity.getType().isAlive());
+                    entities.removeIf(entity -> !(entity instanceof Animals));
 
                     Location animalLocation = location.clone();
-                    animalLocation.setY(plugin.islandsWorld.getHighestBlockYAt(location) + 1);
+                    animalLocation.setY(Utils.getHighestYAt(plugin.islandsWorld, location.getBlockX(), location.getBlockY()) + 1);
 
                     for (Entity entity : entities) {
                         entity.teleport(animalLocation);

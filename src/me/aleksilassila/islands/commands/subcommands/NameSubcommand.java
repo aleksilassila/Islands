@@ -2,16 +2,17 @@ package me.aleksilassila.islands.commands.subcommands;
 
 import me.aleksilassila.islands.IslandLayout;
 import me.aleksilassila.islands.Islands;
-import me.aleksilassila.islands.commands.Subcommand;
+import me.aleksilassila.islands.commands.AbstractIslandsWorldSubcommand;
 import me.aleksilassila.islands.utils.Messages;
 import me.aleksilassila.islands.utils.Permissions;
 import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
-public class NameSubcommand extends Subcommand {
+public class NameSubcommand extends AbstractIslandsWorldSubcommand {
     private final Islands plugin;
     private final IslandLayout layout;
 
@@ -21,21 +22,14 @@ public class NameSubcommand extends Subcommand {
     }
 
     @Override
-    public void onCommand(Player player, String[] args, boolean confirmed) {
-        if (!player.getWorld().equals(plugin.islandsWorld)) {
-            player.sendMessage(Messages.get("error.WRONG_WORLD"));
-            return;
-        }
+    protected Islands getPlugin() {
+        return plugin;
+    }
 
+    @Override
+    protected void runCommand(Player player, String[] args, boolean confirmed, String islandId) {
         if (args.length != 1) {
             player.sendMessage(Messages.help.NAME);
-            return;
-        }
-
-        String islandId = layout.getIslandId(player.getLocation().getBlockX(), player.getLocation().getBlockZ());
-
-        if (islandId == null) {
-            player.sendMessage(Messages.get("error.NOT_ON_ISLAND"));
             return;
         }
 
@@ -63,7 +57,7 @@ public class NameSubcommand extends Subcommand {
     @Override
     public List<String> onTabComplete(Player player, String[] args) {
         if (args.length == 1) {
-            return new ArrayList<String>(Arrays.asList("<name>"));
+            return new ArrayList<String>(Collections.singletonList("<name>"));
         }
 
         return null;
