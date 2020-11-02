@@ -4,6 +4,7 @@ import me.aleksilassila.islands.Islands;
 import me.aleksilassila.islands.utils.Messages;
 import me.aleksilassila.islands.utils.Permissions;
 import org.bukkit.Bukkit;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -167,9 +168,9 @@ public class TrustCommands {
 
             player.sendMessage(Messages.get("info.TRUSTED_INFO", trustedList.size()));
             for (String uuid : trustedList) {
-                Player trustedPlayer = Bukkit.getPlayer(UUID.fromString(uuid));
+                OfflinePlayer trustedPlayer = Bukkit.getOfflinePlayer(UUID.fromString(uuid));
 
-                if (trustedPlayer != null) player.sendMessage(Messages.get("info.TRUSTED_PLAYER", trustedPlayer.getDisplayName()));
+                Messages.send(player, "info.TRUSTED_PLAYER", trustedPlayer.getName());
             }
 
             return true;
