@@ -172,7 +172,13 @@ public class TrustCommands {
                 player.sendMessage(Messages.get("error.NOT_OWNED"));
                 return true;
             }
+            
+            sendTrustedList(player, islandId);
 
+            return true;
+        }
+        
+        private void sendTrustedList(Player player, String islandId) {
             List<String> trustedList = plugin.layout.getTrusted(islandId);
 
             player.sendMessage(Messages.get("info.TRUSTED_INFO", trustedList.size()));
@@ -182,8 +188,6 @@ public class TrustCommands {
                 if (trustedPlayer.getName() != null)
                     Messages.send(player, "info.TRUSTED_PLAYER", trustedPlayer.getName());
             }
-
-            return true;
         }
     }
 }
