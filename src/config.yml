@@ -63,5 +63,5 @@ neutralTeleportRange: 2                 # How far neutrals are being teleported 
 unfinishedIslandTeleports: true         # Deny teleports to island that are still being generated.
 disableRandomBiome: false               # Disable RANDOM biome in island creation
 syncTime: true                          # Night skips will be synced between islands world and wilderness.
-homeSubcommand: false               # If true, /home will become /island home. Useful if you are using other plugins that define /home
+homeSubcommand: false                   # If true, /home will become /island home. Useful if you are using other plugins that define /home
 locale: en

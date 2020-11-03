@@ -27,6 +27,9 @@ import org.bukkit.util.Vector;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.util.*;
 
 public class Islands extends JavaPlugin {
@@ -77,8 +80,9 @@ public class Islands extends JavaPlugin {
             }
         });
 
-        getConfig().options().copyDefaults(true);
-        saveConfig();
+        if (new File(getDataFolder() + "/config.yml").exists())
+            validateConfig();
+        else saveDefaultConfig();
 
         initIslandsConfig();
         initBiomesCache();
@@ -420,6 +424,38 @@ public class Islands extends JavaPlugin {
         try {
             biomesCache.load(biomesCacheFile);
         } catch (IOException | InvalidConfigurationException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void validateConfig() {
+        if (getConfig().getDefaults() == null) {
+            getLogger().severe("Error copying defaults to config.");
+
+            return;
+        }
+
+        String out = "";
+
+        for (String key : getConfig().getDefaults().getKeys(false)) {
+            if (!getConfig().getKeys(false).contains(key)) {
+                Object value = getConfig().getDefaults().get(key);
+                if (!(value instanceof List)) {
+                    getLogger().severe("Config was missing value for " + key
+                            + ". Copied default value to config. Make sure your config is valid, or you might run into errors!");
+                    out = out + "\n" + key + ": " + value;
+                } else
+                    getLogger().severe("Could not copy defaults for " + key
+                            + ". You have to copy necessary defaults by hand. Defaults Can be found in Wiki.");
+
+            }
+        }
+
+        if (out.length() == 0) return;
+
+        try {
+            Files.write(Paths.get(getDataFolder() + "/config.yml"), out.getBytes(), StandardOpenOption.APPEND);
+        } catch (IOException e) {
             e.printStackTrace();
         }
     }
