@@ -214,7 +214,7 @@ public class TeleportCommands {
             try {
                 homeId = args.length == 0 ? 1 : Integer.parseInt(args[0]);
             } catch (NumberFormatException e) {
-                homeId = 1;
+                homeId = 1; // Fixme improve
             }
 
             String islandId = layout.getHomeIsland(player.getUniqueId(), homeId);
@@ -234,7 +234,7 @@ public class TeleportCommands {
                     entities.removeIf(entity -> !(entity instanceof Animals));
 
                     Location animalLocation = location.clone();
-                    animalLocation.setY(Utils.getHighestYAt(plugin.islandsWorld, location.getBlockX(), location.getBlockY()) + 1);
+                    animalLocation.setY(Utils.getHighestYAt(plugin.islandsWorld, location.getBlockX(), location.getBlockZ()) + 2);
 
                     for (Entity entity : entities) {
                         entity.teleport(animalLocation);

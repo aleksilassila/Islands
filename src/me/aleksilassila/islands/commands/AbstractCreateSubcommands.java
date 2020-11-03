@@ -29,7 +29,7 @@ public abstract class AbstractCreateSubcommands extends Subcommand {
 
         int islandSize = args.length == 2 ? getPlugin().parseIslandSize(args[1]) : getPlugin().parseIslandSize("");
 
-        if (!player.hasPermission(getPlugin().getCreatePermission(islandSize)) && !player.hasPermission(Permissions.command.createAny)) { // Fixme test if this was necessary
+        if (!player.hasPermission(getPlugin().getCreatePermission(islandSize)) && !player.hasPermission(Permissions.command.createAny)) {
             player.sendMessage(Messages.get("error.NO_PERMISSION"));
             return;
         }
