@@ -81,7 +81,10 @@ public class Islands extends JavaPlugin {
         });
 
         if (new File(getDataFolder() + "/config.yml").exists())
-            validateConfig();
+            if (!validateConfig()) {
+                Bukkit.getPluginManager().disablePlugin(this);
+                return;
+            }
         else saveDefaultConfig();
 
         initIslandsConfig();
@@ -428,36 +431,73 @@ public class Islands extends JavaPlugin {
         }
     }
 
-    private void validateConfig() {
+    private boolean validateConfig() {
         if (getConfig().getDefaults() == null) {
             getLogger().severe("Error copying defaults to config.");
 
-            return;
+            return true;
         }
 
         String out = "";
 
-        for (String key : getConfig().getDefaults().getKeys(false)) {
-            if (!getConfig().getKeys(false).contains(key)) {
-                Object value = getConfig().getDefaults().get(key);
-                if (!(value instanceof List)) {
-                    getLogger().severe("Config was missing value for " + key
-                            + ". Copied default value to config. Make sure your config is valid, or you might run into errors!");
-                    out = out + "\n" + key + ": " + value;
-                } else
-                    getLogger().severe("Could not copy defaults for " + key
-                            + ". You have to copy necessary defaults by hand. Defaults Can be found in Wiki.");
+        for (String defaultKey : getConfig().getDefaults().getKeys(false)) {
+            Object defaultValue = getConfig().getDefaults().get(defaultKey);
 
+            if (defaultValue instanceof ConfigurationSection) {
+                if (!validateSection(defaultKey)) {
+                    return false;
+                }
+            } else if (!(defaultValue instanceof List) && !getConfig().getKeys(false).contains(defaultKey)) {
+                getLogger().severe("Config is missing value for " + defaultKey
+                        + ". Copied default value to config. Make sure your config is valid, or you might run into errors!");
+                out = out + "\n" + defaultKey + ": " + defaultValue;
             }
         }
 
-        if (out.length() == 0) return;
+        if (out.length() == 0) return true;
 
         try {
             Files.write(Paths.get(getDataFolder() + "/config.yml"), out.getBytes(), StandardOpenOption.APPEND);
         } catch (IOException e) {
             e.printStackTrace();
         }
+
+        return true;
+    }
+
+    private boolean validateSection(String defaultKey) {
+        List<String> DONT_VALIDATE = new ArrayList<>(Arrays.asList(
+                "biomeBlacklist", "illegalIslandNames", "replaceOnGeneration", "groupLimits"));
+        List<String> SOFT_VALIDATE = new ArrayList<>(Arrays.asList("islandSizes", "islandPrices"));
+
+        ConfigurationSection section = getConfig().getConfigurationSection(defaultKey);
+        ConfigurationSection defaultSection = getConfig().getDefaultSection().getConfigurationSection(defaultKey);
+
+        if (section == null || section.getKeys(false).size() == 0) {
+            if (DONT_VALIDATE.contains(defaultKey)) {
+                getLogger().warning("Config is missing " + defaultKey);
+                return true;
+            } else {
+                getLogger().severe("Config is missing section " + defaultKey + ". Disabling Islands.");
+                return false;
+            }
+        } else if (DONT_VALIDATE.contains(defaultKey)) {
+            return true;
+        } else if (SOFT_VALIDATE.contains(defaultKey)) {
+            if (section.getKeys(false).size() == 0) {
+                getLogger().severe("Config is missing section " + defaultKey);
+                return false;
+            } else return true;
+        } else {
+            for (String key : defaultSection.getKeys(false)) {
+                if (!section.getKeys(false).contains(key)) {
+                    getLogger().severe("Config is missing key " + defaultKey + "." + key + ". Disabling islands.");
+                    return false;
+                }
+            }
+        }
+
+        return true;
     }
 
     // TODO:
