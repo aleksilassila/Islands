@@ -7,11 +7,9 @@ import me.aleksilassila.islands.commands.IslandCommands;
 import me.aleksilassila.islands.generation.IslandGeneration;
 import me.aleksilassila.islands.generation.Shape;
 import me.aleksilassila.islands.generation.ShapesLoader;
-import me.aleksilassila.islands.listeners.IslandsListener;
-import me.aleksilassila.islands.utils.ConfirmItem;
-import me.aleksilassila.islands.utils.Messages;
-import me.aleksilassila.islands.utils.Permissions;
-import me.aleksilassila.islands.utils.UpdateChecker;
+import me.aleksilassila.islands.listeners.Listeners;
+import me.aleksilassila.islands.listeners.ProtectionListeners;
+import me.aleksilassila.islands.utils.*;
 import net.milkbowl.vault.economy.Economy;
 import net.milkbowl.vault.permission.Permission;
 import org.bukkit.*;
@@ -90,6 +88,8 @@ public class Islands extends JavaPlugin {
         initIslandsConfig();
         initBiomesCache();
 
+        new ConfigMigrator(this);
+
         islandsWorld = getIslandsWorld();
         islandsSourceWorld = getSourceWorld();
         if (!getConfig().getBoolean("disableWilderness")) {
@@ -110,7 +110,8 @@ public class Islands extends JavaPlugin {
 
         new IslandCommands(this);
 
-        new IslandsListener(this);
+        new Listeners(this);
+        new ProtectionListeners(this);
 
         int pluginId = 8974;
         new Metrics(this, pluginId);

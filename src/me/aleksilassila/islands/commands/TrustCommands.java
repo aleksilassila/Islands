@@ -3,12 +3,14 @@ package me.aleksilassila.islands.commands;
 import me.aleksilassila.islands.Islands;
 import me.aleksilassila.islands.utils.Messages;
 import me.aleksilassila.islands.utils.Permissions;
+import me.aleksilassila.islands.utils.TrustedPlayer;
 import me.aleksilassila.islands.utils.Utils;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 
 import java.util.List;
@@ -173,14 +175,17 @@ public class TrustCommands {
                 return true;
             }
 
-            List<String> trustedList = plugin.layout.getTrusted(islandId);
+            ConfigurationSection section = plugin.getIslandsConfig().getConfigurationSection(islandId + ".trusted");
 
-            player.sendMessage(Messages.get("info.TRUSTED_INFO", trustedList.size()));
-            for (String uuid : trustedList) {
-                OfflinePlayer trustedPlayer = Bukkit.getOfflinePlayer(UUID.fromString(uuid));
+            int trustedSize = section == null ? 0 : section.getKeys(false).size();
 
-                if (trustedPlayer.getName() != null)
-                    Messages.send(player, "info.TRUSTED_PLAYER", trustedPlayer.getName());
+            player.sendMessage(Messages.get("info.TRUSTED_INFO", trustedSize));
+
+            if (section == null) return true;
+            for (String uuid : section.getKeys(false)) {
+// fixme                TrustedPlayer trustedPlayer = plugin.layout.getTrusted(islandId, uuid);
+
+                Messages.send(player, "info.TRUSTED_PLAYER", Bukkit.getOfflinePlayer(UUID.fromString(uuid)).getName());
             }
 
             return true;

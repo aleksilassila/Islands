@@ -4,9 +4,11 @@ import com.sun.istack.internal.NotNull;
 import com.sun.istack.internal.Nullable;
 import me.aleksilassila.islands.generation.IslandGeneration;
 import me.aleksilassila.islands.utils.BiomeMaterials;
+import me.aleksilassila.islands.utils.TrustedPlayer;
 import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.block.Biome;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 
@@ -70,6 +72,10 @@ public class IslandLayout {
         getIslandsConfig().set(islandId + ".height", height);
         getIslandsConfig().set(islandId + ".public", false);
         getIslandsConfig().set(islandId + ".biome", biome.name());
+
+        getIslandsConfig().set(islandId + ".protection.containers", false);
+        getIslandsConfig().set(islandId + ".protection.doors", false);
+        getIslandsConfig().set(islandId + ".protection.utility", false);
 
         plugin.saveIslandsConfig();
 
@@ -290,8 +296,26 @@ public class IslandLayout {
     }
 
     @NotNull
-    public List<String> getTrusted(String islandId) {
-        return getIslandsConfig().getStringList(islandId + ".trusted");
+    public TrustedPlayer getTrusted(String islandId, String uuid) {
+        ConfigurationSection section = getIslandsConfig().getConfigurationSection(islandId + ".trusted." + uuid);
+
+        TrustedPlayer trustedPlayer = new TrustedPlayer(UUID.fromString(uuid));
+
+        if (section != null) {
+            Set<String> keys = section.getKeys(false);
+
+            if (section.getBoolean("generalTrust", false)) return trustedPlayer.setGeneralTrust(true);
+
+            if (section.getBoolean("doorTrust", false)) trustedPlayer.setDoorTrust(true);
+            if (section.getBoolean("containerTrust", false)) trustedPlayer.setContainerTrust(true);
+        }
+
+        return trustedPlayer;
+    }
+
+    @NotNull
+    public TrustedPlayer getTrusted(int x, int y, String uuid) {
+        return getTrusted(getIslandId(x, y), uuid);
     }
 
     String posToIslandId(int xIndex, int zIndex) {
@@ -322,11 +346,9 @@ public class IslandLayout {
         plugin.saveIslandsConfig();
     }
 
-    public void addTrusted(String islandId, String UUID) {
-        List<String> trusted = getIslandsConfig().getStringList(islandId + ".trusted");
-        if (!trusted.contains(UUID)) {
-            trusted.add(UUID);
-            getIslandsConfig().set(islandId + ".trusted", trusted);
+    public void addTrusted(String islandId, String uuid) {
+        if (!getIslandsConfig().contains(islandId + ".trusted." + uuid)) {
+            getIslandsConfig().set(islandId + ".trusted." + uuid + ".generalTrust", true);
 
             plugin.saveIslandsConfig();
         }

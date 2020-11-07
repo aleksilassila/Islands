@@ -65,10 +65,10 @@ public class InfoSubcommand extends AbstractIslandsWorldSubcommand {
         if (extensiveInfo) {
             Messages.send(player, "info.ISLAND_INFO_HOME", island.getInt("home"));
 
-            if (island.getStringList("trusted").size() != 0) {
+            if (island.contains("trusted")) {
                 Messages.send(player, "info.ISLAND_INFO_TRUSTED");
 
-                for (String trustedUUID : island.getStringList("trusted")) {
+                for (String trustedUUID : island.getConfigurationSection("trusted").getKeys(false)) {
                     String trustedPlayer;
                     try {
                         trustedPlayer = plugin.getServer().getOfflinePlayer(UUID.fromString(trustedUUID)).getName();
