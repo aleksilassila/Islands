@@ -1,9 +1,9 @@
 islandsWorldName: world
 wildernessWorldName: wilderness
 
-defaultIslandLimit: 2
+defaultIslandLimit: 2                   # -1 to disable limit
 groupLimits:                            # Requires vault to work, all limits can be bypassed with islands.bypass.islandLimit
-  staff: 5
+  staff: 5                              # Groups are case-sensitive and usually they use the group's display name if there's one
 
 islandSizes:                            # Island sizing. You can add or remove as many sizes as you want.
   BIG: 80                               # NORMAL is the fallback size. At least 1 size has to be defined.

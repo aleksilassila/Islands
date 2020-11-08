@@ -3,7 +3,6 @@ package me.aleksilassila.islands.GUIs;
 import com.github.stefvanschie.inventoryframework.Gui;
 import com.github.stefvanschie.inventoryframework.GuiItem;
 import com.github.stefvanschie.inventoryframework.pane.StaticPane;
-import com.mysql.fabric.xmlrpc.base.Array;
 import me.aleksilassila.islands.Islands;
 import me.aleksilassila.islands.utils.BiomeMaterials;
 import me.aleksilassila.islands.utils.Messages;
@@ -43,12 +42,12 @@ public class CreateGUI extends PageGUI {
     }
 
     @Override
-    Gui getGui() {
+    public Gui getMainGui() {
         return createPaginatedGUI(PAGE_HEIGHT, Messages.get("gui.create.TITLE"), availableIslandPanes());
     }
 
     @Override
-    Player getPlayer() {
+    public Player getPlayer() {
         return player;
     }
 
@@ -115,7 +114,7 @@ public class CreateGUI extends PageGUI {
             gui.addPane(balance);
         }
 
-        return gui;
+        return addMainMenuButton(gui);
     }
 
     private List<StaticPane> availableSizePanes(String createCommand) {

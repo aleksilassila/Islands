@@ -3,7 +3,6 @@ package me.aleksilassila.islands.commands;
 import me.aleksilassila.islands.Islands;
 import me.aleksilassila.islands.utils.Messages;
 import me.aleksilassila.islands.utils.Permissions;
-import me.aleksilassila.islands.utils.TrustedPlayer;
 import me.aleksilassila.islands.utils.Utils;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
@@ -13,7 +12,6 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 
-import java.util.List;
 import java.util.UUID;
 
 public class TrustCommands {
@@ -183,9 +181,11 @@ public class TrustCommands {
 
             if (section == null) return true;
             for (String uuid : section.getKeys(false)) {
-// fixme                TrustedPlayer trustedPlayer = plugin.layout.getTrusted(islandId, uuid);
-
                 Messages.send(player, "info.TRUSTED_PLAYER", Bukkit.getOfflinePlayer(UUID.fromString(uuid)).getName());
+
+                for (String key : section.getConfigurationSection(uuid).getKeys(false)) {
+                    Messages.send(player, "info.TRUSTED_PLAYER_INFO", key, section.getBoolean(uuid + "." + key) ? 1 : 0);
+                }
             }
 
             return true;

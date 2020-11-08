@@ -4,7 +4,6 @@ import me.aleksilassila.islands.Islands;
 import me.aleksilassila.islands.commands.Subcommand;
 import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;
-import org.bukkit.entity.Player;
 
 import java.net.URL;
 import java.net.URLClassLoader;

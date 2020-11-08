@@ -27,7 +27,7 @@ public class VisitGUI extends PageGUI {
     }
 
     @Override
-    Gui getGui() {
+    public Gui getMainGui() {
         Gui gui = createPaginatedGUI(PAGE_HEIGHT, Messages.get("gui.visit.TITLE", sort), getPanes());
 
         StaticPane sort = new StaticPane(4, PAGE_HEIGHT - 1, 1, 1);
@@ -35,7 +35,7 @@ public class VisitGUI extends PageGUI {
         sort.addItem(new GuiItem(createGuiItem(Material.REDSTONE, Messages.get("gui.visit.SORT", this.sort == 1 ? 0 : 1), false), event -> {
             toggleSort();
             event.getWhoClicked().closeInventory();
-            getGui().show(event.getWhoClicked());
+            getMainGui().show(event.getWhoClicked());
         }), 0, 0);
 
         gui.addPane(sort);
@@ -44,7 +44,7 @@ public class VisitGUI extends PageGUI {
     }
 
     @Override
-    Player getPlayer() {
+    public Player getPlayer() {
         return player;
     }
 

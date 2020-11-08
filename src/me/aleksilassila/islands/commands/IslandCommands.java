@@ -39,6 +39,7 @@ public class IslandCommands extends ChatUtils implements TabExecutor {
         subcommands.add(new HelpSubcommand(this));
         subcommands.add(new InfoSubcommand(plugin));
         subcommands.add(new ModerateSubcommand(plugin));
+        subcommands.add(new SettingsSubcommand(plugin));
 
         TeleportCommands teleportCommands = new TeleportCommands(plugin);
 

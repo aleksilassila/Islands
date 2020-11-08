@@ -1,19 +1,17 @@
 package me.aleksilassila.islands.commands.subcommands;
 
-import me.aleksilassila.islands.IslandLayout;
+import me.aleksilassila.islands.GUIs.IslandSettingsGUI;
 import me.aleksilassila.islands.Islands;
 import me.aleksilassila.islands.commands.AbstractIslandsWorldSubcommand;
 import me.aleksilassila.islands.utils.Messages;
 import me.aleksilassila.islands.utils.Permissions;
 import org.bukkit.entity.Player;
 
-public class ClearSubcommand extends AbstractIslandsWorldSubcommand {
+public class SettingsSubcommand extends AbstractIslandsWorldSubcommand {
     private final Islands plugin;
-    private final IslandLayout layout;
 
-    public ClearSubcommand(Islands plugin) {
+    public SettingsSubcommand(Islands plugin) {
         this.plugin = plugin;
-        this.layout = plugin.layout;
     }
 
     @Override
@@ -23,38 +21,27 @@ public class ClearSubcommand extends AbstractIslandsWorldSubcommand {
 
     @Override
     protected void runCommand(Player player, String[] args, boolean confirmed, String islandId) {
-        if (!ownsIsland(player, islandId) && !player.hasPermission(Permissions.bypass.clear)) {
+        if (!ownsIsland(player, islandId) && !player.hasPermission(Permissions.bypass.settings)) {
             Messages.send(player, "error.UNAUTHORIZED");
             return;
         }
 
-        if (!confirmed) {
-            Messages.send(player, "info.CLEAR_CONFIRM");
-            return;
-        }
-
-        if (!plugin.islandGeneration.clearIsland(player, islandId)) {
-            player.sendMessage(Messages.get("error.ONGOING_QUEUE_EVENT"));
-            return;
-        }
-
-        layout.deleteIsland(islandId);
-        Messages.send(player, "success.DELETED");
+        new IslandSettingsGUI(plugin, islandId, player).open();
     }
 
     @Override
     public String getName() {
-        return "clear";
+        return "settings";
     }
 
     @Override
     public String help() {
-        return "Completely clear island and delete it from config.";
+        return null;
     }
 
     @Override
     public String getPermission() {
-        return Permissions.command.clear;
+        return Permissions.command.settings;
     }
 
     @Override

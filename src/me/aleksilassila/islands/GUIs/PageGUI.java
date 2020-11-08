@@ -6,27 +6,14 @@ import com.github.stefvanschie.inventoryframework.pane.OutlinePane;
 import com.github.stefvanschie.inventoryframework.pane.PaginatedPane;
 import com.github.stefvanschie.inventoryframework.pane.Pane;
 import com.github.stefvanschie.inventoryframework.pane.StaticPane;
-import me.aleksilassila.islands.utils.BiomeMaterials;
 import me.aleksilassila.islands.utils.Messages;
-import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
-import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemFlag;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 
-import java.util.*;
+import java.util.List;
 
-public abstract class PageGUI {
-    abstract Gui getGui();
-    abstract Player getPlayer();
-
-    public void open() {
-        getGui().show(getPlayer());
-    }
-
+public abstract class PageGUI extends GUI {
     protected Gui createPaginatedGUI(int pageHeight, String title, List<StaticPane> pages) {
         Gui gui = new Gui(pageHeight, title);
         gui.setOnTopClick(event -> event.setCancelled(true));
@@ -85,26 +72,20 @@ public abstract class PageGUI {
         return gui;
     }
 
-    protected ItemStack createGuiItem(final Material material, final String name, boolean shiny, final String... lore) {
-        final ItemStack item = new ItemStack(material, 1);
-        final ItemMeta meta = item.getItemMeta();
+    protected Gui addMainMenuButton(Gui gui) {
+        StaticPane pane = new StaticPane(4, gui.getRows() - 1, 1, 1);
 
-        if (shiny) {
-            meta.addEnchant(Enchantment.DURABILITY, 1, true);
-            meta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
-        }
+        pane.addItem(new GuiItem(createGuiItem(Material.BARRIER,
+                Messages.get("gui.BACK"),
+                false),
+                event -> {
+                    if (!(event.getWhoClicked() instanceof Player)) return; // Dunno if this is necessary in practice, cows don't click inventories
 
-        meta.setDisplayName(name);
+                    open();
+                }), 0, 0);
 
-        List<String> lores = new ArrayList<>();
+        gui.addPane(pane);
 
-        for (String l : lore) {
-            lores.addAll(Arrays.asList(l.split("\n")));
-        }
-
-        meta.setLore(lores);
-        item.setItemMeta(meta);
-
-        return item;
+        return gui;
     }
 }

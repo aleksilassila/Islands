@@ -1,9 +1,6 @@
-package me.aleksilassila.islands.listeners;
+package me.aleksilassila.islands;
 
-import me.aleksilassila.islands.Islands;
 import me.aleksilassila.islands.utils.ChatUtils;
-import me.aleksilassila.islands.utils.Messages;
-import me.aleksilassila.islands.utils.Permissions;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -12,11 +9,8 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockFromToEvent;
-import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.CreatureSpawnEvent;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
-import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerPortalEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
