@@ -8,7 +8,6 @@ import me.aleksilassila.islands.utils.Permissions;
 import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -33,8 +32,7 @@ public class NameSubcommand extends AbstractIslandsWorldSubcommand {
             return;
         }
 
-        if (layout.getUUID(islandId).equals(player.getUniqueId().toString())
-                || player.hasPermission(Permissions.bypass.name)) {
+        if (ownsIsland(player, islandId) || player.hasPermission(Permissions.bypass.name)) {
             if (layout.getIslandByName(args[0]) != null) {
                 player.sendMessage(Messages.get("error.NAME_TAKEN"));
                 return;

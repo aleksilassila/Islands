@@ -18,7 +18,6 @@ import org.bukkit.util.Vector;
 import java.util.*;
 
 public class IslandGeneration {
-
     private final Islands plugin;
     private final World islandsWorld;
 

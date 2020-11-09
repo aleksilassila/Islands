@@ -9,9 +9,9 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 
-import java.util.List;
 import java.util.UUID;
 
 public class TrustCommands {
@@ -172,22 +172,23 @@ public class TrustCommands {
                 player.sendMessage(Messages.get("error.NOT_OWNED"));
                 return true;
             }
-            
-            sendTrustedList(player, islandId);
+
+            ConfigurationSection section = plugin.getIslandsConfig().getConfigurationSection(islandId + ".trusted");
+
+            int trustedSize = section == null ? 0 : section.getKeys(false).size();
+
+            player.sendMessage(Messages.get("info.TRUSTED_INFO", trustedSize));
+
+            if (section == null) return true;
+            for (String uuid : section.getKeys(false)) {
+                Messages.send(player, "info.TRUSTED_PLAYER", Bukkit.getOfflinePlayer(UUID.fromString(uuid)).getName());
+
+                for (String key : section.getConfigurationSection(uuid).getKeys(false)) {
+                    Messages.send(player, "info.TRUSTED_PLAYER_INFO", key, section.getBoolean(uuid + "." + key) ? 1 : 0);
+                }
+            }
 
             return true;
-        }
-        
-        private void sendTrustedList(Player player, String islandId) {
-            List<String> trustedList = plugin.layout.getTrusted(islandId);
-
-            player.sendMessage(Messages.get("info.TRUSTED_INFO", trustedList.size()));
-            for (String uuid : trustedList) {
-                OfflinePlayer trustedPlayer = Bukkit.getOfflinePlayer(UUID.fromString(uuid));
-
-                if (trustedPlayer.getName() != null)
-                    Messages.send(player, "info.TRUSTED_PLAYER", trustedPlayer.getName());
-            }
         }
     }
 }

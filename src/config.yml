@@ -1,9 +1,9 @@
 islandsWorldName: world
 wildernessWorldName: wilderness
 
-defaultIslandLimit: 2
+defaultIslandLimit: 2                   # -1 to disable limit
 groupLimits:                            # Requires vault to work, all limits can be bypassed with islands.bypass.islandLimit
-  staff: 5
+  staff: 5                              # Groups are case-sensitive and usually they use the group's display name if there's one
 
 islandSizes:                            # Island sizing. You can add or remove as many sizes as you want.
   BIG: 80                               # NORMAL is the fallback size. At least 1 size has to be defined.
@@ -63,5 +63,5 @@ neutralTeleportRange: 2                 # How far neutrals are being teleported 
 unfinishedIslandTeleports: true         # Deny teleports to island that are still being generated.
 disableRandomBiome: false               # Disable RANDOM biome in island creation
 syncTime: true                          # Night skips will be synced between islands world and wilderness.
-homeSubcommand: false               # If true, /home will become /island home. Useful if you are using other plugins that define /home
+homeSubcommand: false                   # If true, /home will become /island home. Useful if you are using other plugins that define /home
 locale: en

@@ -34,8 +34,7 @@ public class UnnameSubcommand extends AbstractIslandsWorldSubcommand {
             return;
         }
 
-        if (layout.getUUID(islandId).equals(player.getUniqueId().toString())
-                || player.hasPermission(Permissions.bypass.unname)) {
+        if (ownsIsland(player, islandId) || player.hasPermission(Permissions.bypass.unname)) {
             layout.unnameIsland(islandId);
 
             player.sendMessage(Messages.get("success.UNNAMED"));

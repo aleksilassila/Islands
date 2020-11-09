@@ -23,8 +23,7 @@ public class SetSpawnSubcommand extends AbstractIslandsWorldSubcommand {
 
     @Override
     protected void runCommand(Player player, String[] args, boolean confirmed, String islandId) {
-        if (layout.getUUID(islandId).equals(player.getUniqueId().toString())
-                || player.hasPermission(Permissions.bypass.setSpawn)) {
+        if (ownsIsland(player, islandId) || player.hasPermission(Permissions.bypass.setSpawn)) {
             layout.setSpawnPoint(islandId, player.getLocation().getBlockX(), player.getLocation().getBlockZ());
 
             player.sendMessage(Messages.get("success.SPAWN_POINT_CHANGED"));

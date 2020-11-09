@@ -2,17 +2,17 @@ package me.aleksilassila.islands.GUIs;
 
 import com.github.stefvanschie.inventoryframework.Gui;
 import com.github.stefvanschie.inventoryframework.GuiItem;
-import com.github.stefvanschie.inventoryframework.pane.OutlinePane;
-import com.github.stefvanschie.inventoryframework.pane.Pane;
 import com.github.stefvanschie.inventoryframework.pane.StaticPane;
 import me.aleksilassila.islands.IslandLayout;
 import me.aleksilassila.islands.Islands;
 import me.aleksilassila.islands.utils.BiomeMaterials;
 import me.aleksilassila.islands.utils.Messages;
-import org.bukkit.*;
+import org.bukkit.Bukkit;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.SkullMeta;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,16 +29,11 @@ public class AdminGUI extends PageGUI {
     }
 
     @Override
-    Gui getGui() {
+    public Gui getMainGui() {
         Gui gui = new Gui(3, Messages.get("gui.admin.TITLE"));
         gui.setOnTopClick(inventoryClickEvent -> inventoryClickEvent.setCancelled(true));
 
-        // Background
-        OutlinePane background = new OutlinePane(0, 0, 9, gui.getRows(), Pane.Priority.LOWEST);
-        background.addItem(new GuiItem(createGuiItem(Material.GRAY_STAINED_GLASS_PANE, "" + ChatColor.RESET, false)));
-        background.setRepeat(true);
-
-        gui.addPane(background);
+        addBackground(gui, Material.GRAY_STAINED_GLASS_PANE);
 
         StaticPane navigationPane = new StaticPane(2, 1, 5, 1);
 
@@ -193,23 +188,6 @@ public class AdminGUI extends PageGUI {
         gui.show(player);
     }
 
-    private Gui addMainMenuButton(Gui gui) {
-        StaticPane pane = new StaticPane(4, gui.getRows() - 1, 1, 1);
-
-        pane.addItem(new GuiItem(createGuiItem(Material.BARRIER,
-                        Messages.get("gui.BACK"),
-                        false),
-                        event -> {
-                            if (!(event.getWhoClicked() instanceof Player)) return; // Dunno if this is necessary in practice, cows don't click inventories
-
-                            open();
-                        }), 0, 0);
-
-        gui.addPane(pane);
-
-        return gui;
-    }
-
     private void teleportIsland(String islandId) {
         Location location = layout.getIslandSpawn(islandId);
 
@@ -221,7 +199,7 @@ public class AdminGUI extends PageGUI {
     }
 
     @Override
-    Player getPlayer() {
+    public Player getPlayer() {
         return player;
     }
 }

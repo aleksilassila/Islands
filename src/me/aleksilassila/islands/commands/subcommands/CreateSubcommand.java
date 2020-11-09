@@ -9,7 +9,6 @@ import me.aleksilassila.islands.utils.Messages;
 import me.aleksilassila.islands.utils.Permissions;
 import org.bukkit.Location;
 import org.bukkit.block.Biome;
-import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 
 import java.util.HashMap;
@@ -42,19 +41,17 @@ public class CreateSubcommand extends AbstractCreateSubcommands {
 
         int previousIslands = layout.getIslandIds(player.getUniqueId()).size();
 
-        int islandsLimit = plugin.getConfig().getInt("defaultIslandLimit");
+        int islandsLimit = plugin.getConfig().getInt("defaultIslandLimit", -1);
 
-        ConfigurationSection section = plugin.getConfig().getConfigurationSection("groupLimits");
-
-        if (plugin.perms != null && section != null) {
+        if (plugin.perms != null) {
             for (String group : plugin.perms.getGroups()) {
-                if (plugin.perms.playerInGroup(player, group) && section.getInt(group) > islandsLimit) {
-                    islandsLimit = section.getInt(group);
+                if (plugin.perms.playerInGroup(player, group)) {
+                    islandsLimit = Math.max(plugin.getConfig().getInt("groupLimits." + group, -1), islandsLimit);
                 }
             }
         }
 
-        if (previousIslands >= islandsLimit && !player.hasPermission(Permissions.bypass.create)) {
+        if (previousIslands >= islandsLimit && !player.hasPermission(Permissions.bypass.create) && islandsLimit != -1) {
             player.sendMessage(Messages.get("error.ISLAND_LIMIT"));
             return;
         }
@@ -83,7 +80,7 @@ public class CreateSubcommand extends AbstractCreateSubcommands {
             }
         }
 
-        String islandId = null;
+        String islandId;
 
         try {
             islandId = plugin.createNewIsland(targetBiome, islandSize, player);

@@ -1,5 +1,5 @@
 name: Islands
-version: 4.7.3
+version: 4.8.0
 author: Aleksi Lassila
 main: me.aleksilassila.islands.Islands
 api-version: 1.15
@@ -53,6 +53,7 @@ permissions:
       islands.command.confirm: true
       islands.command.info: true
       islands.command.moderate: true
+      islands.command.settings: true
   islands.bypass.*:
     description: Access to all island bypasses
     children:
@@ -73,6 +74,7 @@ permissions:
       islands.bypass.queue: true
       islands.bypass.queue.limit: true
       islands.bypass.info: true
+      islands.bypass.settings: true
   islands.command.create.*:
     description: Create any island size (including defined sizes)
     children:
@@ -117,6 +119,9 @@ permissions:
     default: true
   islands.command.info:
     description: Access to island info command with limited functionality
+    default: true
+  islands.command.settings:
+    description: Access to island settings
     default: true
   islands.command.create.custom:
     description: Access to island create custom size command
@@ -202,4 +207,7 @@ permissions:
     default: "op"
   islands.bypass.queue.limit:
     description: Bypass queue limit
+    default: "op"
+  islands.bypass.settings:
+    description: Bypass settings restrictions
     default: "op"

@@ -9,6 +9,7 @@ public class Permissions {
         public static final String name = "islands.bypass.name";                // Name any island
         public static final String unname = "islands.bypass.unname";            // Unname any island
         public static final String setSpawn = "islands.bypass.setspawn";        // Set any island's spawn
+        public static final String settings = "islands.bypass.settings";        // Use settings anywhere
 
         public static final String trust = "islands.bypass.trust";
         public static final String untrust = "islands.bypass.untrust";
@@ -39,6 +40,7 @@ public class Permissions {
         public static final String confirm = "islands.command.confirm";
         public static final String info = "islands.command.info";
         public static final String moderate = "islands.command.moderate";
+        public static final String settings = "islands.command.settings";
 
         public static final String home = "islands.command.home";
         public static final String listHomes = "islands.command.home.list";

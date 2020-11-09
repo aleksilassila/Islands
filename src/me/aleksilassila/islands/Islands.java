@@ -7,11 +7,8 @@ import me.aleksilassila.islands.commands.IslandCommands;
 import me.aleksilassila.islands.generation.IslandGeneration;
 import me.aleksilassila.islands.generation.Shape;
 import me.aleksilassila.islands.generation.ShapesLoader;
-import me.aleksilassila.islands.listeners.IslandsListener;
-import me.aleksilassila.islands.utils.ConfirmItem;
-import me.aleksilassila.islands.utils.Messages;
-import me.aleksilassila.islands.utils.Permissions;
-import me.aleksilassila.islands.utils.UpdateChecker;
+import me.aleksilassila.islands.protection.ProtectionListeners;
+import me.aleksilassila.islands.utils.*;
 import net.milkbowl.vault.economy.Economy;
 import net.milkbowl.vault.permission.Permission;
 import org.bukkit.*;
@@ -27,6 +24,9 @@ import org.bukkit.util.Vector;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.util.*;
 
 public class Islands extends JavaPlugin {
@@ -82,11 +82,17 @@ public class Islands extends JavaPlugin {
             }
         });
 
-        getConfig().options().copyDefaults(true);
-        saveConfig();
+        if (new File(getDataFolder() + "/config.yml").exists())
+            if (!validateConfig()) {
+                Bukkit.getPluginManager().disablePlugin(this);
+                return;
+            }
+        else saveDefaultConfig();
 
         initIslandsConfig();
         initBiomesCache();
+
+        new ConfigMigrator(this);
 
         islandsWorld = getIslandsWorld();
         islandsSourceWorld = getSourceWorld();
@@ -108,7 +114,8 @@ public class Islands extends JavaPlugin {
 
         new IslandCommands(this);
 
-        new IslandsListener(this);
+        new Listeners(this);
+        new ProtectionListeners(this);
 
         int pluginId = 8974;
         new Metrics(this, pluginId);
@@ -427,6 +434,75 @@ public class Islands extends JavaPlugin {
         } catch (IOException | InvalidConfigurationException e) {
             e.printStackTrace();
         }
+    }
+
+    private boolean validateConfig() {
+        if (getConfig().getDefaults() == null) {
+            getLogger().severe("Error copying defaults to config.");
+
+            return true;
+        }
+
+        String out = "";
+
+        for (String defaultKey : getConfig().getDefaults().getKeys(false)) {
+            Object defaultValue = getConfig().getDefaults().get(defaultKey);
+
+            if (defaultValue instanceof ConfigurationSection) {
+                if (!validateSection(defaultKey)) {
+                    return false;
+                }
+            } else if (!(defaultValue instanceof List) && !getConfig().getKeys(false).contains(defaultKey)) {
+                getLogger().severe("Config is missing value for " + defaultKey
+                        + ". Copied default value to config. Make sure your config is valid, or you might run into errors!");
+                out = out + "\n" + defaultKey + ": " + defaultValue;
+            }
+        }
+
+        if (out.length() == 0) return true;
+
+        try { // If using getConfig().set(), all comments will be erased.
+            Files.write(Paths.get(getDataFolder() + "/config.yml"), out.getBytes(), StandardOpenOption.APPEND);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return true;
+    }
+
+    private boolean validateSection(String defaultKey) {
+        List<String> DONT_VALIDATE = new ArrayList<>(Arrays.asList(
+                "biomeBlacklist", "illegalIslandNames", "replaceOnGeneration", "groupLimits"));
+        List<String> SOFT_VALIDATE = new ArrayList<>(Arrays.asList("islandSizes", "islandPrices"));
+
+        ConfigurationSection section = getConfig().getConfigurationSection(defaultKey);
+        ConfigurationSection defaultSection = getConfig().getDefaultSection().getConfigurationSection(defaultKey);
+
+        if (section == null || section.getKeys(false).size() == 0) {
+            if (DONT_VALIDATE.contains(defaultKey)) {
+                getLogger().warning("Config is missing " + defaultKey);
+                return true;
+            } else {
+                getLogger().severe("Config is missing section " + defaultKey + ". Disabling Islands.");
+                return false;
+            }
+        } else if (DONT_VALIDATE.contains(defaultKey)) {
+            return true;
+        } else if (SOFT_VALIDATE.contains(defaultKey)) {
+            if (section.getKeys(false).size() == 0) {
+                getLogger().severe("Config is missing section " + defaultKey);
+                return false;
+            } else return true;
+        } else {
+            for (String key : defaultSection.getKeys(false)) {
+                if (!section.getKeys(false).contains(key)) {
+                    getLogger().severe("Config is missing key " + defaultKey + "." + key + ". Disabling islands.");
+                    return false;
+                }
+            }
+        }
+
+        return true;
     }
 
     // TODO:
