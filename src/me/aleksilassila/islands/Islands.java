@@ -70,10 +70,15 @@ public class Islands extends JavaPlugin {
         }
 
         new UpdateChecker(this, 84303).getVersion(version -> {
+            String majorVersion = version.substring(0,version.lastIndexOf("."));
+            String thisMajorVersion = this.getDescription().getVersion().substring(0, this.getDescription().getVersion().lastIndexOf("."));
+
             if (this.getDescription().getVersion().equalsIgnoreCase(version)) {
                 getLogger().info("You are up to date.");
+            } else if (!majorVersion.equalsIgnoreCase(thisMajorVersion)) {
+                getLogger().warning("There's a new major update available!");
             } else {
-                getLogger().info("There's a new update available!");
+                getLogger().info("There's a new minor update available!");
             }
         });
 
