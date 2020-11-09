@@ -456,7 +456,7 @@ public class Islands extends JavaPlugin {
 
         if (out.length() == 0) return true;
 
-        try {
+        try { // If using getConfig().set(), all comments will be erased.
             Files.write(Paths.get(getDataFolder() + "/config.yml"), out.getBytes(), StandardOpenOption.APPEND);
         } catch (IOException e) {
             e.printStackTrace();
