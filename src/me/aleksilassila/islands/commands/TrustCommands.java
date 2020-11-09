@@ -38,7 +38,7 @@ public class TrustCommands {
 
             plugin.confirmations.remove(player.getUniqueId().toString());
 
-            if (!player.hasPermission(Permissions.command.untrust)) {
+            if (!player.hasPermission(Permissions.command.trust)) {
                 player.sendMessage(Messages.get("error.NO_PERMISSION"));
                 return true;
             }

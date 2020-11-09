@@ -58,9 +58,9 @@ public class ConfigMigrator {
 
             for (String uuid : trustedList) {
                 islandsConfig.set(islandId + ".trusted." + uuid + ".build", true);
-                islandsConfig.set(islandId + ".trusted." + uuid + ".accessContainers", true);
-                islandsConfig.set(islandId + ".trusted." + uuid + ".accessDoors", true);
-                islandsConfig.set(islandId + ".trusted." + uuid + ".accessUtility", true);
+                islandsConfig.set(islandId + ".trusted." + uuid + ".accessContainers", false);
+                islandsConfig.set(islandId + ".trusted." + uuid + ".accessDoors", false);
+                islandsConfig.set(islandId + ".trusted." + uuid + ".accessUtility", false);
             }
         }
 

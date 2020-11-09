@@ -82,7 +82,7 @@ public class VisitGUI extends PageGUI {
 
             pane.addItem(new GuiItem(createGuiItem(BiomeMaterials.valueOf(publicIslands.get(islandId).get("material")).getMaterial(),
                         Messages.get("gui.visit.ISLAND_NAME", publicIslands.get(islandId).get("name")),
-                        displayName.equals("Server"),
+                        "Server".equals(displayName),
                         Messages.get("gui.visit.ISLAND_OWNER", displayName)),
                         event -> {
                             if (!(event.getWhoClicked() instanceof Player)) return; // Dunno if this is necessary in practice, cows don't click inventories

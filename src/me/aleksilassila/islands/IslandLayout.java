@@ -324,9 +324,9 @@ public class IslandLayout {
     public void addTrusted(String islandId, String uuid) {
         if (!getIslandsConfig().contains(islandId + ".trusted." + uuid)) {
             getIslandsConfig().set(islandId + ".trusted." + uuid + ".build", true);
-            getIslandsConfig().set(islandId + ".trusted." + uuid + ".accessContainers", true);
-            getIslandsConfig().set(islandId + ".trusted." + uuid + ".accessDoors", true);
-            getIslandsConfig().set(islandId + ".trusted." + uuid + ".accessUtility", true);
+            getIslandsConfig().set(islandId + ".trusted." + uuid + ".accessContainers", false);
+            getIslandsConfig().set(islandId + ".trusted." + uuid + ".accessDoors", false);
+            getIslandsConfig().set(islandId + ".trusted." + uuid + ".accessUtility", false);
 
             plugin.saveIslandsConfig();
         }

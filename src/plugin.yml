@@ -1,5 +1,5 @@
 name: Islands
-version: 4.8.0
+version: 4.8.1
 author: Aleksi Lassila
 main: me.aleksilassila.islands.Islands
 api-version: 1.15
@@ -91,7 +91,13 @@ permissions:
     children:
       islands.command.trust: true
       islands.command.trust.list: true
-      islands.command.untrust: true
+      islands.command.trust.containerTrust: true
+      islands.command.trust.doorTrust: true
+      islands.command.trust.utilityTrust: true
+      islands.command.trust.general.buildProtection: true
+      islands.command.trust.general.containerTrust: true
+      islands.command.trust.general.doorTrust: true
+      islands.command.trust.general.utilityTrust: true
 
   islands.command:
     description: Access to island command
@@ -122,6 +128,27 @@ permissions:
     default: true
   islands.command.settings:
     description: Access to island settings
+    default: true
+  islands.command.trust.containerTrust:
+    description: Permission to containerTrust people
+    default: true
+  islands.command.trust.doorTrust:
+    description: Permission to doorTrust people
+    default: true
+  islands.command.trust.utilityTrust:
+    description: Permission to utilityTrust people
+    default: true
+  islands.command.trust.general.buildProtection:
+    description: Permission to enable / disable building in general on an island
+    default: "op"
+  islands.command.trust.general.containerTrust:
+    description: Permission to enable / disable container access in general on an island
+    default: true
+  islands.command.trust.general.doorTrust:
+    description: Permission to enable / disable door access in general on an island
+    default: true
+  islands.command.trust.general.utilityTrust:
+    description: Permission to enable / disable utility access in general on an island
     default: true
   islands.command.create.custom:
     description: Access to island create custom size command
