@@ -1,6 +1,6 @@
 package me.aleksilassila.islands.protection;
 
-import me.aleksilassila.islands.Islands;
+import me.aleksilassila.islands.IslandsConfig;
 import org.bukkit.configuration.file.FileConfiguration;
 
 public class ProtectedBlock {
@@ -9,14 +9,14 @@ public class ProtectedBlock {
 
     private final FileConfiguration config;
 
-    public ProtectedBlock(Islands plugin, String islandId) {
-        this.config = plugin.getIslandsConfig();
+    public ProtectedBlock(String islandId) {
+        this.config = IslandsConfig.getConfig();
         this.islandId = islandId;
         this.ownerUUID = config.getString(islandId + ".UUID", null);
     }
 
-    public ProtectedBlock(Islands plugin, int x, int z) {
-        this(plugin, plugin.layout.getIslandId(x, z));
+    public ProtectedBlock(int x, int z) {
+        this(IslandsConfig.getIslandId(x, z));
     }
 
     public boolean canDoAnything(String uuid) {

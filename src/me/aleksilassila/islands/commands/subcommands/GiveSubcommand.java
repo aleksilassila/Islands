@@ -1,7 +1,6 @@
 package me.aleksilassila.islands.commands.subcommands;
 
-import me.aleksilassila.islands.IslandLayout;
-import me.aleksilassila.islands.Islands;
+import me.aleksilassila.islands.IslandsConfig;
 import me.aleksilassila.islands.commands.AbstractIslandsWorldSubcommand;
 import me.aleksilassila.islands.utils.Messages;
 import me.aleksilassila.islands.utils.Permissions;
@@ -14,14 +13,6 @@ import java.util.List;
 import java.util.UUID;
 
 public class GiveSubcommand extends AbstractIslandsWorldSubcommand {
-    private final Islands plugin;
-    private final IslandLayout layout;
-
-    public GiveSubcommand() {
-        this.plugin = Islands.instance;
-        this.layout = plugin.layout;
-    }
-
     @Override
     protected void runCommand(Player player, String[] args, boolean confirmed, String islandId) {
         if ((args.length != 1 && !player.hasPermission(Permissions.bypass.give))
@@ -30,11 +21,11 @@ public class GiveSubcommand extends AbstractIslandsWorldSubcommand {
             return;
         }
 
-        String previousUUID = plugin.getIslandsConfig().getString(islandId + ".UUID");
+        String previousUUID = IslandsConfig.getConfig().getString(islandId + ".UUID");
 
         if ((previousUUID != null && previousUUID.equals(player.getUniqueId().toString()))
                 || player.hasPermission(Permissions.bypass.give)) {
-            if (plugin.getIslandsConfig().getBoolean(islandId + ".public")) {
+            if (IslandsConfig.getConfig().getBoolean(islandId + ".public")) {
                 if (!confirmed) {
                     player.sendMessage(Messages.get("info.CONFIRM"));
                     return;
@@ -49,12 +40,12 @@ public class GiveSubcommand extends AbstractIslandsWorldSubcommand {
                         return;
                     }
 
-                    layout.giveIsland(islandId, targetPlayer);
+                    IslandsConfig.giveIsland(islandId, targetPlayer);
                     player.sendMessage(Messages.get("success.OWNER_CHANGED", args[0]));
 
-                    Messages.send(targetPlayer, "success.ISLAND_RECEIVED", plugin.getIslandsConfig().getString(islandId + ".name"), previousName);
+                    Messages.send(targetPlayer, "success.ISLAND_RECEIVED", IslandsConfig.getConfig().getString(islandId + ".name"), previousName);
                 } else {
-                    layout.giveIsland(islandId);
+                    IslandsConfig.giveIsland(islandId);
                     player.sendMessage(Messages.get("success.OWNER_REMOVED"));
                 }
             } else {

@@ -1,6 +1,7 @@
 package me.aleksilassila.islands.utils;
 
 import me.aleksilassila.islands.Islands;
+import me.aleksilassila.islands.IslandsConfig;
 import org.bukkit.configuration.file.FileConfiguration;
 
 import java.util.List;
@@ -9,7 +10,7 @@ public class ConfigMigrator {
     private final FileConfiguration islandsConfig;
 
     public ConfigMigrator() {
-        this.islandsConfig = Islands.instance.getIslandsConfig();
+        this.islandsConfig = IslandsConfig.getConfig();
 
         boolean doTrustedMigraton = false;
         boolean doProtectionMigration = false;
@@ -41,7 +42,7 @@ public class ConfigMigrator {
             islandsConfig.set(islandId + ".protect.utility", true);
         }
 
-        Islands.instance.saveIslandsConfig();
+        IslandsConfig.saveIslandsConfig();
     }
 
     private void migrateTrustedPlayers() {
@@ -62,6 +63,6 @@ public class ConfigMigrator {
             }
         }
 
-        Islands.instance.saveIslandsConfig();
+        IslandsConfig.saveIslandsConfig();
     }
 }

@@ -8,12 +8,6 @@ import me.aleksilassila.islands.utils.Permissions;
 import org.bukkit.entity.Player;
 
 public class SettingsSubcommand extends AbstractIslandsWorldSubcommand {
-    private final Islands plugin;
-
-    public SettingsSubcommand() {
-        this.plugin = Islands.instance;
-    }
-
     @Override
     protected void runCommand(Player player, String[] args, boolean confirmed, String islandId) {
         if (!ownsIsland(player, islandId) && !player.hasPermission(Permissions.bypass.settings)) {
@@ -21,7 +15,7 @@ public class SettingsSubcommand extends AbstractIslandsWorldSubcommand {
             return;
         }
 
-        new IslandSettingsGUI(plugin, islandId, player).open();
+        new IslandSettingsGUI(islandId, player).open();
     }
 
     @Override

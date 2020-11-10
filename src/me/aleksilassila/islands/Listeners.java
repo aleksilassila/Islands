@@ -42,26 +42,26 @@ public class Listeners extends ChatUtils implements Listener {
     @EventHandler(priority = EventPriority.LOWEST)
     public void onPlayerJoin(PlayerJoinEvent event) {
         if (!event.getPlayer().hasPlayedBefore()) {
-            String spawnIsland = plugin.layout.getSpawnIsland();
+            String spawnIsland = IslandsConfig.getSpawnIsland();
 
             if (spawnIsland != null) {
-                event.getPlayer().teleport(plugin.layout.getIslandSpawn(spawnIsland));
+                event.getPlayer().teleport(IslandsConfig.getIslandSpawn(spawnIsland));
             }
         }
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void onPlayerRespawn(PlayerRespawnEvent event) {
-        String spawnIsland = plugin.layout.getSpawnIsland();
+        String spawnIsland = IslandsConfig.getSpawnIsland();
 
         if (spawnIsland != null) {
-            event.setRespawnLocation(plugin.layout.getIslandSpawn(spawnIsland));
+            event.setRespawnLocation(IslandsConfig.getIslandSpawn(spawnIsland));
         }
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void onPortalEvent(PlayerPortalEvent event) {
-        if (event.getTo().getWorld().equals(Islands.islandsWorld) && Islands.wildernessWorld != null) {
+        if (event.getTo() != null && Islands.islandsWorld.equals(event.getTo().getWorld()) && Islands.wildernessWorld != null) {
             Location to = event.getTo();
             to.setWorld(Islands.wildernessWorld);
             event.setTo(to);
@@ -78,7 +78,7 @@ public class Listeners extends ChatUtils implements Listener {
     @EventHandler
     public void onBlockFromTo(BlockFromToEvent event) {
         if (!event.getBlock().getWorld().equals(Islands.islandsWorld) || !restrictFlow) return;
-        boolean canFlow = plugin.layout.isBlockInIslandSphere(
+        boolean canFlow = IslandsConfig.isBlockInIslandSphere(
                 event.getToBlock().getX(), event.getToBlock().getY(), event.getToBlock().getZ());
 
         if(!canFlow) {

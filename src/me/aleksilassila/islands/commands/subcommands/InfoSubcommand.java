@@ -1,6 +1,7 @@
 package me.aleksilassila.islands.commands.subcommands;
 
 import me.aleksilassila.islands.Islands;
+import me.aleksilassila.islands.IslandsConfig;
 import me.aleksilassila.islands.commands.AbstractIslandsWorldSubcommand;
 import me.aleksilassila.islands.utils.Messages;
 import me.aleksilassila.islands.utils.Permissions;
@@ -11,15 +12,9 @@ import java.util.Optional;
 import java.util.UUID;
 
 public class InfoSubcommand extends AbstractIslandsWorldSubcommand {
-    private final Islands plugin;
-
-    public InfoSubcommand() {
-        this.plugin = Islands.instance;
-    }
-
     @Override
     protected void runCommand(Player player, String[] args, boolean confirmed, String islandId) {
-        ConfigurationSection island = plugin.getIslandsConfig().getConfigurationSection(islandId);
+        ConfigurationSection island = IslandsConfig.getConfig().getConfigurationSection(islandId);
 
         if (island == null) {
             Messages.send(player, "error.ISLAND_NOT_FOUND");
@@ -43,7 +38,7 @@ public class InfoSubcommand extends AbstractIslandsWorldSubcommand {
         if (ownerUUID == null) {
             Messages.send(player, "info.ISLAND_INFO_OWNER", "Server");
         } else {
-            String displayName = plugin.getServer().getOfflinePlayer(UUID.fromString(ownerUUID)).getName();
+            String displayName = Islands.instance.getServer().getOfflinePlayer(UUID.fromString(ownerUUID)).getName();
             if (displayName != null) {
                 if (extensiveInfo) {
                     Messages.send(player, "info.ISLAND_INFO_OWNER_WITH_UUID", displayName, ownerUUID);
@@ -54,7 +49,7 @@ public class InfoSubcommand extends AbstractIslandsWorldSubcommand {
         }
 
         Messages.send(player, "info.ISLAND_INFO_SPAWNPOINT", island.getInt("spawnPoint.x"), island.getInt("spawnPoint.z"));
-        Messages.send(player, "info.ISLAND_INFO_SIZE", island.getInt("size"), plugin.parseIslandSize(island.getInt("size")));
+        Messages.send(player, "info.ISLAND_INFO_SIZE", island.getInt("size"), Islands.instance.parseIslandSize(island.getInt("size")));
         Messages.send(player, "info.ISLAND_INFO_BIOME", Optional.ofNullable(island.getString("biome")).orElse("UNDEFINED"));
 
         if (extensiveInfo) {
@@ -66,7 +61,7 @@ public class InfoSubcommand extends AbstractIslandsWorldSubcommand {
                 for (String trustedUUID : island.getConfigurationSection("trusted").getKeys(false)) {
                     String trustedPlayer;
                     try {
-                        trustedPlayer = plugin.getServer().getOfflinePlayer(UUID.fromString(trustedUUID)).getName();
+                        trustedPlayer = Islands.instance.getServer().getOfflinePlayer(UUID.fromString(trustedUUID)).getName();
                     } catch (Exception e) {
                         trustedPlayer = "\u00a74Unknown";
                     }

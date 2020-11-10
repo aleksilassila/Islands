@@ -1,6 +1,7 @@
 package me.aleksilassila.islands.commands;
 
 import me.aleksilassila.islands.Islands;
+import me.aleksilassila.islands.IslandsConfig;
 import me.aleksilassila.islands.utils.Messages;
 import org.bukkit.entity.Player;
 
@@ -11,7 +12,7 @@ public abstract class AbstractIslandsWorldSubcommand extends Subcommand {
     protected abstract void runCommand(Player player, String[] args, boolean confirmed, String islandId);
 
     protected boolean ownsIsland(Player player, String islandId) {
-        return Islands.instance.layout.getUUID(islandId).equals(player.getUniqueId().toString());
+        return IslandsConfig.getUUID(islandId).equals(player.getUniqueId().toString());
     }
 
     @Override
@@ -21,7 +22,7 @@ public abstract class AbstractIslandsWorldSubcommand extends Subcommand {
             return;
         }
 
-        String islandId = Islands.instance.layout.getIslandId(player.getLocation().getBlockX(), player.getLocation().getBlockZ());
+        String islandId = IslandsConfig.getIslandId(player.getLocation().getBlockX(), player.getLocation().getBlockZ());
 
         if (islandId == null) {
             Messages.send(player, "error.NOT_ON_ISLAND");

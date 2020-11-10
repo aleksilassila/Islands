@@ -3,7 +3,7 @@ package me.aleksilassila.islands.GUIs;
 import com.github.stefvanschie.inventoryframework.Gui;
 import com.github.stefvanschie.inventoryframework.GuiItem;
 import com.github.stefvanschie.inventoryframework.pane.StaticPane;
-import me.aleksilassila.islands.IslandLayout;
+import me.aleksilassila.islands.IslandsConfig;
 import me.aleksilassila.islands.Islands;
 import me.aleksilassila.islands.utils.BiomeMaterials;
 import me.aleksilassila.islands.utils.Messages;
@@ -14,15 +14,13 @@ import org.bukkit.entity.Player;
 import java.util.*;
 
 public class VisitGUI extends PageGUI {
-    private final Islands plugin;
     private final Player player;
 
     private int sort = 0; // 0 = date, 1 = name fixme test
 
     private final int PAGE_HEIGHT = 4; // < 1
 
-    public VisitGUI(Islands plugin, Player player) {
-        this.plugin = plugin;
+    public VisitGUI(Player player) {
         this.player = player;
     }
 
@@ -50,13 +48,13 @@ public class VisitGUI extends PageGUI {
     private List<StaticPane> getPanes() {
         List<StaticPane> panes = new ArrayList<>();
 
-        Map<String, Map<String, String>> publicIslands = plugin.layout.getIslandsInfo(true);
+        Map<String, Map<String, String>> publicIslands = IslandsConfig.getIslandsInfo(true);
 
         List<String> sortedSet = new ArrayList<>(publicIslands.keySet());
 
         // Sort islands
         if (sort == 0) { // Sort by date, oldest first
-            sortedSet.sort(Comparator.comparingInt(IslandLayout.placement::getIslandIndex));
+            sortedSet.sort(Comparator.comparingInt(IslandsConfig.placement::getIslandIndex));
         } else { // Sort by name
             sortedSet.sort(Comparator.comparingInt(a -> publicIslands.get(a).get("name").charAt(0)));
         }

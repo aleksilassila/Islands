@@ -3,7 +3,7 @@ package me.aleksilassila.islands.GUIs;
 import com.github.stefvanschie.inventoryframework.Gui;
 import com.github.stefvanschie.inventoryframework.GuiItem;
 import com.github.stefvanschie.inventoryframework.pane.StaticPane;
-import me.aleksilassila.islands.IslandLayout;
+import me.aleksilassila.islands.IslandsConfig;
 import me.aleksilassila.islands.Islands;
 import me.aleksilassila.islands.utils.BiomeMaterials;
 import me.aleksilassila.islands.utils.Messages;
@@ -21,11 +21,9 @@ import java.util.UUID;
 
 public class AdminGUI extends PageGUI {
     private final Player player;
-    private final IslandLayout layout;
 
-    public AdminGUI(Islands plugin, Player player) {
+    public AdminGUI(Player player) {
         this.player = player;
-        this.layout = plugin.layout;
     }
 
     @Override
@@ -60,7 +58,7 @@ public class AdminGUI extends PageGUI {
         int PAGE_HEIGHT = 4;
 
         List<StaticPane> pages = new ArrayList<>();
-        Map<String, Map<String, String>> publicIslands = layout.getIslandsInfo(false);
+        Map<String, Map<String, String>> publicIslands = IslandsConfig.getIslandsInfo(false);
         List<String> sortedSet = new ArrayList<>(publicIslands.keySet());
 
         StaticPane pane = new StaticPane(0, 0, 9, PAGE_HEIGHT - 1);
@@ -101,7 +99,7 @@ public class AdminGUI extends PageGUI {
         int PAGE_HEIGHT = 4;
 
         List<StaticPane> pages = new ArrayList<>();
-        Map<String, Integer> players = layout.getPlayers();
+        Map<String, Integer> players = IslandsConfig.getPlayers();
 
         StaticPane pane = new StaticPane(0, 0, 9, PAGE_HEIGHT - 1);
 
@@ -149,7 +147,7 @@ public class AdminGUI extends PageGUI {
         if (displayName == null) return;
 
         List<StaticPane> pages = new ArrayList<>();
-        Map<String, Map<String, String>> islands = layout.getIslandsInfo(uuid);
+        Map<String, Map<String, String>> islands = IslandsConfig.getIslandsInfo(uuid);
 
         StaticPane pane = new StaticPane(0, 0, 9, PAGE_HEIGHT - 1);
 
@@ -189,7 +187,7 @@ public class AdminGUI extends PageGUI {
     }
 
     private void teleportIsland(String islandId) {
-        Location location = layout.getIslandSpawn(islandId);
+        Location location = IslandsConfig.getIslandSpawn(islandId);
 
         if (location != null) {
             player.teleport(location);

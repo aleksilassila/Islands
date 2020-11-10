@@ -1,6 +1,7 @@
 package me.aleksilassila.islands.generation;
 
 import me.aleksilassila.islands.Islands;
+import me.aleksilassila.islands.IslandsConfig;
 import me.aleksilassila.islands.utils.Messages;
 import me.aleksilassila.islands.utils.Permissions;
 import org.bukkit.Location;
@@ -48,7 +49,7 @@ public enum IslandGeneration {
             for (String material : section.getKeys(false)) {
                 Material materialToReplace = Material.getMaterial(material.toUpperCase());
                 Material newMaterial = plugin.getConfig().getString("replaceOnGeneration." + material) != null
-                        ? Material.getMaterial(plugin.getConfig().getString("replaceOnGeneration." + material).toUpperCase())
+                        ? Material.getMaterial(section.getString(material).toUpperCase())
                         : null;
 
                 if (materialToReplace != null && newMaterial != null) {
@@ -230,11 +231,11 @@ public enum IslandGeneration {
         @Override
         public void run() {
             for (int count = 0; count < rowsClearedPerDelay; count++) {
-                int relativeX = index / plugin.layout.islandSpacing;
-                int relativeZ = index - relativeX * plugin.layout.islandSpacing;
+                int relativeX = index / IslandsConfig.INSTANCE.islandSpacing;
+                int relativeZ = index - relativeX * IslandsConfig.INSTANCE.islandSpacing;
 
-                int realX = xIndex * plugin.layout.islandSpacing + relativeX;
-                int realZ = zIndex * plugin.layout.islandSpacing + relativeZ;
+                int realX = xIndex * IslandsConfig.INSTANCE.islandSpacing + relativeX;
+                int realZ = zIndex * IslandsConfig.INSTANCE.islandSpacing + relativeZ;
 
                 boolean skipDelay = true;
 
@@ -254,7 +255,7 @@ public enum IslandGeneration {
 
                 if (skipDelay) count--;
 
-                if (index >= plugin.layout.islandSpacing * plugin.layout.islandSpacing) {
+                if (index >= IslandsConfig.INSTANCE.islandSpacing * IslandsConfig.INSTANCE.islandSpacing) {
                     Messages.send(player, "success.CLEARING_DONE");
 
                     queue.remove(this);
@@ -266,11 +267,11 @@ public enum IslandGeneration {
 
                     this.cancel();
                     break;
-                } else if (index == plugin.layout.islandSpacing * plugin.layout.islandSpacing / 4) {
+                } else if (index == IslandsConfig.INSTANCE.islandSpacing * IslandsConfig.INSTANCE.islandSpacing / 4) {
                     Messages.send(player, "info.CLEARING_STATUS", 25);
-                } else if (index == plugin.layout.islandSpacing * plugin.layout.islandSpacing / 2) {
+                } else if (index == IslandsConfig.INSTANCE.islandSpacing * IslandsConfig.INSTANCE.islandSpacing / 2) {
                     Messages.send(player, "info.CLEARING_STATUS", 50);
-                } else if (index == plugin.layout.islandSpacing * plugin.layout.islandSpacing / 4 * 3) {
+                } else if (index == IslandsConfig.INSTANCE.islandSpacing * IslandsConfig.INSTANCE.islandSpacing / 4 * 3) {
                     Messages.send(player, "info.CLEARING_STATUS", 75);
                 }
 
@@ -345,15 +346,15 @@ public enum IslandGeneration {
         public void run() {
             if (shouldDoClearing) {
                 for (int count = 0; count < rowsClearedPerDelay; count++) {
-                    int relativeX = clearingIndex / plugin.layout.islandSpacing;
-                    int relativeZ = clearingIndex - relativeX * plugin.layout.islandSpacing;
+                    int relativeX = clearingIndex / IslandsConfig.INSTANCE.islandSpacing;
+                    int relativeZ = clearingIndex - relativeX * IslandsConfig.INSTANCE.islandSpacing;
 
-                    int realX = xIndex * plugin.layout.islandSpacing + relativeX;
-                    int realZ = zIndex * plugin.layout.islandSpacing + relativeZ;
+                    int realX = xIndex * IslandsConfig.INSTANCE.islandSpacing + relativeX;
+                    int realZ = zIndex * IslandsConfig.INSTANCE.islandSpacing + relativeZ;
 
                     boolean skipDelay = true;
 
-                    for (int y = startY + plugin.layout.islandSpacing; y >= startY; y--) {
+                    for (int y = startY + IslandsConfig.INSTANCE.islandSpacing; y >= startY; y--) {
                         Block target = Islands.islandsWorld.getBlockAt(
                                 realX,
                                 targetY + (y - startY),
@@ -369,16 +370,16 @@ public enum IslandGeneration {
 
                     if (skipDelay) count--;
 
-                    if (clearingIndex >= plugin.layout.islandSpacing * plugin.layout.islandSpacing) {
+                    if (clearingIndex >= IslandsConfig.INSTANCE.islandSpacing * IslandsConfig.INSTANCE.islandSpacing) {
                         Messages.send(player, "success.CLEARING_DONE");
 
                         shouldDoClearing = false;
                         break;
-                    } else if (clearingIndex == plugin.layout.islandSpacing * plugin.layout.islandSpacing / 4) {
+                    } else if (clearingIndex == IslandsConfig.INSTANCE.islandSpacing * IslandsConfig.INSTANCE.islandSpacing / 4) {
                         Messages.send(player, "info.CLEARING_STATUS", 25);
-                    } else if (clearingIndex == plugin.layout.islandSpacing * plugin.layout.islandSpacing / 2) {
+                    } else if (clearingIndex == IslandsConfig.INSTANCE.islandSpacing * IslandsConfig.INSTANCE.islandSpacing / 2) {
                         Messages.send(player, "info.CLEARING_STATUS", 50);
-                    } else if (clearingIndex == plugin.layout.islandSpacing * plugin.layout.islandSpacing / 4 * 3) {
+                    } else if (clearingIndex == IslandsConfig.INSTANCE.islandSpacing * IslandsConfig.INSTANCE.islandSpacing / 4 * 3) {
                         Messages.send(player, "info.CLEARING_STATUS", 75);
                     }
 

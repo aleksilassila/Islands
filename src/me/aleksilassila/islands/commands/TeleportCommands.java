@@ -1,7 +1,7 @@
 package me.aleksilassila.islands.commands;
 
 import me.aleksilassila.islands.GUIs.VisitGUI;
-import me.aleksilassila.islands.IslandLayout;
+import me.aleksilassila.islands.IslandsConfig;
 import me.aleksilassila.islands.Islands;
 import me.aleksilassila.islands.generation.IslandGeneration;
 import me.aleksilassila.islands.utils.Messages;
@@ -21,11 +21,9 @@ import java.util.*;
 
 public class TeleportCommands {
     private final Islands plugin;
-    private final IslandLayout layout;
 
-    public TeleportCommands(Islands plugin) {
-        this.plugin = plugin;
-        this.layout = plugin.layout;
+    public TeleportCommands() {
+        this.plugin = Islands.instance;
 
         new VisitCommand();
     }
@@ -53,7 +51,7 @@ public class TeleportCommands {
             }
 
             if (args.length != 1) {
-                new VisitGUI(plugin, player).open();
+                new VisitGUI(player).open();
                 return true;
             }
 
@@ -62,10 +60,10 @@ public class TeleportCommands {
                 return true;
             }
 
-            String islandId = plugin.layout.getIslandByName(args[0]);
+            String islandId = IslandsConfig.getIslandByName(args[0]);
 
             if (islandId != null) {
-                player.teleport(plugin.layout.getIslandSpawn(islandId));
+                player.teleport(IslandsConfig.getIslandSpawn(islandId));
                 player.sendTitle(Messages.get("success.VISIT_TITLE", args[0]), "", 10, 20 * 5, 10);
             } else {
                 player.sendMessage(Messages.get("error.ISLAND_NOT_FOUND"));
@@ -123,18 +121,18 @@ public class TeleportCommands {
                 return true;
             }
 
-            List<String> ids = plugin.layout.getIslandIds(player.getUniqueId());
+            List<String> ids = IslandsConfig.getIslandIds(player.getUniqueId());
             Map<String, Integer> idMap = new HashMap<>();
 
              for (String islandId : ids) {
-                 idMap.put(islandId, plugin.getIslandsConfig().getInt(islandId + ".home"));
+                 idMap.put(islandId, IslandsConfig.getConfig().getInt(islandId + ".home"));
              }
 
             ids.sort(Comparator.comparingInt(idMap::get));
 
             player.sendMessage(Messages.get("success.HOMES_FOUND", ids.size()));
             for (String islandId : ids) {
-                String name = plugin.getIslandsConfig().getString(islandId + ".name");
+                String name = IslandsConfig.getConfig().getString(islandId + ".name");
                 Messages.send(player, "success.HOME_ITEM", name, idMap.get(islandId));
             }
 
@@ -211,12 +209,12 @@ public class TeleportCommands {
             int homeId;
 
             try {
-                homeId = args.length == 0 ? layout.getLowestHome(player.getUniqueId()) : Integer.parseInt(args[0]);
+                homeId = args.length == 0 ? IslandsConfig.getLowestHome(player.getUniqueId()) : Integer.parseInt(args[0]);
             } catch (NumberFormatException e) {
-                homeId = layout.getLowestHome(player.getUniqueId());
+                homeId = IslandsConfig.getLowestHome(player.getUniqueId());
             }
 
-            String islandId = layout.getHomeIsland(player.getUniqueId(), homeId);
+            String islandId = IslandsConfig.getHomeIsland(player.getUniqueId(), homeId);
 
             if (IslandGeneration.INSTANCE.queue.size() > 0
                     && IslandGeneration.INSTANCE.queue.get(0).getIslandId().equals(islandId)
@@ -225,7 +223,7 @@ public class TeleportCommands {
                 return true;
             }
 
-            Location location = layout.getIslandSpawn(islandId);
+            Location location = IslandsConfig.getIslandSpawn(islandId);
 
             if (location != null) {
                 if (!disableNeutralTeleports && player.hasPermission(Permissions.bypass.neutralTeleport) && player.getWorld().equals(Islands.wildernessWorld)) {

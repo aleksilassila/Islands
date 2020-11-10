@@ -3,8 +3,7 @@ package me.aleksilassila.islands.GUIs;
 import com.github.stefvanschie.inventoryframework.Gui;
 import com.github.stefvanschie.inventoryframework.GuiItem;
 import com.github.stefvanschie.inventoryframework.pane.StaticPane;
-import me.aleksilassila.islands.IslandLayout;
-import me.aleksilassila.islands.Islands;
+import me.aleksilassila.islands.IslandsConfig;
 import me.aleksilassila.islands.utils.Messages;
 import me.aleksilassila.islands.utils.Permissions;
 import org.bukkit.Bukkit;
@@ -20,16 +19,12 @@ import java.util.Set;
 import java.util.UUID;
 
 public class IslandSettingsGUI extends PageGUI {
-    private final Islands plugin;
     private final Player player;
-    private final IslandLayout layout;
     private final String islandId;
 
-    public IslandSettingsGUI(Islands plugin, String islandId, Player player) {
+    public IslandSettingsGUI(String islandId, Player player) {
         this.player = player;
         this.islandId = islandId;
-        this.layout = plugin.layout;
-        this.plugin = plugin;
     }
 
     @Override
@@ -71,7 +66,7 @@ public class IslandSettingsGUI extends PageGUI {
         int PAGE_HEIGHT = 4;
 
         List<StaticPane> pages = new ArrayList<>();
-        ConfigurationSection section = plugin.getIslandsConfig().getConfigurationSection(islandId + ".trusted");
+        ConfigurationSection section = IslandsConfig.getConfig().getConfigurationSection(islandId + ".trusted");
 
         StaticPane pane = new StaticPane(0, 0, 9, PAGE_HEIGHT - 1);
 
@@ -101,7 +96,7 @@ public class IslandSettingsGUI extends PageGUI {
                         event -> {
                             if (event.isShiftClick()) {
                                 if (player.hasPermission(Permissions.command.trust))
-                                    layout.removeTrusted(islandId, offlinePlayer.getUniqueId().toString());
+                                    IslandsConfig.removeTrusted(islandId, offlinePlayer.getUniqueId().toString());
                                 showTrustedPlayersList();
                             } else showPlayerMenu(offlinePlayer);
                         }), (itemCount % (9 * (PAGE_HEIGHT - 1))) % 9, (itemCount % (9 * (PAGE_HEIGHT - 1))) / 9);
@@ -126,56 +121,56 @@ public class IslandSettingsGUI extends PageGUI {
 
         // Building
         if (player.hasPermission(Permissions.command.trust)) {
-            boolean canBuild = layout.canBuild(islandId, uuid);
+            boolean canBuild = IslandsConfig.canBuild(islandId, uuid);
             ItemStack building = createGuiItem(Material.CHEST,
                     Messages.get("gui.trust.player.BUILDING"),
                     canBuild,
                     Messages.get("gui.trust.player.BUILDING_LORE", canBuild ? 1 : 0));
 
             settings.addItem(new GuiItem(building, event -> {
-                layout.setBuildAccess(islandId, uuid, !canBuild);
+                IslandsConfig.setBuildAccess(islandId, uuid, !canBuild);
                 showPlayerMenu(offlinePlayer);
             }), settings.getItems().size() * 2, 0);
         }
 
         // Containers
         if (player.hasPermission(Permissions.command.containerTrust)) {
-            boolean canAccessContainers = layout.canAccessContainers(islandId, uuid);
+            boolean canAccessContainers = IslandsConfig.canAccessContainers(islandId, uuid);
             ItemStack containers = createGuiItem(Material.CHEST,
                     Messages.get("gui.trust.player.CHESTS"),
                     canAccessContainers,
                     Messages.get("gui.trust.player.CHESTS_LORE", canAccessContainers ? 1 : 0));
 
             settings.addItem(new GuiItem(containers, event -> {
-                layout.setContainerAccess(islandId, uuid, !canAccessContainers);
+                IslandsConfig.setContainerAccess(islandId, uuid, !canAccessContainers);
                 showPlayerMenu(offlinePlayer);
             }), settings.getItems().size() * 2, 0);
         }
 
         // Doors
         if (player.hasPermission(Permissions.command.doorTrust)) {
-            boolean canUseDoors = layout.canAccessDoors(islandId, uuid);
+            boolean canUseDoors = IslandsConfig.canAccessDoors(islandId, uuid);
             ItemStack doors = createGuiItem(Material.OAK_DOOR,
                     Messages.get("gui.trust.player.DOORS"),
                     canUseDoors,
                     Messages.get("gui.trust.player.DOORS_LORE", canUseDoors ? 1 : 0));
 
             settings.addItem(new GuiItem(doors, event -> {
-                layout.setDoorAccess(islandId, uuid, !canUseDoors);
+                IslandsConfig.setDoorAccess(islandId, uuid, !canUseDoors);
                 showPlayerMenu(offlinePlayer);
             }), settings.getItems().size() * 2, 0);
         }
 
         // Utility
         if (player.hasPermission(Permissions.command.utilityTrust)) {
-            boolean canUseUtility = layout.canUseUtility(islandId, uuid);
+            boolean canUseUtility = IslandsConfig.canUseUtility(islandId, uuid);
             ItemStack utility = createGuiItem(Material.PLAYER_HEAD,
                     Messages.get("gui.trust.player.UTILITY"),
                     canUseUtility,
                     Messages.get("gui.trust.player.UTILITY_LORE", canUseUtility ? 1 : 0));
 
             settings.addItem(new GuiItem(utility, event -> {
-                layout.setUtilityAccess(islandId, uuid, !canUseUtility);
+                IslandsConfig.setUtilityAccess(islandId, uuid, !canUseUtility);
                 showPlayerMenu(offlinePlayer);
             }), settings.getItems().size() * 2, 0);
         }
@@ -204,56 +199,56 @@ public class IslandSettingsGUI extends PageGUI {
 
         // Building
         if (player.hasPermission(Permissions.command.generalBuildProtection)) {
-            boolean buildProtection = layout.buildProtection(islandId);
+            boolean buildProtection = IslandsConfig.buildProtection(islandId);
             ItemStack building = createGuiItem(Material.CHEST,
                     Messages.get("gui.trust.global.BUILDING"),
                     buildProtection,
                     Messages.get("gui.trust.global.BUILDING_LORE", buildProtection ? 1 : 0));
 
             settings.addItem(new GuiItem(building, event -> {
-                layout.setBuildProtection(islandId, !buildProtection);
+                IslandsConfig.setBuildProtection(islandId, !buildProtection);
                 showIslandProtectionMenu();
             }), 0, 0);
         }
 
         // Containers
         if (player.hasPermission(Permissions.command.generalContainerTrust)) {
-            boolean containerProtection = layout.containerProtection(islandId);
+            boolean containerProtection = IslandsConfig.containerProtection(islandId);
             ItemStack containers = createGuiItem(Material.CHEST,
                     Messages.get("gui.trust.global.CHESTS"),
                     containerProtection,
                     Messages.get("gui.trust.global.CHESTS_LORE", containerProtection ? 1 : 0));
 
             settings.addItem(new GuiItem(containers, event -> {
-                layout.setContainerProtection(islandId, !containerProtection);
+                IslandsConfig.setContainerProtection(islandId, !containerProtection);
                 showIslandProtectionMenu();
             }), 2, 0);
         }
 
         // Doors
         if (player.hasPermission(Permissions.command.generalDoorTrust)) {
-            boolean doorProtection = layout.doorProtection(islandId);
+            boolean doorProtection = IslandsConfig.doorProtection(islandId);
             ItemStack doors = createGuiItem(Material.OAK_DOOR,
                     Messages.get("gui.trust.global.DOORS"),
                     doorProtection,
                     Messages.get("gui.trust.global.DOORS_LORE", doorProtection ? 1 : 0));
 
             settings.addItem(new GuiItem(doors, event -> {
-                layout.setDoorProtection(islandId, !doorProtection);
+                IslandsConfig.setDoorProtection(islandId, !doorProtection);
                 showIslandProtectionMenu();
             }), 4, 0);
         }
 
         // Utility
         if (player.hasPermission(Permissions.command.generalUtilityTrust)) {
-            boolean utilityProtection = layout.utilityProtection(islandId);
+            boolean utilityProtection = IslandsConfig.utilityProtection(islandId);
             ItemStack utility = createGuiItem(Material.PLAYER_HEAD,
                     Messages.get("gui.trust.global.UTILITY"),
                     utilityProtection,
                     Messages.get("gui.trust.global.UTILITY_LORE", utilityProtection ? 1 : 0));
 
             settings.addItem(new GuiItem(utility, event -> {
-                layout.setUtilityProtection(islandId, !utilityProtection);
+                IslandsConfig.setUtilityProtection(islandId, !utilityProtection);
                 showIslandProtectionMenu();
             }), 6, 0);
         }

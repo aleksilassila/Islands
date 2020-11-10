@@ -41,7 +41,7 @@ public class IslandCommands extends ChatUtils implements TabExecutor {
         subcommands.add(new ModerateSubcommand());
         subcommands.add(new SettingsSubcommand());
 
-        TeleportCommands teleportCommands = new TeleportCommands(plugin);
+        TeleportCommands teleportCommands = new TeleportCommands();
 
         boolean homePrefix = plugin.getConfig().getBoolean("homeSubcommand");
 
@@ -53,7 +53,7 @@ public class IslandCommands extends ChatUtils implements TabExecutor {
             subcommands.add(homesCommand);
         }
 
-        new TrustCommands(plugin);
+        new TrustCommands();
     }
 
     @Override
@@ -156,20 +156,5 @@ public class IslandCommands extends ChatUtils implements TabExecutor {
         }
 
         return availableArgs;
-    }
-
-    public static class Utils {
-        @Nullable
-        public Biome getTargetBiome(String biome) {
-             Biome targetBiome = null;
-
-             for (Biome b : Biome.values()) {
-                 if (b.name().equalsIgnoreCase(biome)) {
-                     targetBiome = b;
-                 }
-             }
-
-             return targetBiome;
-        }
     }
 }

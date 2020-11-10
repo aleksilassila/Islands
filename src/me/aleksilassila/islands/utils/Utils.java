@@ -4,6 +4,7 @@ import com.sun.istack.internal.Nullable;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.World;
+import org.bukkit.block.Biome;
 
 public class Utils {
     public static int getHighestYAt(World world, int x, int z) {
@@ -21,5 +22,18 @@ public class Utils {
         }
 
         return null;
+    }
+
+    @Nullable
+    public static Biome getTargetBiome(String biome) {
+         Biome targetBiome = null;
+
+         for (Biome b : Biome.values()) {
+             if (b.name().equalsIgnoreCase(biome)) {
+                 targetBiome = b;
+             }
+         }
+
+         return targetBiome;
     }
 }

@@ -1,6 +1,7 @@
 package me.aleksilassila.islands.commands;
 
 import me.aleksilassila.islands.Islands;
+import me.aleksilassila.islands.IslandsConfig;
 import me.aleksilassila.islands.generation.Biomes;
 import me.aleksilassila.islands.utils.Messages;
 import me.aleksilassila.islands.utils.Permissions;
@@ -34,7 +35,7 @@ public abstract class AbstractCreateSubcommands extends Subcommand {
             return;
         }
 
-        if (islandSize < Islands.instance.getSmallestIslandSize() || islandSize + 4 >= Islands.instance.layout.islandSpacing) {
+        if (islandSize < Islands.instance.getSmallestIslandSize() || islandSize + 4 >= IslandsConfig.INSTANCE.islandSpacing) {
             player.sendMessage(Messages.get("error.INVALID_ISLAND_SIZE"));
             return;
         }

@@ -1,6 +1,7 @@
 package me.aleksilassila.islands.protection;
 
 import me.aleksilassila.islands.Islands;
+import me.aleksilassila.islands.IslandsConfig;
 import me.aleksilassila.islands.utils.Messages;
 import me.aleksilassila.islands.utils.Permissions;
 import org.bukkit.Material;
@@ -15,14 +16,9 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 
 public class ProtectionListeners implements Listener {
-    private final Islands plugin;
-
     public ProtectionListeners() {
-        this.plugin = Islands.instance;
-
-        plugin.getServer().getPluginManager().registerEvents(this, plugin);
+        Islands.instance.getServer().getPluginManager().registerEvents(this, Islands.instance);
     }
-
 
     @EventHandler
     public void onEntityDamageEvent(EntityDamageByEntityEvent event) {
@@ -32,9 +28,9 @@ public class ProtectionListeners implements Listener {
             int x = event.getEntity().getLocation().getBlockX();
             int z = event.getEntity().getLocation().getBlockZ();
 
-            String ownerUUID = plugin.layout.getBlockOwnerUUID(x, z);
+            String ownerUUID = IslandsConfig.getBlockOwnerUUID(x, z);
             if (ownerUUID != null && !ownerUUID.equals(event.getDamager().getUniqueId().toString())) {
-                if (new ProtectedBlock(plugin, x, z).canDoAnything(event.getDamager().getUniqueId().toString())) {
+                if (new ProtectedBlock(x, z).canDoAnything(event.getDamager().getUniqueId().toString())) {
                     return;
                 }
 
@@ -55,11 +51,11 @@ public class ProtectionListeners implements Listener {
         int z = event.getClickedBlock().getZ();
 
         Player player = event.getPlayer();
-        String ownerUUID = plugin.layout.getBlockOwnerUUID(x, z);
+        String ownerUUID = IslandsConfig.getBlockOwnerUUID(x, z);
 
         if (player.getUniqueId().toString().equalsIgnoreCase(ownerUUID)) return;
 
-        ProtectedBlock protectedBlock = new ProtectedBlock(plugin, x, z);
+        ProtectedBlock protectedBlock = new ProtectedBlock(x, z);
 
         // Handle building access
         if (protectedBlock.canDoAnything(player.getUniqueId().toString())) return;
@@ -139,11 +135,11 @@ public class ProtectionListeners implements Listener {
             int x = event.getBlock().getX();
             int z = event.getBlock().getZ();
 
-            String ownerUUID = plugin.layout.getBlockOwnerUUID(x, z);
+            String ownerUUID = IslandsConfig.getBlockOwnerUUID(x, z);
 
             if (ownerUUID == null && !event.getPlayer().hasPermission(Permissions.bypass.interactEverywhere)) {
                 event.setCancelled(true);
-            } else if (!(new ProtectedBlock(plugin, x, z).canDoAnything(event.getPlayer().getUniqueId().toString()))) {
+            } else if (!(new ProtectedBlock(x, z).canDoAnything(event.getPlayer().getUniqueId().toString()))) {
                 event.setCancelled(true);
                 event.getPlayer().sendMessage(Messages.get("error.NOT_TRUSTED"));
             }
@@ -160,11 +156,11 @@ public class ProtectionListeners implements Listener {
             int x = event.getBlock().getX();
             int z = event.getBlock().getZ();
 
-            String ownerUUID = plugin.layout.getBlockOwnerUUID(x, z);
+            String ownerUUID = IslandsConfig.getBlockOwnerUUID(x, z);
 
             if (ownerUUID == null && !event.getPlayer().hasPermission(Permissions.bypass.interactEverywhere)) {
                 event.setCancelled(true);
-            } else if (!(new ProtectedBlock(plugin, x, z).canDoAnything(event.getPlayer().getUniqueId().toString()))) {
+            } else if (!(new ProtectedBlock(x, z).canDoAnything(event.getPlayer().getUniqueId().toString()))) {
                 event.setCancelled(true);
                 event.getPlayer().sendMessage(Messages.get("error.NOT_TRUSTED"));
             }

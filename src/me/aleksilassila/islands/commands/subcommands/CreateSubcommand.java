@@ -1,13 +1,14 @@
 package me.aleksilassila.islands.commands.subcommands;
 
 import me.aleksilassila.islands.GUIs.CreateGUI;
-import me.aleksilassila.islands.IslandLayout;
+import me.aleksilassila.islands.IslandsConfig;
 import me.aleksilassila.islands.Islands;
 import me.aleksilassila.islands.commands.AbstractCreateSubcommands;
 import me.aleksilassila.islands.commands.IslandCommands;
 import me.aleksilassila.islands.generation.Biomes;
 import me.aleksilassila.islands.utils.Messages;
 import me.aleksilassila.islands.utils.Permissions;
+import me.aleksilassila.islands.utils.Utils;
 import org.bukkit.Location;
 import org.bukkit.block.Biome;
 import org.bukkit.entity.Player;
@@ -16,14 +17,7 @@ import java.util.HashMap;
 import java.util.List;
 
 public class CreateSubcommand extends AbstractCreateSubcommands {
-    private final Islands plugin;
-    private final IslandLayout layout;
-    private final IslandCommands.Utils utils = new IslandCommands.Utils();
-
-    public CreateSubcommand() {
-        this.plugin = Islands.instance;
-        this.layout = plugin.layout;
-    }
+    private final Islands plugin = Islands.instance;
 
     @Override
     protected void openGui(Player player) {
@@ -39,7 +33,7 @@ public class CreateSubcommand extends AbstractCreateSubcommands {
 
         HashMap<Biome, List<Location>> availableLocations = Biomes.INSTANCE.availableLocations;
 
-        int previousIslands = layout.getIslandIds(player.getUniqueId()).size();
+        int previousIslands = IslandsConfig.getIslandIds(player.getUniqueId()).size();
 
         int islandsLimit = plugin.getConfig().getInt("defaultIslandLimit", -1);
 
@@ -66,7 +60,7 @@ public class CreateSubcommand extends AbstractCreateSubcommands {
         if (args[0].equalsIgnoreCase("random") && !isRandomBiomeDisabled()) {
             targetBiome = null;
         } else {
-            targetBiome = utils.getTargetBiome(args[0]);
+            targetBiome = Utils.getTargetBiome(args[0]);
 
             if (targetBiome == null) {
                 player.sendMessage(Messages.get("error.NO_BIOME_FOUND"));

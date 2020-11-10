@@ -1,6 +1,7 @@
 package me.aleksilassila.islands.commands.subcommands;
 
 import me.aleksilassila.islands.Islands;
+import me.aleksilassila.islands.IslandsConfig;
 import me.aleksilassila.islands.commands.AbstractIslandsWorldSubcommand;
 import me.aleksilassila.islands.utils.Messages;
 import me.aleksilassila.islands.utils.Permissions;
@@ -13,34 +14,29 @@ import java.util.Collections;
 import java.util.List;
 
 public class SaveSubcommand extends AbstractIslandsWorldSubcommand {
-    private final Islands plugin;
     private final String SAVE_DIRECTORY = "plugins/Islands/saves/";
-
-    public SaveSubcommand() {
-        this.plugin = Islands.instance;
-    }
 
     @Override
     protected void runCommand(Player player, String[] args, boolean confirmed, String islandId) {
-        if (plugin.worldEdit != null) {
-            String name = plugin.getIslandsConfig().getBoolean(islandId + ".public")
-                    ? plugin.getIslandsConfig().getString(islandId + ".name")
+        if (Islands.instance.worldEdit != null) {
+            String name = IslandsConfig.getConfig().getBoolean(islandId + ".public")
+                    ? IslandsConfig.getConfig().getString(islandId + ".name")
                     : islandId;
 
-            int startX = plugin.getIslandsConfig().getInt(islandId + ".x");
-            int startY = plugin.getIslandsConfig().getInt(islandId + ".y");
-            int startZ = plugin.getIslandsConfig().getInt(islandId + ".z");
+            int startX = IslandsConfig.getConfig().getInt(islandId + ".x");
+            int startY = IslandsConfig.getConfig().getInt(islandId + ".y");
+            int startZ = IslandsConfig.getConfig().getInt(islandId + ".z");
 
-            int islandSize = plugin.getIslandsConfig().getInt(islandId + ".size");
+            int islandSize = IslandsConfig.getConfig().getInt(islandId + ".size");
 
             int height;
 
             try {
                 height = args.length == 1
                         ? Integer.parseInt(args[0])
-                        : plugin.getIslandsConfig().getInt(islandId + ".height");
+                        : IslandsConfig.getConfig().getInt(islandId + ".height");
             } catch (NumberFormatException e) {
-                height = plugin.getIslandsConfig().getInt(islandId + ".height");
+                height = IslandsConfig.getConfig().getInt(islandId + ".height");
             }
 
             if (height == 0) height = islandSize;

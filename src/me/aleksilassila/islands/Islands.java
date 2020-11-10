@@ -37,8 +37,6 @@ public class Islands extends JavaPlugin {
     public static World islandsSourceWorld;
     public static World wildernessWorld;
 
-    private FileConfiguration islandsConfig;
-    private File islandsConfigFile;
     private FileConfiguration biomesCache;
     private File biomesCacheFile;
 
@@ -46,8 +44,6 @@ public class Islands extends JavaPlugin {
     public Economy econ = null;
     public WorldEditPlugin worldEdit = null;
     public ShapesLoader shapesLoader = null;
-
-    public IslandLayout layout;
 
     public Set<Player> playersWithNoFall = new HashSet<>();
     public HashMap<String, ConfirmItem> confirmations;
@@ -93,7 +89,6 @@ public class Islands extends JavaPlugin {
             }
         else saveDefaultConfig();
 
-        initIslandsConfig();
         initBiomesCache();
 
         new ConfigMigrator();
@@ -113,8 +108,6 @@ public class Islands extends JavaPlugin {
 
         definedIslandSizes = setupSizes();
         definedIslandShapes = setupShapes();
-
-        layout = new IslandLayout();
 
         new IslandCommands();
 
@@ -143,16 +136,16 @@ public class Islands extends JavaPlugin {
             biome = Biomes.INSTANCE.getRandomBiome(islandSize);
         }
 
-        String islandId = layout.createIsland(player.getUniqueId(), islandSize, height, biome);
+        String islandId = IslandsConfig.createIsland(player.getUniqueId(), islandSize, height, biome);
         try {
             boolean success = IslandGeneration.INSTANCE.copyIsland(
                     player,
                     biome,
                     islandSize,
                     new Vector(
-                            getIslandsConfig().getInt(islandId + ".x"),
-                            getIslandsConfig().getInt(islandId + ".y"),
-                            getIslandsConfig().getInt(islandId + ".z")
+                            IslandsConfig.getConfig().getInt(islandId + ".x"),
+                            IslandsConfig.getConfig().getInt(islandId + ".y"),
+                            IslandsConfig.getConfig().getInt(islandId + ".z")
                     ),
                     false,
                     islandId,
@@ -161,13 +154,13 @@ public class Islands extends JavaPlugin {
             );
 
             if (!success) {
-                layout.deleteIsland(islandId);
+                IslandsConfig.deleteIsland(islandId);
                 return null;
             }
 
             return islandId;
         } catch (IllegalArgumentException e) {
-            layout.deleteIsland(islandId);
+            IslandsConfig.deleteIsland(islandId);
             throw new IllegalArgumentException();
         }
 
@@ -188,7 +181,7 @@ public class Islands extends JavaPlugin {
             biome = Biomes.INSTANCE.getRandomBiome(islandSize);
         }
 
-        layout.updateIsland(islandId, islandSize, height, biome);
+        IslandsConfig.updateIsland(islandId, islandSize, height, biome);
 
         try {
             return IslandGeneration.INSTANCE.copyIsland(
@@ -196,9 +189,9 @@ public class Islands extends JavaPlugin {
                     biome,
                     islandSize,
                     new Vector(
-                            getIslandsConfig().getInt(islandId + ".x"),
-                            getIslandsConfig().getInt(islandId + ".y"),
-                            getIslandsConfig().getInt(islandId + ".z")
+                            IslandsConfig.getConfig().getInt(islandId + ".x"),
+                            IslandsConfig.getConfig().getInt(islandId + ".y"),
+                            IslandsConfig.getConfig().getInt(islandId + ".z")
                     ),
                     true,
                     islandId,
@@ -234,7 +227,7 @@ public class Islands extends JavaPlugin {
 
     @NotNull
     public int getSmallestIslandSize() {
-        int smallestSize = layout.islandSpacing;
+        int smallestSize = IslandsConfig.INSTANCE.islandSpacing;
 
         for (String definedSize : definedIslandSizes.keySet()) {
             if (definedIslandSizes.get(definedSize) < smallestSize)
@@ -379,33 +372,6 @@ public class Islands extends JavaPlugin {
         if (worldEdit == null) return new HashMap<>();
 
         return shapesLoader.loadAll();
-    }
-
-    public FileConfiguration getIslandsConfig() {
-        return this.islandsConfig;
-    }
-
-    public void saveIslandsConfig() {
-        try {
-            islandsConfig.save(islandsConfigFile);
-        } catch (IOException e) {
-            getLogger().severe("Unable to save islandsConfig");
-        }
-    }
-
-    private void initIslandsConfig() {
-        islandsConfigFile = new File(getDataFolder(), "islands.yml");
-        if (!islandsConfigFile.exists()) {
-            islandsConfigFile.getParentFile().mkdirs();
-            saveResource("islands.yml", false);
-         }
-
-        islandsConfig = new YamlConfiguration();
-        try {
-            islandsConfig.load(islandsConfigFile);
-        } catch (IOException | InvalidConfigurationException e) {
-            e.printStackTrace();
-        }
     }
 
     public FileConfiguration getBiomesCache() {
