@@ -47,7 +47,6 @@ public class Islands extends JavaPlugin {
     public WorldEditPlugin worldEdit = null;
     public ShapesLoader shapesLoader = null;
 
-    public IslandGeneration islandGeneration;
     public IslandLayout layout;
 
     public Set<Player> playersWithNoFall = new HashSet<>();
@@ -115,7 +114,6 @@ public class Islands extends JavaPlugin {
         definedIslandSizes = setupSizes();
         definedIslandShapes = setupShapes();
 
-        islandGeneration = new IslandGeneration();
         layout = new IslandLayout();
 
         new IslandCommands();
@@ -147,7 +145,7 @@ public class Islands extends JavaPlugin {
 
         String islandId = layout.createIsland(player.getUniqueId(), islandSize, height, biome);
         try {
-            boolean success = islandGeneration.copyIsland(
+            boolean success = IslandGeneration.INSTANCE.copyIsland(
                     player,
                     biome,
                     islandSize,
@@ -193,7 +191,7 @@ public class Islands extends JavaPlugin {
         layout.updateIsland(islandId, islandSize, height, biome);
 
         try {
-            return islandGeneration.copyIsland(
+            return IslandGeneration.INSTANCE.copyIsland(
                     player,
                     biome,
                     islandSize,

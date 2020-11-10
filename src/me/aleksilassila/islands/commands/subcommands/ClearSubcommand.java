@@ -3,6 +3,7 @@ package me.aleksilassila.islands.commands.subcommands;
 import me.aleksilassila.islands.IslandLayout;
 import me.aleksilassila.islands.Islands;
 import me.aleksilassila.islands.commands.AbstractIslandsWorldSubcommand;
+import me.aleksilassila.islands.generation.IslandGeneration;
 import me.aleksilassila.islands.utils.Messages;
 import me.aleksilassila.islands.utils.Permissions;
 import org.bukkit.entity.Player;
@@ -33,7 +34,7 @@ public class ClearSubcommand extends AbstractIslandsWorldSubcommand {
             return;
         }
 
-        if (!plugin.islandGeneration.clearIsland(player, islandId)) {
+        if (!IslandGeneration.INSTANCE.clearIsland(player, islandId)) {
             player.sendMessage(Messages.get("error.ONGOING_QUEUE_EVENT"));
             return;
         }

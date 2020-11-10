@@ -3,6 +3,7 @@ package me.aleksilassila.islands.commands;
 import me.aleksilassila.islands.GUIs.VisitGUI;
 import me.aleksilassila.islands.IslandLayout;
 import me.aleksilassila.islands.Islands;
+import me.aleksilassila.islands.generation.IslandGeneration;
 import me.aleksilassila.islands.utils.Messages;
 import me.aleksilassila.islands.utils.Permissions;
 import me.aleksilassila.islands.utils.Utils;
@@ -217,8 +218,8 @@ public class TeleportCommands {
 
             String islandId = layout.getHomeIsland(player.getUniqueId(), homeId);
 
-            if (plugin.islandGeneration.queue.size() > 0
-                    && plugin.islandGeneration.queue.get(0).getIslandId().equals(islandId)
+            if (IslandGeneration.INSTANCE.queue.size() > 0
+                    && IslandGeneration.INSTANCE.queue.get(0).getIslandId().equals(islandId)
                     && !unfinishedIslandTeleports) {
                 Messages.send(player, "error.ISLAND_UNFINISHED");
                 return true;

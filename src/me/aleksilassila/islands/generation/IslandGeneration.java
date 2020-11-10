@@ -16,17 +16,19 @@ import org.bukkit.util.Vector;
 
 import java.util.*;
 
-public class IslandGeneration {
+public enum IslandGeneration {
+    INSTANCE;
+
     private final Islands plugin;
 
     public List<Task> queue = new ArrayList<>();
     private final int buildDelay;
     private int rowsBuiltPerDelay = 1;
-    private int rowsClearedPerDelay = 2;
+    private final int rowsClearedPerDelay;
 
-    private final Map<Material, Material> replacementMap;
+    private final Map<Material, Material> replacementMap = new HashMap<>();
 
-    public IslandGeneration() {
+    IslandGeneration() {
         this.plugin = Islands.instance;
 
         double delay = plugin.getConfig().getDouble("generation.generationDelayInTicks");
@@ -37,9 +39,8 @@ public class IslandGeneration {
         } else {
             this.buildDelay = (int) delay;
         }
-        this.rowsClearedPerDelay = rowsBuiltPerDelay * plugin.getConfig().getInt("generation.clearSpeedMultiplier");
 
-        replacementMap = new HashMap<>();
+        this.rowsClearedPerDelay = rowsBuiltPerDelay * plugin.getConfig().getInt("generation.clearSpeedMultiplier", 1);
 
         ConfigurationSection section = plugin.getConfig().getConfigurationSection("replaceOnGeneration");
 
