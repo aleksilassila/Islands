@@ -28,11 +28,11 @@ public class VisitGUI extends PageGUI {
 
     @Override
     public Gui getMainGui() {
-        Gui gui = createPaginatedGUI(PAGE_HEIGHT, Messages.get("gui.visit.TITLE", sort), getPanes());
+        Gui gui = createPaginatedGUI(PAGE_HEIGHT, Messages.get("gui.visit.TITLE"), getPanes());
 
         StaticPane sort = new StaticPane(4, PAGE_HEIGHT - 1, 1, 1);
 
-        sort.addItem(new GuiItem(createGuiItem(Material.REDSTONE, Messages.get("gui.visit.SORT", this.sort == 1 ? 0 : 1), false), event -> {
+        sort.addItem(new GuiItem(createGuiItem(Material.REDSTONE, Messages.get("gui.visit.SORT", this.sort), false), event -> {
             toggleSort();
             open();
         }), 0, 0);
@@ -56,8 +56,7 @@ public class VisitGUI extends PageGUI {
 
         // Sort islands
         if (sort == 0) { // Sort by date, oldest first
-            sortedSet.sort(Comparator.comparingInt(a ->
-                    IslandLayout.placement.getIslandIndex(new int[]{Integer.parseInt(a.split("x")[0]), Integer.parseInt(a.split("x")[1])})));
+            sortedSet.sort(Comparator.comparingInt(IslandLayout.placement::getIslandIndex));
         } else { // Sort by name
             sortedSet.sort(Comparator.comparingInt(a -> publicIslands.get(a).get("name").charAt(0)));
         }

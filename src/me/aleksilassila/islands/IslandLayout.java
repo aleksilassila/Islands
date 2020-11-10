@@ -201,7 +201,7 @@ public class IslandLayout {
         List<String> allIslands = getIslandIds(uuid);
 
         for (String islandId : allIslands) {
-            if (getIslandsConfig().getInt(islandId + ".home") == homeId) {
+            if (getIslandsConfig().getInt(islandId + ".home", -1) == homeId) {
                 return islandId;
             }
         }
@@ -216,9 +216,9 @@ public class IslandLayout {
         int lowestHome = -1;
 
         for (String islandId : allIslands) {
-            int home = getIslandsConfig().getInt(islandId + ".home");
+            int home = getIslandsConfig().getInt(islandId + ".home", -1);
 
-            if (home < lowestHome || lowestHome == -1) {
+            if (home != -1 && (home < lowestHome || lowestHome == -1)) {
                 lowestHome = home;
             }
         }
@@ -437,7 +437,7 @@ public class IslandLayout {
     }
 
     public void unnameIsland(String islandId) {
-        int homeId = getIslandsConfig().getInt(islandId + ".home");
+        int homeId = getIslandsConfig().getInt(islandId + ".home", -1);
 
         getIslandsConfig().set(islandId + ".name", String.valueOf(homeId));
         getIslandsConfig().set(islandId + ".public", false);
@@ -460,7 +460,7 @@ public class IslandLayout {
     }
 
     public void giveIsland(String islandId) {
-        getIslandsConfig().set(islandId + ".home", -1);
+        getIslandsConfig().set(islandId + ".home", null);
         getIslandsConfig().set(islandId + ".UUID", null);
 
         plugin.saveIslandsConfig();
@@ -521,6 +521,14 @@ public class IslandLayout {
             }
 
             return index;
+        }
+
+        public static int getIslandIndex(String islandId) {
+            try {
+                return getIslandIndex(new int[]{Integer.parseInt(islandId.split("x")[0]), Integer.parseInt(islandId.split("x")[1])});
+            } catch (NumberFormatException e) {
+                return -1;
+            }
         }
     }
 }

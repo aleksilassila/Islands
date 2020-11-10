@@ -28,16 +28,15 @@ public class UnnameSubcommand extends AbstractIslandsWorldSubcommand {
             return;
         }
 
-        if (plugin.getIslandsConfig().getInt(islandId + ".home") <= 0
-                || plugin.getIslandsConfig().getString(islandId + ".UUID") == null) {
+        if (!plugin.getIslandsConfig().contains(islandId + ".home")
+                || !plugin.getIslandsConfig().contains(islandId + ".UUID")) {
             player.sendMessage(Messages.get("error.ISLAND_NO_OWNER"));
             return;
         }
 
         if (ownsIsland(player, islandId) || player.hasPermission(Permissions.bypass.unname)) {
             layout.unnameIsland(islandId);
-
-            player.sendMessage(Messages.get("success.UNNAMED"));
+            Messages.send(player, "success.UNNAMED");
         } else {
             player.sendMessage(Messages.get("error.UNAUTHORIZED"));
         }
