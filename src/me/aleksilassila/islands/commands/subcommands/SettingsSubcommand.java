@@ -43,9 +43,4 @@ public class SettingsSubcommand extends AbstractIslandsWorldSubcommand {
     public String getPermission() {
         return Permissions.command.settings;
     }
-
-    @Override
-    public String[] aliases() {
-        return new String[0];
-    }
 }

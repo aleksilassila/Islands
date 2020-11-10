@@ -98,9 +98,4 @@ public class SaveSubcommand extends AbstractIslandsWorldSubcommand {
     public String getPermission() {
         return Permissions.command.save;
     }
-
-    @Override
-    public String[] aliases() {
-        return new String[0];
-    }
 }

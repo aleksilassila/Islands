@@ -56,9 +56,4 @@ public class ClearSubcommand extends AbstractIslandsWorldSubcommand {
     public String getPermission() {
         return Permissions.command.clear;
     }
-
-    @Override
-    public String[] aliases() {
-        return new String[0];
-    }
 }

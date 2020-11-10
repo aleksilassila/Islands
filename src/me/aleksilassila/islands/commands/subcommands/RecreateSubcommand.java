@@ -138,9 +138,4 @@ public class RecreateSubcommand extends AbstractCreateSubcommands {
     public String getPermission() {
         return Permissions.command.recreate;
     }
-
-    @Override
-    public String[] aliases() {
-        return new String[0];
-    }
 }

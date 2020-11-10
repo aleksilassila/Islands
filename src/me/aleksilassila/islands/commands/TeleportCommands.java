@@ -16,9 +16,7 @@ import org.bukkit.entity.Animals;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 public class TeleportCommands {
     private final Islands plugin;
@@ -109,11 +107,6 @@ public class TeleportCommands {
         }
 
         @Override
-        public String[] aliases() {
-            return new String[0];
-        }
-
-        @Override
         public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
             if (!(sender instanceof Player)) {
                 sender.sendMessage("This is for players only.");
@@ -130,18 +123,23 @@ public class TeleportCommands {
             }
 
             List<String> ids = plugin.layout.getIslandIds(player.getUniqueId());
+            Map<String, Integer> idMap = new HashMap<>();
+
+             for (String islandId : ids) {
+                 idMap.put(islandId, plugin.getIslandsConfig().getInt(islandId + ".home"));
+             }
+
+            ids.sort(Comparator.comparingInt(idMap::get));
 
             player.sendMessage(Messages.get("success.HOMES_FOUND", ids.size()));
             for (String islandId : ids) {
                 String name = plugin.getIslandsConfig().getString(islandId + ".name");
-                String homeNumber = plugin.getIslandsConfig().getString(islandId + ".home");
-                Messages.send(player, "success.HOME_ITEM", name, homeNumber);
+                Messages.send(player, "success.HOME_ITEM", name, idMap.get(islandId));
             }
 
             return true;
         }
     }
-
 
     public class HomeCommand extends Subcommand implements CommandExecutor {
         private final boolean allowHomeOnlyFromOverworld;
@@ -212,9 +210,9 @@ public class TeleportCommands {
             int homeId;
 
             try {
-                homeId = args.length == 0 ? 1 : Integer.parseInt(args[0]);
+                homeId = args.length == 0 ? layout.getLowestHome(player.getUniqueId()) : Integer.parseInt(args[0]);
             } catch (NumberFormatException e) {
-                homeId = 1; // Fixme improve
+                homeId = layout.getLowestHome(player.getUniqueId());
             }
 
             String islandId = layout.getHomeIsland(player.getUniqueId(), homeId);
@@ -272,11 +270,6 @@ public class TeleportCommands {
         @Override
         public String getPermission() {
             return Permissions.command.home;
-        }
-
-        @Override
-        public String[] aliases() {
-            return new String[0];
         }
     }
 

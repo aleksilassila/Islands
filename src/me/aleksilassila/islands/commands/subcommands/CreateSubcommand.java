@@ -114,9 +114,4 @@ public class CreateSubcommand extends AbstractCreateSubcommands {
     public String getPermission() {
         return Permissions.command.create;
     }
-
-    @Override
-    public String[] aliases() {
-        return new String[0];
-    }
 }

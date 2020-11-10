@@ -89,9 +89,4 @@ public class GiveSubcommand extends AbstractIslandsWorldSubcommand {
     public List<String> onTabComplete(Player player, String[] args) {
         return null;
     }
-
-    @Override
-    public String[] aliases() {
-        return new String[0];
-    }
 }

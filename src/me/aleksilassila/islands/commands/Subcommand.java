@@ -10,5 +10,4 @@ public abstract class Subcommand {
     public abstract String getName();
     public abstract String help();
     public abstract String getPermission();
-    public abstract String[] aliases();
 }

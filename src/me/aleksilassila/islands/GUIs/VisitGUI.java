@@ -17,7 +17,7 @@ public class VisitGUI extends PageGUI {
     private final Islands plugin;
     private final Player player;
 
-    private int sort = 0;
+    private int sort = 0; // 0 = date, 1 = name fixme test
 
     private final int PAGE_HEIGHT = 4; // < 1
 
@@ -34,8 +34,7 @@ public class VisitGUI extends PageGUI {
 
         sort.addItem(new GuiItem(createGuiItem(Material.REDSTONE, Messages.get("gui.visit.SORT", this.sort == 1 ? 0 : 1), false), event -> {
             toggleSort();
-            event.getWhoClicked().closeInventory();
-            getMainGui().show(event.getWhoClicked());
+            open();
         }), 0, 0);
 
         gui.addPane(sort);

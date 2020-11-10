@@ -57,9 +57,4 @@ public class UnnameSubcommand extends AbstractIslandsWorldSubcommand {
     public String getPermission() {
         return Permissions.command.unname;
     }
-
-    @Override
-    public String[] aliases() {
-        return new String[0];
-    }
 }

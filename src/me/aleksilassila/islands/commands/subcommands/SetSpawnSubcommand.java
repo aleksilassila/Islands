@@ -46,9 +46,4 @@ public class SetSpawnSubcommand extends AbstractIslandsWorldSubcommand {
     public String getPermission() {
         return Permissions.command.setSpawn;
     }
-
-    @Override
-    public String[] aliases() {
-        return new String[0];
-    }
 }

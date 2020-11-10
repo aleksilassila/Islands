@@ -99,9 +99,4 @@ public class InfoSubcommand extends AbstractIslandsWorldSubcommand {
     public String getPermission() {
         return Permissions.command.info;
     }
-
-    @Override
-    public String[] aliases() {
-        return new String[0];
-    }
 }

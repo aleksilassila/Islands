@@ -43,9 +43,4 @@ public class HelpSubcommand extends Subcommand {
     public String getPermission() {
         return null;
     }
-
-    @Override
-    public String[] aliases() {
-        return new String[0];
-    }
 }

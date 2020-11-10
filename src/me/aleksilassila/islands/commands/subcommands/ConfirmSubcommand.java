@@ -31,9 +31,4 @@ public class ConfirmSubcommand extends Subcommand {
     public String getPermission() {
         return Permissions.command.confirm;
     }
-
-    @Override
-    public String[] aliases() {
-        return new String[0];
-    }
 }

@@ -210,6 +210,23 @@ public class IslandLayout {
     }
 
     @Nullable
+    public int getLowestHome(UUID uuid) {
+        List<String> allIslands = getIslandIds(uuid);
+
+        int lowestHome = -1;
+
+        for (String islandId : allIslands) {
+            int home = getIslandsConfig().getInt(islandId + ".home");
+
+            if (home < lowestHome || lowestHome == -1) {
+                lowestHome = home;
+            }
+        }
+
+        return lowestHome;
+    }
+
+    @Nullable
     public Location getIslandSpawn(String islandId) {
         if (getIslandsConfig().getKeys(false).contains(islandId)) {
             return new Location(
