@@ -7,7 +7,6 @@ import me.aleksilassila.islands.commands.IslandCommands;
 import me.aleksilassila.islands.generation.Biomes;
 import me.aleksilassila.islands.generation.IslandGeneration;
 import me.aleksilassila.islands.generation.Shape;
-import me.aleksilassila.islands.generation.ShapesLoader;
 import me.aleksilassila.islands.protection.ProtectionListeners;
 import me.aleksilassila.islands.utils.*;
 import net.milkbowl.vault.economy.Economy;
@@ -43,7 +42,6 @@ public class Islands extends JavaPlugin {
     public Permission perms = null;
     public Economy econ = null;
     public WorldEditPlugin worldEdit = null;
-    public ShapesLoader shapesLoader = null;
 
     public Set<Player> playersWithNoFall = new HashSet<>();
     public HashMap<String, ConfirmItem> confirmations;
@@ -107,7 +105,7 @@ public class Islands extends JavaPlugin {
         confirmations = new HashMap<>();
 
         definedIslandSizes = setupSizes();
-        definedIslandShapes = setupShapes();
+        definedIslandShapes = Shape.loadAllShapes();
 
         new IslandCommands();
 
@@ -338,10 +336,7 @@ public class Islands extends JavaPlugin {
 
     private boolean setupWorldedit() {
         worldEdit = (WorldEditPlugin) Bukkit.getPluginManager().getPlugin("WorldEdit");
-        if (worldEdit != null) {
-            shapesLoader = new ShapesLoader(this);
-            return true;
-        } else return false;
+        return worldEdit != null;
     }
 
     private Map<String, Integer> setupSizes() {
@@ -366,12 +361,6 @@ public class Islands extends JavaPlugin {
         }
 
         return sizes;
-    }
-
-    private Map<Integer, List<Shape>> setupShapes() {
-        if (worldEdit == null) return new HashMap<>();
-
-        return shapesLoader.loadAll();
     }
 
     public FileConfiguration getBiomesCache() {

@@ -7,7 +7,6 @@ import me.aleksilassila.islands.utils.ChatUtils;
 import me.aleksilassila.islands.utils.ConfirmItem;
 import me.aleksilassila.islands.utils.Messages;
 import me.aleksilassila.islands.utils.Permissions;
-import org.bukkit.block.Biome;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabExecutor;

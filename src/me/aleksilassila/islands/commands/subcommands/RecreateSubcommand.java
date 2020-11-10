@@ -1,8 +1,8 @@
 package me.aleksilassila.islands.commands.subcommands;
 
 import me.aleksilassila.islands.GUIs.CreateGUI;
-import me.aleksilassila.islands.IslandsConfig;
 import me.aleksilassila.islands.Islands;
+import me.aleksilassila.islands.IslandsConfig;
 import me.aleksilassila.islands.commands.AbstractCreateSubcommands;
 import me.aleksilassila.islands.generation.Biomes;
 import me.aleksilassila.islands.utils.Messages;

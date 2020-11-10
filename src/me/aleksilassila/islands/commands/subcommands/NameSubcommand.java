@@ -1,7 +1,7 @@
 package me.aleksilassila.islands.commands.subcommands;
 
-import me.aleksilassila.islands.IslandsConfig;
 import me.aleksilassila.islands.Islands;
+import me.aleksilassila.islands.IslandsConfig;
 import me.aleksilassila.islands.commands.AbstractIslandsWorldSubcommand;
 import me.aleksilassila.islands.utils.Messages;
 import me.aleksilassila.islands.utils.Permissions;

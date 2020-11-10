@@ -1,8 +1,8 @@
 package me.aleksilassila.islands.commands;
 
 import me.aleksilassila.islands.GUIs.VisitGUI;
-import me.aleksilassila.islands.IslandsConfig;
 import me.aleksilassila.islands.Islands;
+import me.aleksilassila.islands.IslandsConfig;
 import me.aleksilassila.islands.generation.IslandGeneration;
 import me.aleksilassila.islands.utils.Messages;
 import me.aleksilassila.islands.utils.Permissions;
