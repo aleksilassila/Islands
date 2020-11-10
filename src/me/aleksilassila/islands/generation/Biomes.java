@@ -37,7 +37,7 @@ public class Biomes {
         randomLocations = new HashMap<>();
 
         // Generate biomes and save them to config
-        if (plugin.getBiomesCache().getString("seed") == null || !plugin.getBiomesCache().getString("seed").equals(String.valueOf(plugin.islandsSourceWorld.getSeed()))) {
+        if (plugin.getBiomesCache().getString("seed") == null || !plugin.getBiomesCache().getString("seed").equals(String.valueOf(Islands.islandsSourceWorld.getSeed()))) {
             generateAndSaveBiomes();
         } else { // Load existing biomes from config
             loadBiomesFromConfig();
@@ -58,7 +58,7 @@ public class Biomes {
                     if (locationStrings.size() != 3) continue;
 
                     Location location = new Location(
-                            plugin.islandsSourceWorld,
+                            Islands.islandsSourceWorld,
                             Integer.parseInt(locationStrings.get(0)),
                             Integer.parseInt(locationStrings.get(1)),
                             Integer.parseInt(locationStrings.get(2))
@@ -77,7 +77,7 @@ public class Biomes {
         plugin.clearBiomesCache();
         this.availableLocations = generateIslandLocations();
 
-        plugin.getBiomesCache().set("seed", String.valueOf(plugin.islandsSourceWorld.getSeed()));
+        plugin.getBiomesCache().set("seed", String.valueOf(Islands.islandsSourceWorld.getSeed()));
 
         for (Biome biome : availableLocations.keySet()) {
             List<Location> locationsList = availableLocations.get(biome);
@@ -191,14 +191,14 @@ public class Biomes {
         while (true) {
             int x = (int) (Math.random() * biomeSearchSize);
             int z = (int) (Math.random() * biomeSearchSize);
-            int y = plugin.islandsWorld.getHighestBlockYAt(x, z);
+            int y = Islands.islandsWorld.getHighestBlockYAt(x, z);
 
-            Biome biome = plugin.islandsSourceWorld.getBiome(x, y, z);
+            Biome biome = Islands.islandsSourceWorld.getBiome(x, y, z);
 
             if (isBlacklisted(biome))
                 continue;
 
-            randomLocations.put(biome, new Location(plugin.islandsSourceWorld,
+            randomLocations.put(biome, new Location(Islands.islandsSourceWorld,
                     x - islandSize / 2.0,
                     y,
                     z - islandSize / 2.0));
@@ -210,9 +210,9 @@ public class Biomes {
     public Location getRandomLocation(Biome biome, int islandSize) {
         int x = (int) (Math.random() * biomeSearchSize);
         int z = (int) (Math.random() * biomeSearchSize);
-        int y = plugin.islandsWorld.getHighestBlockYAt(x, z);
+        int y = Islands.islandsWorld.getHighestBlockYAt(x, z);
 
-        return randomLocations.getOrDefault(biome, new Location(plugin.islandsSourceWorld,
+        return randomLocations.getOrDefault(biome, new Location(Islands.islandsSourceWorld,
                 x - islandSize / 2.0,
                 y,
                 z - islandSize / 2.0));

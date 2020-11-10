@@ -24,7 +24,7 @@ public class UnnameSubcommand extends AbstractIslandsWorldSubcommand {
     @Override
     protected void runCommand(Player player, String[] args, boolean confirmed, String islandId) {
         if (args.length != 0) {
-            player.sendMessage(Messages.help.UNNAME);
+            Messages.send(player, "usage.UNNAME");
             return;
         }
 

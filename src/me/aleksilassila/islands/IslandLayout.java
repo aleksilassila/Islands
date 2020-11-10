@@ -230,7 +230,7 @@ public class IslandLayout {
     public Location getIslandSpawn(String islandId) {
         if (getIslandsConfig().getKeys(false).contains(islandId)) {
             return new Location(
-                    plugin.islandsWorld,
+                    Islands.islandsWorld,
                     getIslandsConfig().getInt(islandId + ".spawnPoint.x"),
                     getIslandsConfig().getInt(islandId + ".y") + 100,
                     getIslandsConfig().getInt(islandId + ".spawnPoint.z")

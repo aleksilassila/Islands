@@ -31,7 +31,7 @@ public class GiveSubcommand extends AbstractIslandsWorldSubcommand {
     protected void runCommand(Player player, String[] args, boolean confirmed, String islandId) {
         if ((args.length != 1 && !player.hasPermission(Permissions.bypass.give))
                 || (player.hasPermission(Permissions.bypass.give) && args.length > 1)) {
-            player.sendMessage(Messages.help.GIVE);
+            Messages.send(player, "usage.GIVE");
             return;
         }
 

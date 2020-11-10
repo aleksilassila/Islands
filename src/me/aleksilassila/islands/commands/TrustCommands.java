@@ -43,13 +43,13 @@ public class TrustCommands {
                 return true;
             }
 
-            if (!player.getWorld().equals(plugin.islandsWorld)) {
+            if (!player.getWorld().equals(Islands.islandsWorld)) {
                 Messages.send(player, "error.WRONG_WORLD");
                 return true;
             }
 
             if (args.length != 1) {
-                player.sendMessage(Messages.help.UNTRUST);
+                Messages.send(player, "usage.UNTRUST");
                 return true;
             }
 
@@ -99,13 +99,13 @@ public class TrustCommands {
                 return true;
             }
 
-            if (!player.getWorld().equals(plugin.islandsWorld)) {
+            if (!player.getWorld().equals(Islands.islandsWorld)) {
                 Messages.send(player, "error.WRONG_WORLD");
                 return true;
             }
 
             if (args.length != 1) {
-                player.sendMessage(Messages.help.TRUST);
+                Messages.send(player, "usage.TRUST");
                 return true;
             }
 
@@ -155,7 +155,7 @@ public class TrustCommands {
                 return true;
             }
 
-            if (!player.getWorld().equals(plugin.islandsWorld)) {
+            if (!player.getWorld().equals(Islands.islandsWorld)) {
                 Messages.send(player, "error.WRONG_WORLD");
                 return true;
             }

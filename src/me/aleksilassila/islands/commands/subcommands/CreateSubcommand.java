@@ -37,6 +37,11 @@ public class CreateSubcommand extends AbstractCreateSubcommands {
 
     @Override
     protected void runCommand(Player player, String[] args, boolean confirmed, int islandSize) {
+        if (args.length > 2) {
+            Messages.send(player, "usage.CREATE");
+            return;
+        }
+
         HashMap<Biome, List<Location>> availableLocations = plugin.islandGeneration.biomes.availableLocations;
 
         int previousIslands = layout.getIslandIds(player.getUniqueId()).size();

@@ -184,7 +184,7 @@ public class TeleportCommands {
                     Integer.parseInt(args[0]);
                 }
             } catch (NumberFormatException e) {
-                player.sendMessage(Messages.help.HOME);
+                Messages.send(player, "usage.HOME");
                 return true;
             }
 
@@ -227,12 +227,12 @@ public class TeleportCommands {
             Location location = layout.getIslandSpawn(islandId);
 
             if (location != null) {
-                if (!disableNeutralTeleports && player.hasPermission(Permissions.bypass.neutralTeleport) && player.getWorld().equals(plugin.wildernessWorld)) {
+                if (!disableNeutralTeleports && player.hasPermission(Permissions.bypass.neutralTeleport) && player.getWorld().equals(Islands.wildernessWorld)) {
                     List<Entity> entities = player.getNearbyEntities(neutralTeleportRange, neutralTeleportRange, neutralTeleportRange);
                     entities.removeIf(entity -> !(entity instanceof Animals));
 
                     Location animalLocation = location.clone();
-                    animalLocation.setY(Utils.getHighestYAt(plugin.islandsWorld, location.getBlockX(), location.getBlockZ()) + 2);
+                    animalLocation.setY(Utils.getHighestYAt(Islands.islandsWorld, location.getBlockX(), location.getBlockZ()) + 2);
 
                     for (Entity entity : entities) {
                         entity.teleport(animalLocation);

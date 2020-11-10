@@ -16,11 +16,11 @@ public class HelpSubcommand extends Subcommand {
 
     @Override
     public void onCommand(Player player, String[] args, boolean confirmed) {
-        player.sendMessage(Messages.help.AVAILABLE_COMMANDS);
+        Messages.send(player, "info.AVAILABLE_SUBCOMMANDS");
 
         for (Subcommand subcommand : commands.subcommands) {
             if (subcommand.getPermission() == null || player.hasPermission(subcommand.getPermission()))
-                player.sendMessage(Messages.help.SUBCOMMAND(subcommand));
+                Messages.send(player, "info.AVAILABLE_SUBCOMMAND", subcommand.getName(), subcommand.help());
         }
     }
 

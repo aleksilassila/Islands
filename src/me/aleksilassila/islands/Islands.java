@@ -30,9 +30,9 @@ import java.nio.file.StandardOpenOption;
 import java.util.*;
 
 public class Islands extends JavaPlugin {
-    public World islandsWorld;
-    public World islandsSourceWorld;
-    public World wildernessWorld;
+    public static World islandsWorld;
+    public static World islandsSourceWorld;
+    public static World wildernessWorld;
 
     private FileConfiguration islandsConfig;
     private File islandsConfigFile;

@@ -31,8 +31,8 @@ public class IslandGeneration {
 
     public IslandGeneration(Islands plugin) {
         this.plugin = plugin;
-        this.islandsWorld = plugin.islandsWorld;
-        this.biomes = new Biomes(plugin, plugin.islandsSourceWorld);
+        this.islandsWorld = Islands.islandsWorld;
+        this.biomes = new Biomes(plugin, Islands.islandsSourceWorld);
 
         double delay = plugin.getConfig().getDouble("generation.generationDelayInTicks");
 
@@ -96,7 +96,7 @@ public class IslandGeneration {
             int centerX = (int) (sourceLocation.getBlockX() + ((double) islandSize) / 2.0);
             int centerZ = (int) (sourceLocation.getBlockZ() + ((double) islandSize) / 2.0);
 
-            Material material = plugin.islandsSourceWorld.getBlockAt(centerX, centerY, centerZ).getBlockData().getMaterial();
+            Material material = Islands.islandsSourceWorld.getBlockAt(centerX, centerY, centerZ).getBlockData().getMaterial();
             if (shape != null && !material.isAir() && !material.isBurnable()) {
                 break;
             } else if (Arrays.asList(Material.WATER, Material.SANDSTONE, Material.STONE).contains(material)) {
@@ -243,7 +243,7 @@ public class IslandGeneration {
                 boolean skipDelay = true;
 
                 for (int y = 256; y >= 0; y--) {
-                    Block target = plugin.islandsWorld.getBlockAt(
+                    Block target = Islands.islandsWorld.getBlockAt(
                             realX,
                             y,
                             realZ
@@ -358,7 +358,7 @@ public class IslandGeneration {
                     boolean skipDelay = true;
 
                     for (int y = startY + plugin.layout.islandSpacing; y >= startY; y--) {
-                        Block target = plugin.islandsWorld.getBlockAt(
+                        Block target = Islands.islandsWorld.getBlockAt(
                                 realX,
                                 targetY + (y - startY),
                                 realZ
@@ -397,14 +397,14 @@ public class IslandGeneration {
                     int relativeX = index / islandSize;
                     int relativeZ = index - relativeX * islandSize;
 
-                    Block sourceBlock = plugin.islandsSourceWorld.getBlockAt(startX + relativeX, y, startZ + relativeZ);
+                    Block sourceBlock = Islands.islandsSourceWorld.getBlockAt(startX + relativeX, y, startZ + relativeZ);
 
                     if (replacementMap.containsKey(sourceBlock.getType())) {
                         Material material = replacementMap.get(sourceBlock.getType());
                         sourceBlock.setBlockData(material.createBlockData());
                     }
 
-                    Block target = plugin.islandsWorld.getBlockAt(targetX + relativeX, targetY + (y - startY), targetZ + relativeZ);
+                    Block target = Islands.islandsWorld.getBlockAt(targetX + relativeX, targetY + (y - startY), targetZ + relativeZ);
 
                     if (shape == null) {
                         if (isBlockInIslandShape(relativeX, y - startY, relativeZ, islandSize)) {
@@ -433,7 +433,7 @@ public class IslandGeneration {
 
                 if (index >= islandSize * islandSize) {
                     // Update lighting
-                    plugin.islandsWorld.getChunkAt(targetX + islandSize / 2, targetZ + islandSize / 2);
+                    Islands.islandsWorld.getChunkAt(targetX + islandSize / 2, targetZ + islandSize / 2);
 
                     player.sendMessage(Messages.get("success.GENERATION_DONE"));
                     queue.remove(this);

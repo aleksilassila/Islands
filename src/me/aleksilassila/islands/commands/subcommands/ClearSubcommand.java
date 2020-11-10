@@ -23,6 +23,11 @@ public class ClearSubcommand extends AbstractIslandsWorldSubcommand {
 
     @Override
     protected void runCommand(Player player, String[] args, boolean confirmed, String islandId) {
+        if (args.length != 0) {
+            Messages.send(player, "usage.CLEAR");
+            return;
+        }
+
         if (!ownsIsland(player, islandId) && !player.hasPermission(Permissions.bypass.clear)) {
             Messages.send(player, "error.UNAUTHORIZED");
             return;

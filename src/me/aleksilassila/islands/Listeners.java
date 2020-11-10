@@ -61,23 +61,23 @@ public class Listeners extends ChatUtils implements Listener {
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void onPortalEvent(PlayerPortalEvent event) {
-        if (event.getTo().getWorld().equals(plugin.islandsWorld) && plugin.wildernessWorld != null) {
+        if (event.getTo().getWorld().equals(Islands.islandsWorld) && Islands.wildernessWorld != null) {
             Location to = event.getTo();
-            to.setWorld(plugin.wildernessWorld);
+            to.setWorld(Islands.wildernessWorld);
             event.setTo(to);
         }
     }
 
     @EventHandler
     public void onCreatureSpawn(CreatureSpawnEvent event) {
-        if (event.getSpawnReason().equals(CreatureSpawnEvent.SpawnReason.NATURAL) && event.getEntity().getWorld().equals(plugin.islandsWorld) && disableMobs) {
+        if (event.getSpawnReason().equals(CreatureSpawnEvent.SpawnReason.NATURAL) && event.getEntity().getWorld().equals(Islands.islandsWorld) && disableMobs) {
             event.setCancelled(true);
         }
     }
 
     @EventHandler
     public void onBlockFromTo(BlockFromToEvent event) {
-        if (!event.getBlock().getWorld().equals(plugin.islandsWorld) || !restrictFlow) return;
+        if (!event.getBlock().getWorld().equals(Islands.islandsWorld) || !restrictFlow) return;
         boolean canFlow = plugin.layout.isBlockInIslandSphere(
                 event.getToBlock().getX(), event.getToBlock().getY(), event.getToBlock().getZ());
 
@@ -91,13 +91,13 @@ public class Listeners extends ChatUtils implements Listener {
         if (e.getEntity() instanceof Player) {
             Player player = (Player) e.getEntity();
 
-            if (e.getCause().equals(EntityDamageEvent.DamageCause.VOID) && player.getWorld().equals(plugin.islandsWorld) && voidTeleport) {
+            if (e.getCause().equals(EntityDamageEvent.DamageCause.VOID) && player.getWorld().equals(Islands.islandsWorld) && voidTeleport) {
                 World targetWorld;
 
-                if (plugin.wildernessWorld == null) {
+                if (Islands.wildernessWorld == null) {
                     targetWorld = plugin.getServer().getWorlds().get(0);
                 } else {
-                    targetWorld = plugin.wildernessWorld;
+                    targetWorld = Islands.wildernessWorld;
                 }
 
                 Location location = player.getLocation();
@@ -120,7 +120,7 @@ public class Listeners extends ChatUtils implements Listener {
             } else if (e.getCause().equals(EntityDamageEvent.DamageCause.FALL) && plugin.playersWithNoFall.contains(player)) {
                 plugin.playersWithNoFall.remove(player);
                 e.setCancelled(true);
-            } else if (player.getWorld().equals(plugin.islandsWorld) && !islandDamage) {
+            } else if (player.getWorld().equals(Islands.islandsWorld) && !islandDamage) {
                 e.setCancelled(true);
             } else {
                 plugin.teleportCooldowns.put(player.getUniqueId().toString(), new Date().getTime());
@@ -136,10 +136,10 @@ public class Listeners extends ChatUtils implements Listener {
 
         long targetTime = event.getWorld().getTime() + event.getSkipAmount();
 
-        if (event.getWorld().equals(plugin.islandsWorld)) {
-            plugin.wildernessWorld.setTime(targetTime);
-        } else if (event.getWorld().equals(plugin.wildernessWorld)) {
-            plugin.islandsWorld.setTime(targetTime);
+        if (event.getWorld().equals(Islands.islandsWorld)) {
+            Islands.wildernessWorld.setTime(targetTime);
+        } else if (event.getWorld().equals(Islands.wildernessWorld)) {
+            Islands.islandsWorld.setTime(targetTime);
         }
     }
 }

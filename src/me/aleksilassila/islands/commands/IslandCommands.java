@@ -74,7 +74,7 @@ public class IslandCommands extends ChatUtils implements TabExecutor {
 
             if (target == null) {
                 player.sendMessage(Messages.get("error.SUBCOMMAND_NOT_FOUND"));
-                sendHelp(player);
+                getSubcommand("help").onCommand(player, new String[0], true);
                 return true;
             }
 
@@ -132,17 +132,6 @@ public class IslandCommands extends ChatUtils implements TabExecutor {
         }
 
         return null;
-    }
-
-    private void sendHelp(Player player) {
-        player.sendMessage(success("Available /island subcommands:"));
-
-        player.sendMessage(Messages.help.CREATE);
-        player.sendMessage(Messages.help.RECREATE);
-        player.sendMessage(Messages.help.DELETE);
-        player.sendMessage(Messages.help.NAME);
-        player.sendMessage(Messages.help.UNNAME);
-        player.sendMessage(Messages.help.GIVE);
     }
 
     @Override

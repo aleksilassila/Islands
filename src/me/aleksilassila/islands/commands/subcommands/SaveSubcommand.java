@@ -66,7 +66,7 @@ public class SaveSubcommand extends AbstractIslandsWorldSubcommand {
                 return;
             }
 
-            if (SaveHandler.saveSchematic(file, plugin.islandsWorld, startX, startY, startZ, islandSize, height))
+            if (SaveHandler.saveSchematic(file, Islands.islandsWorld, startX, startY, startZ, islandSize, height))
                 player.sendMessage(Messages.get("success.ISLAND_SAVED", name, islandSize, height));
             else
                 player.sendMessage(Messages.get("error.ISLAND_SAVE_ERROR", name));

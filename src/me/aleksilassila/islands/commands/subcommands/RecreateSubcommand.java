@@ -42,7 +42,7 @@ public class RecreateSubcommand extends AbstractCreateSubcommands {
     }
 
     private String getIslandId(Player player) {
-        if (!player.getWorld().equals(plugin.islandsWorld)) {
+        if (!player.getWorld().equals(Islands.islandsWorld)) {
             player.sendMessage(Messages.get("error.WRONG_WORLD"));
             return null;
         }
@@ -63,6 +63,11 @@ public class RecreateSubcommand extends AbstractCreateSubcommands {
 
     @Override
     protected void runCommand(Player player, String[] args, boolean confirmed, int islandSize) {
+        if (args.length > 2) {
+            Messages.send(player, "usage.RECREATE");
+            return;
+        }
+
         String islandId = getIslandId(player);
         if (islandId == null) return;
 

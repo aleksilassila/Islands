@@ -26,7 +26,7 @@ public class ProtectionListeners implements Listener {
 
     @EventHandler
     public void onEntityDamageEvent(EntityDamageByEntityEvent event) {
-        if (event.getEntity().getWorld().equals(plugin.islandsWorld) && event.getDamager() instanceof Player) {
+        if (event.getEntity().getWorld().equals(Islands.islandsWorld) && event.getDamager() instanceof Player) {
             if (event.getDamager().hasPermission(Permissions.bypass.interactEverywhere)) return;
 
             int x = event.getEntity().getLocation().getBlockX();
@@ -49,7 +49,7 @@ public class ProtectionListeners implements Listener {
     public void onPlayerInteract(PlayerInteractEvent event) {
         if (event.getClickedBlock() == null) return;
         if (event.getPlayer().hasPermission(Permissions.bypass.interactEverywhere)) return;
-        if (!event.getPlayer().getWorld().equals(plugin.islandsWorld)) return;
+        if (!event.getPlayer().getWorld().equals(Islands.islandsWorld)) return;
 
         int x = event.getClickedBlock().getX();
         int z = event.getClickedBlock().getZ();
@@ -135,7 +135,7 @@ public class ProtectionListeners implements Listener {
         if (event.isCancelled()) return;
         if (event.getPlayer().hasPermission(Permissions.bypass.interactEverywhere)) return;
 
-        if (event.getBlock().getWorld().equals(plugin.islandsWorld)) {
+        if (event.getBlock().getWorld().equals(Islands.islandsWorld)) {
             int x = event.getBlock().getX();
             int z = event.getBlock().getZ();
 
@@ -156,7 +156,7 @@ public class ProtectionListeners implements Listener {
         if (event.isCancelled()) return;
         if (event.getPlayer().hasPermission(Permissions.bypass.interactEverywhere)) return;
 
-        if (event.getBlock().getWorld().equals(plugin.islandsWorld)) {
+        if (event.getBlock().getWorld().equals(Islands.islandsWorld)) {
             int x = event.getBlock().getX();
             int z = event.getBlock().getZ();
 

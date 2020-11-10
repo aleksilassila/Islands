@@ -28,7 +28,7 @@ public class NameSubcommand extends AbstractIslandsWorldSubcommand {
     @Override
     protected void runCommand(Player player, String[] args, boolean confirmed, String islandId) {
         if (args.length != 1) {
-            player.sendMessage(Messages.help.NAME);
+            Messages.send(player, "usage.NAME");
             return;
         }
 
