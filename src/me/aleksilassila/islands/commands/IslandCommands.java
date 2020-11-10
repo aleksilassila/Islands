@@ -19,27 +19,27 @@ public class IslandCommands extends ChatUtils implements TabExecutor {
     private final Islands plugin;
     public final Set<Subcommand> subcommands;
 
-    public IslandCommands(Islands plugin) {
-        this.plugin = plugin;
+    public IslandCommands() {
+        this.plugin = Islands.instance;
 
         plugin.getCommand("island").setExecutor(this);
 
         subcommands = new HashSet<>();
 
-        subcommands.add(new CreateSubcommand(plugin));
-        subcommands.add(new RecreateSubcommand(plugin));
-        subcommands.add(new ClearSubcommand(plugin));
-        subcommands.add(new NameSubcommand(plugin));
-        subcommands.add(new UnnameSubcommand(plugin));
-        subcommands.add(new GiveSubcommand(plugin));
-        subcommands.add(new SetSpawnSubcommand(plugin));
-        subcommands.add(new SaveSubcommand(plugin));
-        subcommands.add(new SetSpawnIslandSubcommand(plugin));
+        subcommands.add(new CreateSubcommand());
+        subcommands.add(new RecreateSubcommand());
+        subcommands.add(new ClearSubcommand());
+        subcommands.add(new NameSubcommand());
+        subcommands.add(new UnnameSubcommand());
+        subcommands.add(new GiveSubcommand());
+        subcommands.add(new SetSpawnSubcommand());
+        subcommands.add(new SaveSubcommand());
+        subcommands.add(new SetSpawnIslandSubcommand());
         subcommands.add(new ConfirmSubcommand());
         subcommands.add(new HelpSubcommand(this));
-        subcommands.add(new InfoSubcommand(plugin));
-        subcommands.add(new ModerateSubcommand(plugin));
-        subcommands.add(new SettingsSubcommand(plugin));
+        subcommands.add(new InfoSubcommand());
+        subcommands.add(new ModerateSubcommand());
+        subcommands.add(new SettingsSubcommand());
 
         TeleportCommands teleportCommands = new TeleportCommands(plugin);
 

@@ -9,24 +9,25 @@ import org.bukkit.block.Biome;
 
 import java.util.*;
 
-public class Biomes {
+public enum Biomes {
+    INSTANCE;
     private final Islands plugin;
 
     private final World world;
     public HashMap<Biome, List<Location>> availableLocations;
     private final int biggestIslandSize;
 
-    final int biomeSearchJumpBlocks;
-    final int biomeSearchSize;
-    final int maxLocationsPerBiome;
-    final List<String> biomeBlacklist;
+    int biomeSearchJumpBlocks;
+    int biomeSearchSize;
+    int maxLocationsPerBiome;
+    List<String> biomeBlacklist;
 
     private final Map<Biome, Location> randomLocations;
 
-    public Biomes(Islands plugin, World world) {
-        this.world = world;
+    Biomes() {
+        this.plugin = Islands.instance;
+        this.world = Islands.islandsSourceWorld;
         this.biggestIslandSize = plugin.getConfig().getInt("generation.minBiomeSize");
-        this.plugin = plugin;
 
         this.biomeSearchJumpBlocks = plugin.getConfig().getInt("generation.searchJump");
         this.biomeSearchSize = plugin.getConfig().getInt("generation.biomeSearchArea");
@@ -37,7 +38,7 @@ public class Biomes {
         randomLocations = new HashMap<>();
 
         // Generate biomes and save them to config
-        if (plugin.getBiomesCache().getString("seed") == null || !plugin.getBiomesCache().getString("seed").equals(String.valueOf(Islands.islandsSourceWorld.getSeed()))) {
+        if (plugin.getBiomesCache().getString("seed") == null || !String.valueOf(Islands.islandsSourceWorld.getSeed()).equals(plugin.getBiomesCache().getString("seed"))) {
             generateAndSaveBiomes();
         } else { // Load existing biomes from config
             loadBiomesFromConfig();
@@ -123,7 +124,7 @@ public class Biomes {
     @NotNull
     public HashMap<Biome, List<Location>> generateIslandLocations() {
         HashMap<Biome, List<Location>> locations = new HashMap<>();
-        List<int[]> usedPositions = new ArrayList<int[]>();
+        List<int[]> usedPositions = new ArrayList<>();
 
         plugin.getLogger().info("Generating biomes...");
 

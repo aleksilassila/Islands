@@ -8,23 +8,12 @@ import me.aleksilassila.islands.utils.Permissions;
 import org.bukkit.entity.Player;
 
 public class SetSpawnSubcommand extends AbstractIslandsWorldSubcommand {
-    private final Islands plugin;
-    private final IslandLayout layout;
-
-    public SetSpawnSubcommand(Islands plugin) {
-        this.plugin = plugin;
-        this.layout = plugin.layout;
-    }
-
-    @Override
-    protected Islands getPlugin() {
-        return plugin;
-    }
+    public SetSpawnSubcommand() {}
 
     @Override
     protected void runCommand(Player player, String[] args, boolean confirmed, String islandId) {
         if (ownsIsland(player, islandId) || player.hasPermission(Permissions.bypass.setSpawn)) {
-            layout.setSpawnPoint(islandId, player.getLocation().getBlockX(), player.getLocation().getBlockZ());
+            Islands.instance.layout.setSpawnPoint(islandId, player.getLocation().getBlockX(), player.getLocation().getBlockZ());
 
             player.sendMessage(Messages.get("success.SPAWN_POINT_CHANGED"));
         } else {

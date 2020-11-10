@@ -4,6 +4,7 @@ import com.github.stefvanschie.inventoryframework.Gui;
 import com.github.stefvanschie.inventoryframework.GuiItem;
 import com.github.stefvanschie.inventoryframework.pane.StaticPane;
 import me.aleksilassila.islands.Islands;
+import me.aleksilassila.islands.generation.Biomes;
 import me.aleksilassila.islands.utils.BiomeMaterials;
 import me.aleksilassila.islands.utils.Messages;
 import me.aleksilassila.islands.utils.Permissions;
@@ -54,7 +55,7 @@ public class CreateGUI extends PageGUI {
     private List<StaticPane> availableIslandPanes() {
         List<StaticPane> panes = new ArrayList<>();
 
-        HashMap<Biome, List<Location>> availableLocations = plugin.islandGeneration.biomes.availableLocations;
+        HashMap<Biome, List<Location>> availableLocations = Biomes.INSTANCE.availableLocations;
 
         List<Biome> sortedSet = new ArrayList<>(availableLocations.keySet());
 

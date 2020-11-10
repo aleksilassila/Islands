@@ -5,6 +5,7 @@ import me.aleksilassila.islands.IslandLayout;
 import me.aleksilassila.islands.Islands;
 import me.aleksilassila.islands.commands.AbstractCreateSubcommands;
 import me.aleksilassila.islands.commands.IslandCommands;
+import me.aleksilassila.islands.generation.Biomes;
 import me.aleksilassila.islands.utils.Messages;
 import me.aleksilassila.islands.utils.Permissions;
 import org.bukkit.Location;
@@ -19,15 +20,9 @@ public class CreateSubcommand extends AbstractCreateSubcommands {
     private final IslandLayout layout;
     private final IslandCommands.Utils utils = new IslandCommands.Utils();
 
-    public CreateSubcommand(Islands plugin) {
-        this.plugin = plugin;
-
+    public CreateSubcommand() {
+        this.plugin = Islands.instance;
         this.layout = plugin.layout;
-    }
-
-    @Override
-    protected Islands getPlugin() {
-        return plugin;
     }
 
     @Override
@@ -42,7 +37,7 @@ public class CreateSubcommand extends AbstractCreateSubcommands {
             return;
         }
 
-        HashMap<Biome, List<Location>> availableLocations = plugin.islandGeneration.biomes.availableLocations;
+        HashMap<Biome, List<Location>> availableLocations = Biomes.INSTANCE.availableLocations;
 
         int previousIslands = layout.getIslandIds(player.getUniqueId()).size();
 

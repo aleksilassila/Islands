@@ -10,13 +10,8 @@ import org.bukkit.entity.Player;
 public class SettingsSubcommand extends AbstractIslandsWorldSubcommand {
     private final Islands plugin;
 
-    public SettingsSubcommand(Islands plugin) {
-        this.plugin = plugin;
-    }
-
-    @Override
-    protected Islands getPlugin() {
-        return plugin;
+    public SettingsSubcommand() {
+        this.plugin = Islands.instance;
     }
 
     @Override

@@ -15,14 +15,9 @@ public class NameSubcommand extends AbstractIslandsWorldSubcommand {
     private final Islands plugin;
     private final IslandLayout layout;
 
-    public NameSubcommand(Islands plugin) {
-        this.plugin = plugin;
+    public NameSubcommand() {
+        this.plugin = Islands.instance;
         this.layout = plugin.layout;
-    }
-
-    @Override
-    protected Islands getPlugin() {
-        return plugin;
     }
 
     @Override

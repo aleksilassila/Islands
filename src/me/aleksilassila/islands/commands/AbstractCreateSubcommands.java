@@ -1,6 +1,7 @@
 package me.aleksilassila.islands.commands;
 
 import me.aleksilassila.islands.Islands;
+import me.aleksilassila.islands.generation.Biomes;
 import me.aleksilassila.islands.utils.Messages;
 import me.aleksilassila.islands.utils.Permissions;
 import org.bukkit.Location;
@@ -12,12 +13,11 @@ import java.util.HashMap;
 import java.util.List;
 
 public abstract class AbstractCreateSubcommands extends Subcommand {
-    protected abstract Islands getPlugin();
     protected abstract void openGui(Player player);
     abstract protected void runCommand(Player player, String[] args, boolean confirmed, int islandSize);
 
     protected boolean isRandomBiomeDisabled() {
-        return getPlugin().getConfig().getBoolean("disableRandomBiome");
+        return Islands.instance.getConfig().getBoolean("disableRandomBiome");
     }
 
     @Override
@@ -27,14 +27,14 @@ public abstract class AbstractCreateSubcommands extends Subcommand {
             return;
         }
 
-        int islandSize = args.length == 2 ? getPlugin().parseIslandSize(args[1]) : getPlugin().parseIslandSize("");
+        int islandSize = args.length == 2 ? Islands.instance.parseIslandSize(args[1]) : Islands.instance.parseIslandSize("");
 
-        if (!player.hasPermission(getPlugin().getCreatePermission(islandSize)) && !player.hasPermission(Permissions.command.createAny)) {
+        if (!player.hasPermission(Islands.instance.getCreatePermission(islandSize)) && !player.hasPermission(Permissions.command.createAny)) {
             player.sendMessage(Messages.get("error.NO_PERMISSION"));
             return;
         }
 
-        if (islandSize < getPlugin().getSmallestIslandSize() || islandSize + 4 >= getPlugin().layout.islandSpacing) {
+        if (islandSize < Islands.instance.getSmallestIslandSize() || islandSize + 4 >= Islands.instance.layout.islandSpacing) {
             player.sendMessage(Messages.get("error.INVALID_ISLAND_SIZE"));
             return;
         }
@@ -43,16 +43,16 @@ public abstract class AbstractCreateSubcommands extends Subcommand {
     }
 
     protected boolean hasFunds(Player player, double cost) {
-        if (getPlugin().econ == null || player.hasPermission(Permissions.bypass.economy)) return true;
+        if (Islands.instance.econ == null || player.hasPermission(Permissions.bypass.economy)) return true;
 
-        return getPlugin().econ.has(player, cost);
+        return Islands.instance.econ.has(player, cost);
     }
 
     protected void pay(Player player, double cost) {
-        if (getPlugin().econ == null || player.hasPermission(Permissions.bypass.economy)) return;
+        if (Islands.instance.econ == null || player.hasPermission(Permissions.bypass.economy)) return;
 
         if (cost > 0) {
-            getPlugin().econ.withdrawPlayer(player, cost);
+            Islands.instance.econ.withdrawPlayer(player, cost);
             player.sendMessage(Messages.get("success.ISLAND_PURCHASED", cost));
         }
     }
@@ -62,7 +62,7 @@ public abstract class AbstractCreateSubcommands extends Subcommand {
         List<String> availableArgs = new ArrayList<>();
 
         if (args.length == 1) {
-            HashMap<Biome, List<Location>> availableLocations = getPlugin().islandGeneration.biomes.availableLocations;
+            HashMap<Biome, List<Location>> availableLocations = Biomes.INSTANCE.availableLocations;
 
             if (!isRandomBiomeDisabled())
                 availableArgs.add("RANDOM");
@@ -72,8 +72,8 @@ public abstract class AbstractCreateSubcommands extends Subcommand {
             }
 
         } else if (args.length == 2) {
-            for (String size : getPlugin().definedIslandSizes.keySet()) {
-                if (player.hasPermission(getPlugin().getCreatePermission(getPlugin().definedIslandSizes.get(size))))
+            for (String size : Islands.instance.definedIslandSizes.keySet()) {
+                if (player.hasPermission(Islands.instance.getCreatePermission(Islands.instance.definedIslandSizes.get(size))))
                     availableArgs.add(size);
             }
         }

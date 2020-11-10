@@ -5,7 +5,6 @@ import me.aleksilassila.islands.utils.Messages;
 import me.aleksilassila.islands.utils.Permissions;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.World;
 import org.bukkit.block.Biome;
 import org.bukkit.block.Block;
 import org.bukkit.configuration.ConfigurationSection;
@@ -19,9 +18,7 @@ import java.util.*;
 
 public class IslandGeneration {
     private final Islands plugin;
-    private final World islandsWorld;
 
-    public Biomes biomes;
     public List<Task> queue = new ArrayList<>();
     private final int buildDelay;
     private int rowsBuiltPerDelay = 1;
@@ -29,10 +26,8 @@ public class IslandGeneration {
 
     private final Map<Material, Material> replacementMap;
 
-    public IslandGeneration(Islands plugin) {
-        this.plugin = plugin;
-        this.islandsWorld = Islands.islandsWorld;
-        this.biomes = new Biomes(plugin, Islands.islandsSourceWorld);
+    public IslandGeneration() {
+        this.plugin = Islands.instance;
 
         double delay = plugin.getConfig().getDouble("generation.generationDelayInTicks");
 
@@ -75,9 +70,9 @@ public class IslandGeneration {
         Location sourceLocation;
 
         if (random) {
-            sourceLocation = plugin.islandGeneration.biomes.getRandomLocation(biome, islandSize);
+            sourceLocation = Biomes.INSTANCE.getRandomLocation(biome, islandSize);
         } else {
-            List<Location> locations = biomes.availableLocations.get(biome);
+            List<Location> locations = Biomes.INSTANCE.availableLocations.get(biome);
 
             if (locations == null)
                 throw new IllegalArgumentException();

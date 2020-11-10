@@ -4,6 +4,7 @@ import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import com.sun.istack.internal.NotNull;
 import com.sun.istack.internal.Nullable;
 import me.aleksilassila.islands.commands.IslandCommands;
+import me.aleksilassila.islands.generation.Biomes;
 import me.aleksilassila.islands.generation.IslandGeneration;
 import me.aleksilassila.islands.generation.Shape;
 import me.aleksilassila.islands.generation.ShapesLoader;
@@ -30,6 +31,8 @@ import java.nio.file.StandardOpenOption;
 import java.util.*;
 
 public class Islands extends JavaPlugin {
+    public static Islands instance;
+
     public static World islandsWorld;
     public static World islandsSourceWorld;
     public static World wildernessWorld;
@@ -57,6 +60,8 @@ public class Islands extends JavaPlugin {
 
     @Override
     public void onEnable() {
+        instance = this;
+
         if (!setupEconomy()) {
             getLogger().severe("No Vault or economy plugin found. Economy disabled.");
         }
@@ -92,16 +97,17 @@ public class Islands extends JavaPlugin {
         initIslandsConfig();
         initBiomesCache();
 
-        new ConfigMigrator(this);
+        new ConfigMigrator();
 
         islandsWorld = getIslandsWorld();
         islandsSourceWorld = getSourceWorld();
+
         if (!getConfig().getBoolean("disableWilderness")) {
             wildernessWorld = getWilderness();
         }
 
         // ISLANDS
-        Messages.init(this);
+        Messages.init();
 
         teleportCooldowns = new HashMap<>();
         confirmations = new HashMap<>();
@@ -109,13 +115,13 @@ public class Islands extends JavaPlugin {
         definedIslandSizes = setupSizes();
         definedIslandShapes = setupShapes();
 
-        islandGeneration = new IslandGeneration(this);
-        layout = new IslandLayout(this);
+        islandGeneration = new IslandGeneration();
+        layout = new IslandLayout();
 
-        new IslandCommands(this);
+        new IslandCommands();
 
-        new Listeners(this);
-        new ProtectionListeners(this);
+        new Listeners();
+        new ProtectionListeners();
 
         int pluginId = 8974;
         new Metrics(this, pluginId);
@@ -136,7 +142,7 @@ public class Islands extends JavaPlugin {
         boolean random = biome == null;
 
         if (biome == null) {
-            biome = islandGeneration.biomes.getRandomBiome(islandSize);
+            biome = Biomes.INSTANCE.getRandomBiome(islandSize);
         }
 
         String islandId = layout.createIsland(player.getUniqueId(), islandSize, height, biome);
@@ -181,7 +187,7 @@ public class Islands extends JavaPlugin {
         boolean random = biome == null;
 
         if (biome == null) {
-            biome = islandGeneration.biomes.getRandomBiome(islandSize);
+            biome = Biomes.INSTANCE.getRandomBiome(islandSize);
         }
 
         layout.updateIsland(islandId, islandSize, height, biome);

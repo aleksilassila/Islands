@@ -5,6 +5,7 @@ import me.aleksilassila.islands.IslandLayout;
 import me.aleksilassila.islands.Islands;
 import me.aleksilassila.islands.commands.AbstractCreateSubcommands;
 import me.aleksilassila.islands.commands.IslandCommands;
+import me.aleksilassila.islands.generation.Biomes;
 import me.aleksilassila.islands.utils.Messages;
 import me.aleksilassila.islands.utils.Permissions;
 import org.bukkit.block.Biome;
@@ -16,14 +17,9 @@ public class RecreateSubcommand extends AbstractCreateSubcommands {
 
     private final IslandCommands.Utils utils = new IslandCommands.Utils();
 
-    public RecreateSubcommand(Islands plugin) {
-        this.plugin = plugin;
+    public RecreateSubcommand() {
+        this.plugin = Islands.instance;
         this.layout = plugin.layout;
-    }
-
-    @Override
-    protected Islands getPlugin() {
-        return plugin;
     }
 
     @Override
@@ -102,7 +98,7 @@ public class RecreateSubcommand extends AbstractCreateSubcommands {
             }
 
 
-            if (!plugin.islandGeneration.biomes.availableLocations.containsKey(targetBiome)) {
+            if (!Biomes.INSTANCE.availableLocations.containsKey(targetBiome)) {
                 player.sendMessage(Messages.get("error.NO_LOCATIONS_FOR_BIOME"));
                 return;
             }

@@ -11,14 +11,9 @@ public class SetSpawnIslandSubcommand extends AbstractIslandsWorldSubcommand {
     private final Islands plugin;
     private final IslandLayout layout;
 
-    public SetSpawnIslandSubcommand(Islands plugin) {
-        this.plugin = plugin;
+    public SetSpawnIslandSubcommand() {
+        this.plugin = Islands.instance;
         this.layout = plugin.layout;
-    }
-
-    @Override
-    protected Islands getPlugin() {
-        return plugin;
     }
 
     @Override

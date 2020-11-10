@@ -16,8 +16,8 @@ import java.util.List;
 public class ModerateSubcommand extends Subcommand {
     private final Islands plugin;
 
-    public ModerateSubcommand(Islands plugin) {
-        this.plugin = plugin;
+    public ModerateSubcommand() {
+        this.plugin = Islands.instance;
     }
 
     @Override

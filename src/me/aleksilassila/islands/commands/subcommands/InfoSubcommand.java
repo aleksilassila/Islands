@@ -13,13 +13,8 @@ import java.util.UUID;
 public class InfoSubcommand extends AbstractIslandsWorldSubcommand {
     private final Islands plugin;
 
-    public InfoSubcommand(Islands plugin) {
-        this.plugin = plugin;
-    }
-
-    @Override
-    protected Islands getPlugin() {
-        return plugin;
+    public InfoSubcommand() {
+        this.plugin = Islands.instance;
     }
 
     @Override

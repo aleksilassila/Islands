@@ -9,22 +9,19 @@ import java.text.MessageFormat;
 import java.util.*;
 
 public class Messages {
-        private static Islands plugin;
-
         private static ResourceBundle bundle;
         private static ResourceBundle fallbackBundle;
         private static Map<String, String> messageCache;
 
         static final String BUNDLE_NAME = "messages";
 
-        public static void init(Islands plugin) {
-            Messages.plugin = plugin;
+        public static void init() {
             Messages.messageCache = new HashMap<>();
 
-            Locale locale = new Locale(Optional.ofNullable(plugin.getConfig().getString("locale")).orElse("en"));
+            Locale locale = new Locale(Optional.ofNullable(Islands.instance.getConfig().getString("locale")).orElse("en"));
 
             try {
-                URL[] urls = new URL[]{plugin.getDataFolder().toURI().toURL()};
+                URL[] urls = new URL[]{Islands.instance.getDataFolder().toURI().toURL()};
                 ClassLoader loader = new URLClassLoader(urls);
                 bundle = ResourceBundle.getBundle(BUNDLE_NAME, locale, loader);
             } catch (Exception ignored) {
@@ -33,7 +30,7 @@ public class Messages {
 
             fallbackBundle = ResourceBundle.getBundle(BUNDLE_NAME, locale);
 
-            plugin.getLogger().info("Using " + locale.getDisplayName() + " locales");
+            Islands.instance.getLogger().info("Using " + locale.getDisplayName() + " locales");
         }
 
         public static void send(OfflinePlayer player, final String formatKey, final Object... objects) {
@@ -61,7 +58,7 @@ public class Messages {
             try {
                 return bundle.getString(string);
             } catch (MissingResourceException e) {
-                plugin.getLogger().severe("No translation found for " + string + ", used default translation");
+                Islands.instance.getLogger().severe("No translation found for " + string + ", used default translation");
                 return fallbackBundle.getString(string);
             }
         }
@@ -73,7 +70,7 @@ public class Messages {
             try {
                 messageFormat = new MessageFormat(format);
             } catch (final IllegalArgumentException e) {
-                plugin.getLogger().severe("Invalid Translation key for '" + string + "': " + e.getMessage());
+                Islands.instance.getLogger().severe("Invalid Translation key for '" + string + "': " + e.getMessage());
                 format = format.replaceAll("\\{(\\D*?)\\}", "\\[$1\\]");
                 messageFormat = new MessageFormat(format);
             }

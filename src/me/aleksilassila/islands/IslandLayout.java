@@ -17,8 +17,8 @@ public class IslandLayout {
     public final int islandSpacing;
     public final int verticalSpacing;
 
-    public IslandLayout(Islands plugin) {
-        this.plugin = plugin;
+    public IslandLayout() {
+        this.plugin = Islands.instance;
 
         this.islandSpacing = plugin.getConfig().getInt("generation.islandGridSpacing");
         this.verticalSpacing = plugin.getConfig().getInt("generation.islandGridVerticalSpacing");

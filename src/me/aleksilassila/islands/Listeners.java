@@ -27,8 +27,8 @@ public class Listeners extends ChatUtils implements Listener {
     private final boolean restrictFlow;
     private final boolean syncTime;
 
-    public Listeners(Islands plugin) {
-        this.plugin = plugin;
+    public Listeners() {
+        this.plugin = Islands.instance;
 
         this.voidTeleport = plugin.getConfig().getBoolean("voidTeleport");
         this.restrictFlow = plugin.getConfig().getBoolean("restrictIslandBlockFlows");

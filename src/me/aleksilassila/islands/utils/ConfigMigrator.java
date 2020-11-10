@@ -6,12 +6,10 @@ import org.bukkit.configuration.file.FileConfiguration;
 import java.util.List;
 
 public class ConfigMigrator {
-    private final Islands plugin;
     private final FileConfiguration islandsConfig;
 
-    public ConfigMigrator(Islands plugin) {
-        this.plugin = plugin;
-        this.islandsConfig = plugin.getIslandsConfig();
+    public ConfigMigrator() {
+        this.islandsConfig = Islands.instance.getIslandsConfig();
 
         boolean doTrustedMigraton = false;
         boolean doProtectionMigration = false;
@@ -32,7 +30,7 @@ public class ConfigMigrator {
     }
 
     private void migrateIslandProtection() {
-        plugin.getLogger().warning("ISLANDS.YML IS USING OLD SYNTAX FOR ISLAND PROTECTION. MIGRATING CONFIG...");
+        Islands.instance.getLogger().warning("ISLANDS.YML IS USING OLD SYNTAX FOR ISLAND PROTECTION. MIGRATING CONFIG...");
 
         for (String islandId : islandsConfig.getKeys(false)) {
             if (islandsConfig.contains(islandId + ".protect")) continue;
@@ -43,11 +41,11 @@ public class ConfigMigrator {
             islandsConfig.set(islandId + ".protect.utility", true);
         }
 
-        plugin.saveIslandsConfig();
+        Islands.instance.saveIslandsConfig();
     }
 
     private void migrateTrustedPlayers() {
-        plugin.getLogger().warning("ISLANDS.YML IS USING OLD SYNTAX FOR TRUSTED PLAYERS. MIGRATING CONFIG...");
+        Islands.instance.getLogger().warning("ISLANDS.YML IS USING OLD SYNTAX FOR TRUSTED PLAYERS. MIGRATING CONFIG...");
 
         for (String islandId : islandsConfig.getKeys(false)) {
             if (!islandsConfig.contains(islandId + ".trusted")) continue;
@@ -64,6 +62,6 @@ public class ConfigMigrator {
             }
         }
 
-        plugin.saveIslandsConfig();
+        Islands.instance.saveIslandsConfig();
     }
 }

@@ -16,13 +16,8 @@ public class SaveSubcommand extends AbstractIslandsWorldSubcommand {
     private final Islands plugin;
     private final String SAVE_DIRECTORY = "plugins/Islands/saves/";
 
-    public SaveSubcommand(Islands plugin) {
-        this.plugin = plugin;
-    }
-
-    @Override
-    protected Islands getPlugin() {
-        return plugin;
+    public SaveSubcommand() {
+        this.plugin = Islands.instance;
     }
 
     @Override

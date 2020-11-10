@@ -17,8 +17,8 @@ import org.bukkit.event.player.PlayerInteractEvent;
 public class ProtectionListeners implements Listener {
     private final Islands plugin;
 
-    public ProtectionListeners(Islands plugin) {
-        this.plugin = plugin;
+    public ProtectionListeners() {
+        this.plugin = Islands.instance;
 
         plugin.getServer().getPluginManager().registerEvents(this, plugin);
     }
