@@ -70,7 +70,7 @@ permissions:
       islands.bypass.protection: true
       islands.bypass.home: true
       islands.bypass.trust.list: true
-      islands.bypass.econonmy: true
+      islands.bypass.economy: true
       islands.bypass.queue: true
       islands.bypass.queue.limit: true
       islands.bypass.info: true
@@ -226,7 +226,7 @@ permissions:
   islands.bypass.home:
     description: Bypass home restrictions
     default: "op"
-  islands.bypass.econonmy:
+  islands.bypass.economy:
     description: Bypass economy restrictions
     default: "op"
   islands.bypass.queue:

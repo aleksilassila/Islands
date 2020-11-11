@@ -10,6 +10,7 @@ import org.bukkit.block.Biome;
 import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 
@@ -77,6 +78,10 @@ public abstract class AbstractCreateSubcommands extends Subcommand {
                 if (player.hasPermission(Islands.instance.getCreatePermission(Islands.instance.definedIslandSizes.get(size))) || player.hasPermission(Permissions.command.createAny))
                     availableArgs.add(size);
             }
+
+            availableArgs.sort(
+                    Comparator.comparingInt(key -> Islands.instance.definedIslandSizes.get(key))
+            );
         }
 
         return availableArgs;

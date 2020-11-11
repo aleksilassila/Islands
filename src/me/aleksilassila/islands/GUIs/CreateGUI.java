@@ -123,8 +123,13 @@ public class CreateGUI extends PageGUI {
 
         StaticPane pane = new StaticPane(0, 0, 9, 1);
 
+        List<String> sortedKeys = new ArrayList<>(plugin.definedIslandSizes.keySet());
+        sortedKeys.sort(
+                Comparator.comparingInt(key -> plugin.definedIslandSizes.get(key))
+        );
+
         int itemCount = 0;
-        for (String key : plugin.definedIslandSizes.keySet()) {
+        for (String key : sortedKeys) {
             if (pane.getItems().size() >= 9) {
                 panes.add(pane);
                 pane = new StaticPane(0, 0, 9, 1);

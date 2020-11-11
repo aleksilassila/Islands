@@ -462,9 +462,5 @@ public class Islands extends JavaPlugin {
 
     // TODO:
     //  - Island generation in custom locations outside of the grid. Bigger sizes.
-    //  - Generation cooldown
-    //  - /ContainerTrust etc. Maybe transition to protection plugin?
     //  - Fix giant trees cutting off from top.
-    //  - API ??
-    //  - Transition into using a database
 }
