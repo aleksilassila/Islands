@@ -208,7 +208,7 @@ public class IslandSettingsGUI extends PageGUI {
             settings.addItem(new GuiItem(building, event -> {
                 IslandsConfig.setBuildProtection(islandId, !buildProtection);
                 showIslandProtectionMenu();
-            }), 0, 0);
+            }), settings.getItems().size() * 2, 0);
         }
 
         // Containers
@@ -222,7 +222,7 @@ public class IslandSettingsGUI extends PageGUI {
             settings.addItem(new GuiItem(containers, event -> {
                 IslandsConfig.setContainerProtection(islandId, !containerProtection);
                 showIslandProtectionMenu();
-            }), 2, 0);
+            }), settings.getItems().size() * 2, 0);
         }
 
         // Doors
@@ -236,7 +236,7 @@ public class IslandSettingsGUI extends PageGUI {
             settings.addItem(new GuiItem(doors, event -> {
                 IslandsConfig.setDoorProtection(islandId, !doorProtection);
                 showIslandProtectionMenu();
-            }), 4, 0);
+            }), settings.getItems().size() * 2, 0);
         }
 
         // Utility
@@ -250,7 +250,7 @@ public class IslandSettingsGUI extends PageGUI {
             settings.addItem(new GuiItem(utility, event -> {
                 IslandsConfig.setUtilityProtection(islandId, !utilityProtection);
                 showIslandProtectionMenu();
-            }), 6, 0);
+            }), settings.getItems().size() * 2, 0);
         }
 
         gui.addPane(settings);
