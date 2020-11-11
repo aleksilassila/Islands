@@ -63,7 +63,8 @@ public class Islands extends JavaPlugin {
             getLogger().severe("No Vault found. Some permissions disabled.");
         }
 
-        if (!setupWorldedit()) {
+        worldEdit = (WorldEditPlugin) Bukkit.getPluginManager().getPlugin("WorldEdit");
+        if (worldEdit == null) {
             getLogger().severe("No WorldEdit found. Island shapes disabled.");
         }
 
@@ -332,11 +333,6 @@ public class Islands extends JavaPlugin {
         }
 
         return true;
-    }
-
-    private boolean setupWorldedit() {
-        worldEdit = (WorldEditPlugin) Bukkit.getPluginManager().getPlugin("WorldEdit");
-        return worldEdit != null;
     }
 
     private Map<String, Integer> setupSizes() {

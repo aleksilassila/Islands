@@ -173,7 +173,7 @@ public enum Biomes {
         return locations;
     }
 
-    Biome getBiome(int x, int z) {
+    private Biome getBiome(int x, int z) {
         return world.getBiome(x, 180, z);
     }
 

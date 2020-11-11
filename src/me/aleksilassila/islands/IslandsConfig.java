@@ -59,10 +59,12 @@ public enum IslandsConfig {
     public static String createIsland(UUID uuid, int islandSize, int height, Biome biome) {
         int index = 0;
 
+        Set<String> islands = getConfig().getKeys(false);
+
         while (true) {
             int[] pos = placement.getIslandPos(index);
 
-            if (!getConfig().getKeys(false).contains(posToIslandId(pos[0], pos[1]))) {
+            if (!islands.contains(posToIslandId(pos[0], pos[1]))) {
                 return addIsland(pos[0], pos[1], islandSize, height, uuid, String.valueOf(getNewHomeId(uuid)), biome);
             }
 
