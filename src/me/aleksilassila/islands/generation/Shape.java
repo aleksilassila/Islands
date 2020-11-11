@@ -36,7 +36,7 @@ public class Shape {
     }
 
     public int getWidth() {
-        return Math.max(dimensions.getBlockX() + 1, dimensions.getBlockZ() + 1);
+        return Math.max(dimensions.getBlockX(), dimensions.getBlockZ());
     }
 
     public int getHeight() {

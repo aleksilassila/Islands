@@ -81,12 +81,12 @@ public class Islands extends JavaPlugin {
             }
         });
 
-        if (new File(getDataFolder() + "/config.yml").exists())
+        if (new File(getDataFolder() + "/config.yml").exists()) {
             if (!validateConfig()) {
                 Bukkit.getPluginManager().disablePlugin(this);
                 return;
             }
-        else saveDefaultConfig();
+        } else saveDefaultConfig();
 
         initBiomesCache();
 

@@ -131,7 +131,7 @@ public class CreateGUI extends PageGUI {
             }
 
             int islandSize = plugin.definedIslandSizes.get(key);
-            if (!player.hasPermission(plugin.getCreatePermission(islandSize))) continue;
+            if (!player.hasPermission(plugin.getCreatePermission(islandSize)) && !player.hasPermission(Permissions.command.createAny)) continue;
 
             double cost = 0.0;
 

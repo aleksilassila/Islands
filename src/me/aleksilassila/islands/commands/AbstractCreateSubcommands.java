@@ -74,7 +74,7 @@ public abstract class AbstractCreateSubcommands extends Subcommand {
 
         } else if (args.length == 2) {
             for (String size : Islands.instance.definedIslandSizes.keySet()) {
-                if (player.hasPermission(Islands.instance.getCreatePermission(Islands.instance.definedIslandSizes.get(size))))
+                if (player.hasPermission(Islands.instance.getCreatePermission(Islands.instance.definedIslandSizes.get(size))) || player.hasPermission(Permissions.command.createAny))
                     availableArgs.add(size);
             }
         }

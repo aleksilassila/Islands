@@ -83,7 +83,7 @@ public enum IslandGeneration {
                 throw new IllegalArgumentException();
 
             if (!canAddQueueItem(player))
-                throw new IllegalArgumentException();
+                return false;
 
             sourceLocation = locations.get(new Random().nextInt(locations.size()));
         }
@@ -155,7 +155,7 @@ public enum IslandGeneration {
 
     public boolean canAddQueueItem(Player player) {
         if (queue.size() == 0) return true;
-        return !queue.get(0).getPlayer().equals(player) || !player.hasPermission(Permissions.bypass.queueLimit);
+        return !queue.get(0).getPlayer().equals(player) || player.hasPermission(Permissions.bypass.queueLimit);
     }
 
     public void removeFromQueue(Player player) {
