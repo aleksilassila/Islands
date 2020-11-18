@@ -13,7 +13,7 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.player.*;
 
 public class ProtectionListeners implements Listener {
     public ProtectionListeners() {
@@ -35,8 +35,52 @@ public class ProtectionListeners implements Listener {
                 }
 
                 event.setCancelled(true);
-
                 event.getDamager().sendMessage(Messages.get("error.NOT_TRUSTED"));
+            }
+        }
+    }
+
+    @EventHandler
+    public void onPlayerInteractAtEntity(PlayerInteractAtEntityEvent event) {
+        if (event.getPlayer().getWorld().equals(Islands.islandsWorld)) {
+            if (event.getPlayer().hasPermission(Permissions.bypass.interactEverywhere)) return;
+
+            int x = event.getRightClicked().getLocation().getBlockX();
+            int z = event.getRightClicked().getLocation().getBlockZ();
+
+            String ownerUUID = IslandsConfig.getBlockOwnerUUID(x, z);
+            if (ownerUUID != null && !ownerUUID.equals(event.getPlayer().getUniqueId().toString())) {
+                if (new ProtectedBlock(x, z).canOpenContainers(event.getPlayer().getUniqueId().toString())) return;
+
+                event.setCancelled(true);
+                event.getPlayer().sendMessage(Messages.get("error.NOT_TRUSTED"));
+            }
+        }
+    }
+
+    @EventHandler
+    public void onPlayerBucketEmpty(PlayerBucketEmptyEvent event) {
+        onPlayerBucketEvent(event);
+    }
+
+    @EventHandler
+    public void onPlayerBucketFill(PlayerBucketFillEvent event) {
+        onPlayerBucketEvent(event);
+    }
+
+    public void onPlayerBucketEvent(PlayerBucketEvent event) {
+        if (event.getPlayer().getWorld().equals(Islands.islandsWorld)) {
+            if (event.getPlayer().hasPermission(Permissions.bypass.interactEverywhere)) return;
+
+            int x = event.getBlock().getLocation().getBlockX();
+            int z = event.getBlock().getLocation().getBlockZ();
+
+            String ownerUUID = IslandsConfig.getBlockOwnerUUID(x, z);
+            if (ownerUUID != null && !ownerUUID.equals(event.getPlayer().getUniqueId().toString())) {
+                if (new ProtectedBlock(x, z).canDoAnything(event.getPlayer().getUniqueId().toString())) return;
+
+                event.setCancelled(true);
+                event.getPlayer().sendMessage(Messages.get("error.NOT_TRUSTED"));
             }
         }
     }
