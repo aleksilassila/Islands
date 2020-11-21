@@ -45,6 +45,7 @@ public enum IslandGeneration {
 
         ConfigurationSection section = plugin.getConfig().getConfigurationSection("replaceOnGeneration");
 
+        // Initialize block replacement according to config.yml
         if (section != null) {
             for (String material : section.getKeys(false)) {
                 Material materialToReplace = Material.getMaterial(material.toUpperCase());
@@ -68,10 +69,11 @@ public enum IslandGeneration {
         }
     }
 
-    public boolean copyIsland(Player player, Biome biome, int islandSize, Vector target, boolean shouldClearArea, String islandId, Shape shape, boolean random) throws IllegalArgumentException {
+    public boolean copyIsland(Player player, Biome biome, int islandSize, Vector target, boolean shouldClearArea, String islandId, Shape shape, boolean randomBiome) throws IllegalArgumentException {
         Location sourceLocation;
 
-        if (random) {
+        // get location
+        if (randomBiome) {
             sourceLocation = Biomes.INSTANCE.getRandomLocation(biome, islandSize);
         } else {
             List<Location> locations = Biomes.INSTANCE.availableLocations.get(biome);
@@ -88,6 +90,8 @@ public enum IslandGeneration {
             sourceLocation = locations.get(new Random().nextInt(locations.size()));
         }
 
+        // Get island center y. Center block will be in the middle the first block
+        // that is not burnable
         int centerY = 100;
         while (true) {
             int centerX = (int) (sourceLocation.getBlockX() + ((double) islandSize) / 2.0);
@@ -344,8 +348,10 @@ public enum IslandGeneration {
 
         @Override
         public void run() {
-            if (shouldDoClearing) {
+            if (shouldDoClearing) { // Clear the area first if necessary
                 for (int count = 0; count < rowsClearedPerDelay; count++) {
+                    // Relative coordinates: relative to the target location.
+                    // They tell where the block is in the target plot, so the coords are in range 0<=x<=islandSpacing
                     int relativeX = clearingIndex / IslandsConfig.INSTANCE.islandSpacing;
                     int relativeZ = clearingIndex - relativeX * IslandsConfig.INSTANCE.islandSpacing;
 
@@ -361,11 +367,11 @@ public enum IslandGeneration {
                                 realZ
                         );
 
-                        if (!target.isEmpty()) {
+                        if (!target.isEmpty()) { // If there's block there, clear it
                             target.setType(Material.AIR);
-                            skipDelay = false;
+                            skipDelay = false; // Don't skip the delay between iterations, normally true
                         }
-                        target.setBiome(Biome.PLAINS);
+                        target.setBiome(Biome.PLAINS); // Clear biome
                     }
 
                     if (skipDelay) count--;
@@ -389,13 +395,17 @@ public enum IslandGeneration {
                 return;
             }
 
+            // Paste the blocks
             for (int count = 0; count < rowsBuiltPerDelay; count++) {
                 for (int y = startY; y < startY + islandHeight; y++) {
+                    // Relative coordinates: relative to the target location.
+                    // They tell where the block is in the target plot, so the coords are in range 0<=x<=islandSpacing
                     int relativeX = index / islandSize;
                     int relativeZ = index - relativeX * islandSize;
 
                     Block sourceBlock = Islands.islandsSourceWorld.getBlockAt(startX + relativeX, y, startZ + relativeZ);
 
+                    // Check if block should be replaced according to config.yml
                     if (replacementMap.containsKey(sourceBlock.getType())) {
                         Material material = replacementMap.get(sourceBlock.getType());
                         sourceBlock.setBlockData(material.createBlockData());
@@ -403,20 +413,20 @@ public enum IslandGeneration {
 
                     Block target = Islands.islandsWorld.getBlockAt(targetX + relativeX, targetY + (y - startY), targetZ + relativeZ);
 
-                    if (shape == null) {
+                    if (shape == null) { // If no shape, calculate default shape with isBlockInIslandShape function
                         if (isBlockInIslandShape(relativeX, y - startY, relativeZ, islandSize)) {
                             target.setBlockData(sourceBlock.getBlockData());
                         } else {
                             target.setType(Material.AIR);
                         }
                     } else {
-                        if (y - startY > shape.getHeight() - 1) {
+                        if (y - startY > shape.getHeight() - 1) { // If current block is above the schematic shape, calculate default shape with isBlockInIslandShape function
                             if (isBlockInIslandShape(relativeX, y - startY - (islandHeight - islandSize), relativeZ, islandSize)) {
                                 target.setBlockData(sourceBlock.getBlockData());
                             } else {
                                 target.setType(Material.AIR);
                             }
-                        } else {
+                        } else { // If block y is below shape height, use the shape as a mask
                             if (!shape.isBlockAir(relativeX, y - startY, relativeZ)) {
                                 target.setBlockData(sourceBlock.getBlockData());
                             } else {
@@ -428,6 +438,7 @@ public enum IslandGeneration {
                     target.setBiome(sourceBlock.getBiome());
                 }
 
+                // If done
                 if (index >= islandSize * islandSize) {
                     // Update lighting
                     Islands.islandsWorld.getChunkAt(targetX + islandSize / 2, targetZ + islandSize / 2);
@@ -455,16 +466,19 @@ public enum IslandGeneration {
         }
     }
 
+    // Check if the block is inside the egg-shape of the island, the blocks should be in range is 0<=x<=islandSize
     public static boolean isBlockInIslandShape(int x, int y, int z, int islandSize) {
         return (Math.pow(x - islandSize / 2.0, 2) + (islandSize / Math.pow(y, 2) + 1.3) * Math.pow(y - islandSize / 2.0, 2) + Math.pow(z - islandSize / 2.0, 2))
                 <= Math.pow(islandSize / 2.0, 2);
     }
 
+    // Check if the block is inside sphere with diameter of islandSize, the blocks should be in range is 0<=x<=islandSize
     public static boolean isBlockInIslandSphere(int x, int y, int z, int islandSize) {
         return (Math.pow(x - islandSize / 2.0, 2) + Math.pow(y - islandSize / 2.0, 2) + Math.pow(z - islandSize / 2.0, 2))
                 <= Math.pow(islandSize / 2.0, 2);
     }
 
+    // Check if the block is inside cylinder with diameter of islandSize, ignoring height (y), the blocks should be in range is 0<=x<=islandSize
     public static boolean isBlockInIslandCylinder(int relativeX, int relativeZ, int islandSize) {
         return (Math.pow(relativeX - islandSize / 2.0, 2) + Math.pow(relativeZ - islandSize / 2.0, 2))
                 <= Math.pow(islandSize / 2.0, 2);
