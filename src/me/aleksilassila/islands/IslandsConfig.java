@@ -308,19 +308,34 @@ public enum IslandsConfig {
 
     @Nullable
     public static String getBlockOwnerUUID(int x, int z) {
-        int xIndex = x / INSTANCE.islandSpacing;
-        int zIndex = z / INSTANCE.islandSpacing;
+        return getBlockOwnerUUID(x, z, false);
+    }
 
-        int islandSize = getConfig().getInt(posToIslandId(xIndex, zIndex)  + ".size");
+    /**
+     * Get block owner.
+     *
+     * @param plotOnly If false, the space between islands will be considered
+     *                 as no man's land. If true, the whole plot belongs to the
+     *                 island owner.
+     */
+    @Nullable
+    public static String getBlockOwnerUUID(int x, int z, boolean plotOnly) {
+        int plotX = x / INSTANCE.islandSpacing;
+        int plotZ = z / INSTANCE.islandSpacing;
 
-        int relativeX = x - (xIndex * INSTANCE.islandSpacing + INSTANCE.islandSpacing / 2 - islandSize / 2);
-        int relativeZ = z - (zIndex * INSTANCE.islandSpacing + INSTANCE.islandSpacing / 2 - islandSize / 2);
+        // Check if block is inside an island, not only inside plot
+        if (!plotOnly) {
+            int islandSize = getConfig().getInt(posToIslandId(plotX, plotZ) + ".size");
 
-        boolean isInside = IslandGeneration.isBlockInIslandCylinder(relativeX + 2, relativeZ + 2, islandSize + 4);
+            int relativeX = x - (plotX * INSTANCE.islandSpacing + INSTANCE.islandSpacing / 2 - islandSize / 2);
+            int relativeZ = z - (plotZ * INSTANCE.islandSpacing + INSTANCE.islandSpacing / 2 - islandSize / 2);
 
-        if (!isInside) return null;
+            boolean isInside = IslandGeneration.isBlockInIslandCylinder(relativeX + 2, relativeZ + 2, islandSize + 4);
 
-        return Optional.ofNullable(getConfig().getString(posToIslandId(xIndex, zIndex) + ".UUID")).orElse("Server");
+            if (!isInside) return null;
+        }
+
+        return Optional.ofNullable(getConfig().getString(posToIslandId(plotX, plotZ) + ".UUID")).orElse("Server");
     }
 
     public static int getNewHomeId(UUID uuid) {

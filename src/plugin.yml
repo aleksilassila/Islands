@@ -68,6 +68,7 @@ permissions:
       islands.bypass.setspawn: true
       islands.bypass.untrust: true
       islands.bypass.protection: true
+      islands.bypass.plotprotection: true
       islands.bypass.home: true
       islands.bypass.trust.list: true
       islands.bypass.economy: true
@@ -222,6 +223,9 @@ permissions:
     default: "op"
   islands.bypass.protection:
     description: Bypass protection restrictions
+    default: "op"
+  islands.bypass.plotprotection:
+    description: Bypass protection limits inside your own plot (build outside of the island)
     default: "op"
   islands.bypass.home:
     description: Bypass home restrictions

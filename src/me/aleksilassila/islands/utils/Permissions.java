@@ -16,6 +16,7 @@ public class Permissions {
         public static final String listTrusted = "islands.bypass.trust.list";
 
         public static final String interactEverywhere = "islands.bypass.protection";
+        public static final String interactInPlot = "islands.bypass.plotprotection";
         public static final String home = "islands.bypass.home";
         public static final String economy = "islands.bypass.economy";
         public static final String queue = "islands.bypass.queue";

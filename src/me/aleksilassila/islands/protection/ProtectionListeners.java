@@ -28,7 +28,7 @@ public class ProtectionListeners implements Listener {
             int x = event.getEntity().getLocation().getBlockX();
             int z = event.getEntity().getLocation().getBlockZ();
 
-            String ownerUUID = IslandsConfig.getBlockOwnerUUID(x, z);
+            String ownerUUID = IslandsConfig.getBlockOwnerUUID(x, z, event.getDamager().hasPermission(Permissions.bypass.interactInPlot));
             if (ownerUUID != null && !ownerUUID.equals(event.getDamager().getUniqueId().toString())) {
                 if (new ProtectedBlock(x, z).canDoAnything(event.getDamager().getUniqueId().toString())) {
                     return;
@@ -48,7 +48,7 @@ public class ProtectionListeners implements Listener {
             int x = event.getRightClicked().getLocation().getBlockX();
             int z = event.getRightClicked().getLocation().getBlockZ();
 
-            String ownerUUID = IslandsConfig.getBlockOwnerUUID(x, z);
+            String ownerUUID = IslandsConfig.getBlockOwnerUUID(x, z, event.getPlayer().hasPermission(Permissions.bypass.interactInPlot));
             if (ownerUUID != null && !ownerUUID.equals(event.getPlayer().getUniqueId().toString())) {
                 if (new ProtectedBlock(x, z).canOpenContainers(event.getPlayer().getUniqueId().toString())) return;
 
@@ -75,7 +75,7 @@ public class ProtectionListeners implements Listener {
             int x = event.getBlock().getLocation().getBlockX();
             int z = event.getBlock().getLocation().getBlockZ();
 
-            String ownerUUID = IslandsConfig.getBlockOwnerUUID(x, z);
+            String ownerUUID = IslandsConfig.getBlockOwnerUUID(x, z, event.getPlayer().hasPermission(Permissions.bypass.interactInPlot));
             if (ownerUUID != null && !ownerUUID.equals(event.getPlayer().getUniqueId().toString())) {
                 if (new ProtectedBlock(x, z).canDoAnything(event.getPlayer().getUniqueId().toString())) return;
 
@@ -95,7 +95,7 @@ public class ProtectionListeners implements Listener {
         int z = event.getClickedBlock().getZ();
 
         Player player = event.getPlayer();
-        String ownerUUID = IslandsConfig.getBlockOwnerUUID(x, z);
+        String ownerUUID = IslandsConfig.getBlockOwnerUUID(x, z, player.hasPermission(Permissions.bypass.interactInPlot));
 
         if (player.getUniqueId().toString().equalsIgnoreCase(ownerUUID)) return;
 
@@ -137,6 +137,7 @@ public class ProtectionListeners implements Listener {
                 event.getClickedBlock().getType() == Material.DISPENSER ||
                 event.getClickedBlock().getType() == Material.DROPPER ||
                 event.getClickedBlock().getType() == Material.JUKEBOX ||
+                event.getClickedBlock().getType() == Material.BARREL ||
                 Tag.SHULKER_BOXES.isTagged(event.getClickedBlock().getType()))
         {
             if (!protectedBlock.canOpenContainers(player.getUniqueId().toString())) {
@@ -179,7 +180,7 @@ public class ProtectionListeners implements Listener {
             int x = event.getBlock().getX();
             int z = event.getBlock().getZ();
 
-            String ownerUUID = IslandsConfig.getBlockOwnerUUID(x, z);
+            String ownerUUID = IslandsConfig.getBlockOwnerUUID(x, z, event.getPlayer().hasPermission(Permissions.bypass.interactInPlot));
 
             if (ownerUUID == null && !event.getPlayer().hasPermission(Permissions.bypass.interactEverywhere)) {
                 event.setCancelled(true);
@@ -200,7 +201,7 @@ public class ProtectionListeners implements Listener {
             int x = event.getBlock().getX();
             int z = event.getBlock().getZ();
 
-            String ownerUUID = IslandsConfig.getBlockOwnerUUID(x, z);
+            String ownerUUID = IslandsConfig.getBlockOwnerUUID(x, z, event.getPlayer().hasPermission(Permissions.bypass.interactInPlot));
 
             if (ownerUUID == null && !event.getPlayer().hasPermission(Permissions.bypass.interactEverywhere)) {
                 event.setCancelled(true);
