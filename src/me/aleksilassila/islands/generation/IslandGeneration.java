@@ -466,19 +466,47 @@ public enum IslandGeneration {
         }
     }
 
-    // Check if the block is inside the egg-shape of the island, the blocks should be in range is 0<=x<=islandSize
+    /**
+     * Check if the block is inside the egg-shape (not sphere!!) of the island,
+     * the blocks should be in range is 0<=x<=islandSize
+     *
+     * @param x x coordinate relative to the position of the island.
+     * @param y y coordinate relative to the position of the island.
+     * @param z z coordinate relative to the position of the island.
+     * @param islandSize Size of the island (diameter of the sphere)
+     * @return true if the block is inside
+     */
     public static boolean isBlockInIslandShape(int x, int y, int z, int islandSize) {
         return (Math.pow(x - islandSize / 2.0, 2) + (islandSize / Math.pow(y, 2) + 1.3) * Math.pow(y - islandSize / 2.0, 2) + Math.pow(z - islandSize / 2.0, 2))
                 <= Math.pow(islandSize / 2.0, 2);
     }
 
-    // Check if the block is inside sphere with diameter of islandSize, the blocks should be in range is 0<=x<=islandSize
+    /**
+     * Check if the block is inside sphere with diameter of islandSize,
+     * the blocks should be in range is 0<=x<=islandSize
+     *
+     * @param x x coordinate relative to the position of the island.
+     * @param y y coordinate relative to the position of the island.
+     * @param z z coordinate relative to the position of the island.
+     * @param islandSize Size of the island (diameter of the sphere)
+     * @return true if the block is inside
+     */
     public static boolean isBlockInIslandSphere(int x, int y, int z, int islandSize) {
         return (Math.pow(x - islandSize / 2.0, 2) + Math.pow(y - islandSize / 2.0, 2) + Math.pow(z - islandSize / 2.0, 2))
                 <= Math.pow(islandSize / 2.0, 2);
     }
 
-    // Check if the block is inside cylinder with diameter of islandSize, ignoring height (y), the blocks should be in range is 0<=x<=islandSize
+    //
+
+    /**
+     * Check if the block is inside cylinder with diameter of islandSize,
+     * ignoring height (y), the blocks should be in range is 0<=x<=islandSize
+     *
+     * @param relativeX x coordinate relative to the position of the island.
+     * @param relativeZ z coordinate relative to the position of the island.
+     * @param islandSize Size of the island (diameter of the cylinder)
+     * @return true if the block is inside
+     */
     public static boolean isBlockInIslandCylinder(int relativeX, int relativeZ, int islandSize) {
         return (Math.pow(relativeX - islandSize / 2.0, 2) + Math.pow(relativeZ - islandSize / 2.0, 2))
                 <= Math.pow(islandSize / 2.0, 2);

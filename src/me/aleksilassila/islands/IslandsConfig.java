@@ -281,7 +281,14 @@ public enum IslandsConfig {
         return null;
     }
 
-    public static boolean isBlockInIslandSphere(int x, int y, int z) {
+    /**
+     * Checks if block (relative to the position of
+     * the island) is inside water flow are.
+     *
+     * From bottom to up the area is first a half sphere with diameter
+     * of the island width and then a cylinder with same diameter.
+     */
+    public static boolean isBlockInWaterFlowArea(int x, int y, int z) {
         int xIndex = x / INSTANCE.islandSpacing;
         int zIndex = z / INSTANCE.islandSpacing;
         int islandLowY = getIslandY(xIndex, zIndex);
@@ -292,7 +299,11 @@ public enum IslandsConfig {
         int relativeZ = z - (zIndex * INSTANCE.islandSpacing + INSTANCE.islandSpacing / 2 - islandSize / 2);
         int relativeY = y - islandLowY;
 
-        return IslandGeneration.isBlockInIslandSphere(relativeX, relativeY, relativeZ, islandSize);
+        if (relativeY <= islandSize / 2.0) {
+            return IslandGeneration.isBlockInIslandSphere(relativeX, relativeY, relativeZ, islandSize);
+        } else {
+            return IslandGeneration.isBlockInIslandCylinder(relativeX, relativeZ, islandSize);
+        }
     }
 
     @Nullable

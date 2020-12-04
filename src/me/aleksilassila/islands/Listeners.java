@@ -78,7 +78,7 @@ public class Listeners extends ChatUtils implements Listener {
     @EventHandler
     public void onBlockFromTo(BlockFromToEvent event) {
         if (!event.getBlock().getWorld().equals(Islands.islandsWorld) || !restrictFlow) return;
-        boolean canFlow = IslandsConfig.isBlockInIslandSphere(
+        boolean canFlow = IslandsConfig.isBlockInWaterFlowArea(
                 event.getToBlock().getX(), event.getToBlock().getY(), event.getToBlock().getZ());
 
         if(!canFlow) {
