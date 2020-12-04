@@ -16,6 +16,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Animals;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Villager;
 
 import java.util.*;
 
@@ -143,6 +144,7 @@ public class TeleportCommands {
     public class HomeCommand extends Subcommand implements CommandExecutor {
         private final boolean allowHomeOnlyFromOverworld;
         private final boolean disableNeutralTeleports;
+        private final boolean enableAllTaggedTeleports;
         private final int neutralTeleportRange;
         private final boolean unfinishedIslandTeleports;
 
@@ -153,6 +155,7 @@ public class TeleportCommands {
 
             this.allowHomeOnlyFromOverworld = plugin.getConfig().getBoolean("allowHomeOnlyFromOverworld");
             this.disableNeutralTeleports = plugin.getConfig().getBoolean("disableNeutralTeleports");
+            this.enableAllTaggedTeleports = plugin.getConfig().getBoolean("teleportAllNameTagged");
             this.neutralTeleportRange = plugin.getConfig().getInt("neutralTeleportRange");
             this.unfinishedIslandTeleports = plugin.getConfig().getBoolean("unfinishedIslandTeleports");
         }
@@ -226,17 +229,7 @@ public class TeleportCommands {
             Location location = IslandsConfig.getIslandSpawn(islandId);
 
             if (location != null) {
-                if (!disableNeutralTeleports && player.hasPermission(Permissions.bypass.neutralTeleport) && player.getWorld().equals(Islands.wildernessWorld)) {
-                    List<Entity> entities = player.getNearbyEntities(neutralTeleportRange, neutralTeleportRange, neutralTeleportRange);
-                    entities.removeIf(entity -> !(entity instanceof Animals));
-
-                    Location animalLocation = location.clone();
-                    animalLocation.setY(Utils.getHighestYAt(Islands.islandsWorld, location.getBlockX(), location.getBlockZ()) + 2);
-
-                    for (Entity entity : entities) {
-                        entity.teleport(animalLocation);
-                    }
-                }
+                teleportNeutrals(player, location);
 
                 player.teleport(location);
             } else {
@@ -270,11 +263,40 @@ public class TeleportCommands {
         public String getPermission() {
             return Permissions.command.home;
         }
+
+        private void teleportNeutrals(Player player, Location location) {
+            if (!disableNeutralTeleports && player.hasPermission(Permissions.bypass.neutralTeleport) && player.getWorld().equals(Islands.wildernessWorld)) {
+                List<Entity> entities = player.getNearbyEntities(neutralTeleportRange, neutralTeleportRange, neutralTeleportRange);
+                List<Entity> notAnimals = new ArrayList<>();
+                entities.removeIf(entity -> {
+                    if (!(entity instanceof Animals)
+                            && !(entity instanceof Villager)) {
+                        notAnimals.add(entity);
+                        return true;
+                    } else return false;
+                });
+
+                if (enableAllTaggedTeleports) {
+                    for (Entity entity : notAnimals) {
+                        if (entity.getCustomName() != null) {
+                            entities.add(entity);
+                        }
+                    }
+                }
+
+                Location animalLocation = location.clone();
+                animalLocation.setY(Utils.getHighestYAt(Islands.islandsWorld, location.getBlockX(), location.getBlockZ()) + 2);
+
+                for (Entity entity : entities) {
+                    entity.teleport(animalLocation);
+                }
+            }
+        }
     }
 
     private boolean canTeleport(Player player) {
         if (plugin.teleportCooldowns.containsKey(player.getUniqueId().toString())) {
-            long cooldownTime  = plugin.getConfig().getInt("tpCooldownTime") * 1000;
+            long cooldownTime  = plugin.getConfig().getInt("tpCooldownTime") * 1000L;
             long timePassed = new Date().getTime() - plugin.teleportCooldowns.get(player.getUniqueId().toString());
 
             return timePassed >= cooldownTime;
@@ -285,7 +307,7 @@ public class TeleportCommands {
 
     private int teleportCooldown(Player player) {
         if (plugin.teleportCooldowns.containsKey(player.getUniqueId().toString())) {
-            long cooldownTime  = plugin.getConfig().getInt("tpCooldownTime") * 1000;
+            long cooldownTime  = plugin.getConfig().getInt("tpCooldownTime") * 1000L;
             long timePassed = new Date().getTime() - plugin.teleportCooldowns.get(player.getUniqueId().toString());
 
             long remaining = cooldownTime - timePassed;

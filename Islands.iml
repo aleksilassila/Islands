@@ -11,5 +11,6 @@
     <orderEntry type="library" name="WorldEdit" level="project" />
     <orderEntry type="library" name="Vault" level="project" />
     <orderEntry type="library" name="IF-0.8.0" level="project" />
+    <orderEntry type="library" name="IF-0.8.1" level="project" />
   </component>
 </module>
