@@ -17,6 +17,7 @@ import org.bukkit.util.Vector;
 
 import java.util.*;
 
+// Eh sorry about this one, its a mess
 public enum IslandGeneration {
     INSTANCE;
 
@@ -69,26 +70,22 @@ public enum IslandGeneration {
         }
     }
 
-    public boolean copyIsland(Player player, Biome biome, int islandSize, Vector target, boolean shouldClearArea, String islandId, Shape shape, boolean randomBiome) throws IllegalArgumentException {
+    public boolean copyIsland(Player player, Biome biome, int islandSize, Vector target, boolean shouldClearArea, String islandId, Shape shape) throws IllegalArgumentException {
         Location sourceLocation;
 
         // get location
-        if (randomBiome) {
-            sourceLocation = Biomes.INSTANCE.getRandomLocation(biome, islandSize);
-        } else {
-            List<Location> locations = Biomes.INSTANCE.availableLocations.get(biome);
+        List<Location> locations = Biomes.INSTANCE.availableLocations.get(biome);
 
-            if (locations == null)
-                throw new IllegalArgumentException();
+        if (locations == null)
+            throw new IllegalArgumentException();
 
-            if (locations.size() == 0)
-                throw new IllegalArgumentException();
+        if (locations.size() == 0)
+            throw new IllegalArgumentException();
 
-            if (!canAddQueueItem(player))
-                return false;
+        if (!canAddQueueItem(player))
+            return false;
 
-            sourceLocation = locations.get(new Random().nextInt(locations.size()));
-        }
+        sourceLocation = locations.get(new Random().nextInt(locations.size()));
 
         // Get island center y. Center block will be in the middle the first block
         // that is not burnable

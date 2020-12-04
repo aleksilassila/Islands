@@ -121,21 +121,24 @@ public class Islands extends JavaPlugin {
 
     @Nullable
     public String createNewIsland(Biome biome, int islandSize, Player player) throws IllegalArgumentException {
+        // If random biome
+        biome = Optional.ofNullable(biome).orElse(Biomes.getRandomBiome());
+
         Shape shape = definedIslandShapes.getOrDefault(islandSize, null) != null
                 ? definedIslandShapes.get(islandSize).get(new Random().nextInt(definedIslandShapes.get(islandSize).size()))
                 : null;
+
+        if (getConfig().contains("excludeShapes", true)
+                && getConfig().getStringList("excludeShapes").contains(biome.name())) {
+            shape = null;
+        }
 
         int height = shape != null
                 ? shape.getHeight() + islandSize / 2
                 : islandSize;
 
-        boolean random = biome == null;
-
-        if (biome == null) {
-            biome = Biomes.INSTANCE.getRandomBiome(islandSize);
-        }
-
         String islandId = IslandsConfig.createIsland(player.getUniqueId(), islandSize, height, biome);
+
         try {
             boolean success = IslandGeneration.INSTANCE.copyIsland(
                     player,
@@ -148,8 +151,7 @@ public class Islands extends JavaPlugin {
                     ),
                     false,
                     islandId,
-                    shape,
-                    random
+                    shape
             );
 
             if (!success) {
@@ -166,19 +168,21 @@ public class Islands extends JavaPlugin {
     }
 
     public boolean recreateIsland(String islandId, Biome biome, int islandSize, Player player) throws IllegalArgumentException {
+        // If random biome
+        biome = Optional.ofNullable(biome).orElse(Biomes.getRandomBiome());
+
         Shape shape = definedIslandShapes.getOrDefault(islandSize, null) != null
                 ? definedIslandShapes.get(islandSize).get(new Random().nextInt(definedIslandShapes.get(islandSize).size()))
                 : null;
 
+        if (getConfig().contains("excludeShapes", true)
+                && getConfig().getStringList("excludeShapes").contains(biome.name())) {
+            shape = null;
+        }
+
         int height = shape != null
                 ? shape.getHeight() + islandSize / 2
                 : islandSize;
-
-        boolean random = biome == null;
-
-        if (biome == null) {
-            biome = Biomes.INSTANCE.getRandomBiome(islandSize);
-        }
 
         IslandsConfig.updateIsland(islandId, islandSize, height, biome);
 
@@ -194,8 +198,7 @@ public class Islands extends JavaPlugin {
                     ),
                     true,
                     islandId,
-                    shape,
-                    random
+                    shape
             );
         } catch (IllegalArgumentException e) {
             throw new IllegalArgumentException();
@@ -427,7 +430,7 @@ public class Islands extends JavaPlugin {
 
     private boolean validateSection(String defaultKey) {
         List<String> DONT_VALIDATE = new ArrayList<>(Arrays.asList(
-                "biomeBlacklist", "illegalIslandNames", "replaceOnGeneration", "groupLimits"));
+                "biomeBlacklist", "excludeShapes", "illegalIslandNames", "replaceOnGeneration", "groupLimits"));
         List<String> SOFT_VALIDATE = new ArrayList<>(Arrays.asList("islandSizes", "islandPrices"));
 
         ConfigurationSection section = getConfig().getConfigurationSection(defaultKey);

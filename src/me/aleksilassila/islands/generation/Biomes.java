@@ -188,34 +188,17 @@ public enum Biomes {
         return true;
     }
 
-    public Biome getRandomBiome(int islandSize) {
-        while (true) {
-            int x = (int) (Math.random() * biomeSearchSize);
-            int z = (int) (Math.random() * biomeSearchSize);
-            int y = Islands.islandsWorld.getHighestBlockYAt(x, z);
+    public static Biome getRandomBiome() {
+        int size = INSTANCE.availableLocations.keySet().size();
+        int item = new Random().nextInt(size);
+        int i = 0;
 
-            Biome biome = Islands.islandsSourceWorld.getBiome(x, y, z);
-
-            if (isBlacklisted(biome))
-                continue;
-
-            randomLocations.put(biome, new Location(Islands.islandsSourceWorld,
-                    x - islandSize / 2.0,
-                    y,
-                    z - islandSize / 2.0));
-
-            return biome;
+        for (Biome biome : INSTANCE.availableLocations.keySet()) {
+            if (i == item) return biome;
+            i++;
         }
-    }
 
-    public Location getRandomLocation(Biome biome, int islandSize) {
-        int x = (int) (Math.random() * biomeSearchSize);
-        int z = (int) (Math.random() * biomeSearchSize);
-        int y = Islands.islandsWorld.getHighestBlockYAt(x, z);
-
-        return randomLocations.getOrDefault(biome, new Location(Islands.islandsSourceWorld,
-                x - islandSize / 2.0,
-                y,
-                z - islandSize / 2.0));
+        // To make it always return biome (never gets here)
+        return new ArrayList<>(INSTANCE.availableLocations.keySet()).get(0);
     }
 }
