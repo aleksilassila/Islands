@@ -1,7 +1,7 @@
 package me.aleksilassila.islands.GUIs;
 
-import com.github.stefvanschie.inventoryframework.gui.GuiItem;
-import com.github.stefvanschie.inventoryframework.gui.type.ChestGui;
+import com.github.stefvanschie.inventoryframework.Gui;
+import com.github.stefvanschie.inventoryframework.GuiItem;
 import com.github.stefvanschie.inventoryframework.pane.StaticPane;
 import me.aleksilassila.islands.Islands;
 import me.aleksilassila.islands.generation.Biomes;
@@ -43,7 +43,7 @@ public class CreateGUI extends PageGUI {
     }
 
     @Override
-    public ChestGui getMainGui() {
+    public Gui getMainGui() {
         return createPaginatedGUI(PAGE_HEIGHT, Messages.get("gui.create.TITLE"), availableIslandPanes());
     }
 
@@ -103,8 +103,8 @@ public class CreateGUI extends PageGUI {
         return panes;
     }
 
-    private ChestGui getSizeGui(Biome biome) {
-        ChestGui gui = createPaginatedGUI(2, Messages.get("gui.create.SIZE_TITLE"), availableSizePanes("island " + subcommand + " " + (biome == null ? "RANDOM" : biome.name())));
+    private Gui getSizeGui(Biome biome) {
+        Gui gui = createPaginatedGUI(2, Messages.get("gui.create.SIZE_TITLE"), availableSizePanes("island " + subcommand + " " + (biome == null ? "RANDOM" : biome.name())));
         gui.setOnTopClick(inventoryClickEvent -> inventoryClickEvent.setCancelled(true));
 
         if (plugin.econ != null) {

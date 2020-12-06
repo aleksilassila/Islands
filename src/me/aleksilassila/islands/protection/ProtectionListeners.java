@@ -7,6 +7,7 @@ import me.aleksilassila.islands.utils.Permissions;
 import org.bukkit.Material;
 import org.bukkit.Tag;
 import org.bukkit.block.Block;
+import org.bukkit.entity.Arrow;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -14,6 +15,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.event.entity.EntityChangeBlockEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.player.*;
 import org.bukkit.event.vehicle.VehicleDestroyEvent;
@@ -25,22 +27,22 @@ public class ProtectionListeners implements Listener {
 
     @EventHandler
     private void onEntityDamageEvent(EntityDamageByEntityEvent event) {
-        if (event.isCancelled()) return;
-        if (event.getEntity().getWorld().equals(Islands.islandsWorld) && event.getDamager() instanceof Player) {
-            if (event.getDamager().hasPermission(Permissions.bypass.interactEverywhere)) return;
+        if (event.isCancelled() || !event.getEntity().getWorld().equals(Islands.islandsWorld)) return;
 
-            int x = event.getEntity().getLocation().getBlockX();
-            int z = event.getEntity().getLocation().getBlockZ();
+        Player player;
 
-            String ownerUUID = IslandsConfig.getBlockOwnerUUID(x, z, event.getDamager().hasPermission(Permissions.bypass.interactInPlot));
-            if (ownerUUID != null && !ownerUUID.equals(event.getDamager().getUniqueId().toString())) {
-                if (new ProtectedBlock(x, z).canDoAnything(event.getDamager().getUniqueId().toString())) {
-                    return;
-                }
+        if (event.getDamager() instanceof Player) player = (Player) event.getDamager();
+        else if (event.getDamager() instanceof Arrow) {
+            Arrow arrow = (Arrow) event.getDamager();
 
-                event.setCancelled(true);
-                event.getDamager().sendMessage(Messages.get("error.NOT_TRUSTED"));
-            }
+            if (arrow.getShooter() instanceof Player) player = (Player) arrow.getShooter();
+            else return;
+        } else return;
+
+        if (!canBuild(player, event.getEntity().getLocation().getBlockX(),
+                event.getEntity().getLocation().getBlockZ())) {
+            event.setCancelled(true);
+            player.sendMessage(Messages.get("error.NOT_TRUSTED"));
         }
     }
 
@@ -85,15 +87,8 @@ public class ProtectionListeners implements Listener {
     private void onPlayerBucketEvent(PlayerBucketEvent event) {
         if (event.isCancelled()) return;
         if (event.getPlayer().getWorld().equals(Islands.islandsWorld)) {
-            if (event.getPlayer().hasPermission(Permissions.bypass.interactEverywhere)) return;
-
-            int x = event.getBlock().getLocation().getBlockX();
-            int z = event.getBlock().getLocation().getBlockZ();
-
-            String ownerUUID = IslandsConfig.getBlockOwnerUUID(x, z, event.getPlayer().hasPermission(Permissions.bypass.interactInPlot));
-            if (ownerUUID != null && !ownerUUID.equals(event.getPlayer().getUniqueId().toString())) {
-                if (new ProtectedBlock(x, z).canDoAnything(event.getPlayer().getUniqueId().toString())) return;
-
+            if (!canBuild(event.getPlayer(), event.getBlock().getLocation().getBlockX(),
+                    event.getBlock().getLocation().getBlockZ())) {
                 event.setCancelled(true);
                 event.getPlayer().sendMessage(Messages.get("error.NOT_TRUSTED"));
             }
@@ -134,7 +129,8 @@ public class ProtectionListeners implements Listener {
         // These need permission to do anything
         if (clickedBlock.getType() == Material.TNT ||
                 Tag.RAILS.isTagged(clickedBlock.getType()) ||
-                (event.getItem() != null && event.getItem().getType() == Material.BONE_MEAL)) {
+                (event.getItem() != null && event.getItem().getType() == Material.BONE_MEAL) ||
+                (event.getItem() != null && event.getItem().getType() == Material.ARMOR_STAND)) {
             event.setCancelled(true);
             Messages.send(event.getPlayer(), "error.NOT_TRUSTED");
             return;
@@ -241,24 +237,46 @@ public class ProtectionListeners implements Listener {
 
     // MINECARTS
     @EventHandler
-    private void on(VehicleDestroyEvent event) {
+    private void onVehicleDestroy(VehicleDestroyEvent event) {
         if (event.isCancelled()) return;
         if (!(event.getAttacker() instanceof Player)) return;
 
         Player player = (Player) event.getAttacker();
-        if (player.getWorld().equals(Islands.islandsWorld)) {
-            if (player.hasPermission(Permissions.bypass.interactEverywhere)) return;
-
-            int x = event.getVehicle().getLocation().getBlockX();
-            int z = event.getVehicle().getLocation().getBlockZ();
-
-            String ownerUUID = IslandsConfig.getBlockOwnerUUID(x, z, player.hasPermission(Permissions.bypass.interactInPlot));
-            if (ownerUUID != null && !ownerUUID.equals(player.getUniqueId().toString())) {
-                if (new ProtectedBlock(x, z).canDoAnything(player.getUniqueId().toString())) return;
+        if (event.getVehicle().getWorld().equals(Islands.islandsWorld)) {
+            if (!canBuild(player, event.getVehicle().getLocation().getBlockX(),
+                    event.getVehicle().getLocation().getBlockZ())) {
 
                 event.setCancelled(true);
                 player.sendMessage(Messages.get("error.NOT_TRUSTED"));
             }
         }
+    }
+
+    // ARROWS AND TNT IGNITION
+    @EventHandler
+    private void onEntityChangeBlock(EntityChangeBlockEvent event) {
+        if (event.isCancelled() || !Islands.islandsWorld.equals(event.getBlock().getWorld())) return;
+
+        if (event.getEntity() instanceof Arrow &&
+                event.getBlock().getType() == Material.TNT) {
+            Arrow arrow = (Arrow) event.getEntity();
+            if (arrow.getShooter() instanceof Player) {
+                Player owner = (Player) arrow.getShooter();
+
+                if (!canBuild(owner, event.getBlock().getX(), event.getBlock().getZ())) event.setCancelled(true);
+            }
+        }
+    }
+
+    public boolean canBuild(Player player, int x, int z) {
+        if (player.hasPermission(Permissions.bypass.interactEverywhere)) return true;
+
+        String ownerUUID = IslandsConfig.getBlockOwnerUUID(x, z, player.hasPermission(Permissions.bypass.interactInPlot));
+        if (ownerUUID == null) return false;
+        if (!ownerUUID.equals(player.getUniqueId().toString())) {
+            return new ProtectedBlock(x, z).canDoAnything(player.getUniqueId().toString());
+        }
+
+        return true;
     }
 }

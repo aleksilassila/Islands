@@ -1,7 +1,7 @@
 package me.aleksilassila.islands.GUIs;
 
-import com.github.stefvanschie.inventoryframework.gui.GuiItem;
-import com.github.stefvanschie.inventoryframework.gui.type.ChestGui;
+import com.github.stefvanschie.inventoryframework.Gui;
+import com.github.stefvanschie.inventoryframework.GuiItem;
 import com.github.stefvanschie.inventoryframework.pane.OutlinePane;
 import com.github.stefvanschie.inventoryframework.pane.PaginatedPane;
 import com.github.stefvanschie.inventoryframework.pane.Pane;
@@ -14,8 +14,8 @@ import org.bukkit.entity.Player;
 import java.util.List;
 
 public abstract class PageGUI extends GUI {
-    protected ChestGui createPaginatedGUI(int pageHeight, String title, List<StaticPane> pages) {
-        ChestGui gui = new ChestGui(pageHeight, title);
+    protected Gui createPaginatedGUI(int pageHeight, String title, List<StaticPane> pages) {
+        Gui gui = new Gui(pageHeight, title);
         gui.setOnTopClick(event -> event.setCancelled(true));
 
         PaginatedPane pane = new PaginatedPane(0, 0, 9, pageHeight - 1);
@@ -72,7 +72,7 @@ public abstract class PageGUI extends GUI {
         return gui;
     }
 
-    protected ChestGui addMainMenuButton(ChestGui gui) {
+    protected Gui addMainMenuButton(Gui gui) {
         StaticPane pane = new StaticPane(4, gui.getRows() - 1, 1, 1);
 
         pane.addItem(new GuiItem(createGuiItem(Material.BARRIER,

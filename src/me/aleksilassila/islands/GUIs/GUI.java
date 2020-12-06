@@ -1,7 +1,7 @@
 package me.aleksilassila.islands.GUIs;
 
-import com.github.stefvanschie.inventoryframework.gui.GuiItem;
-import com.github.stefvanschie.inventoryframework.gui.type.ChestGui;
+import com.github.stefvanschie.inventoryframework.Gui;
+import com.github.stefvanschie.inventoryframework.GuiItem;
 import com.github.stefvanschie.inventoryframework.pane.OutlinePane;
 import com.github.stefvanschie.inventoryframework.pane.Pane;
 import org.bukkit.ChatColor;
@@ -17,7 +17,7 @@ import java.util.Arrays;
 import java.util.List;
 
 public abstract class GUI {
-    public abstract ChestGui getMainGui();
+    public abstract Gui getMainGui();
     public abstract Player getPlayer();
 
     public void open() {
@@ -47,7 +47,7 @@ public abstract class GUI {
         return item;
     }
 
-    protected void addBackground(ChestGui gui, Material material) {
+    protected void addBackground(Gui gui, Material material) {
         OutlinePane background = new OutlinePane(0, 0, 9, gui.getRows(), Pane.Priority.LOWEST);
         background.addItem(new GuiItem(createGuiItem(material, "" + ChatColor.RESET, false)));
         background.setRepeat(true);
