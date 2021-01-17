@@ -1,7 +1,7 @@
 package me.aleksilassila.islands.GUIs;
 
-import com.github.stefvanschie.inventoryframework.Gui;
-import com.github.stefvanschie.inventoryframework.GuiItem;
+import com.github.stefvanschie.inventoryframework.gui.GuiItem;
+import com.github.stefvanschie.inventoryframework.gui.type.ChestGui;
 import com.github.stefvanschie.inventoryframework.pane.StaticPane;
 import me.aleksilassila.islands.IslandsConfig;
 import me.aleksilassila.islands.utils.BiomeMaterials;
@@ -26,8 +26,8 @@ public class AdminGUI extends PageGUI {
     }
 
     @Override
-    public Gui getMainGui() {
-        Gui gui = new Gui(3, Messages.get("gui.admin.TITLE"));
+    public ChestGui getMainGui() {
+        ChestGui gui = new ChestGui(3, Messages.get("gui.admin.TITLE"));
         gui.setOnTopClick(inventoryClickEvent -> inventoryClickEvent.setCancelled(true));
 
         addBackground(gui, Material.GRAY_STAINED_GLASS_PANE);
@@ -171,7 +171,7 @@ public class AdminGUI extends PageGUI {
 
         if (pane.getItems().size() > 0) pages.add(pane);
 
-        Gui gui = createPaginatedGUI(PAGE_HEIGHT, Messages.get("gui.admin.PLAYER_TITLE", displayName), pages);
+        ChestGui gui = createPaginatedGUI(PAGE_HEIGHT, Messages.get("gui.admin.PLAYER_TITLE", displayName), pages);
 
         StaticPane back = new StaticPane(4, gui.getRows() - 1, 1, 1);
 

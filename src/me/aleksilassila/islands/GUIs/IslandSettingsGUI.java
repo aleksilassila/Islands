@@ -1,7 +1,7 @@
 package me.aleksilassila.islands.GUIs;
 
-import com.github.stefvanschie.inventoryframework.Gui;
-import com.github.stefvanschie.inventoryframework.GuiItem;
+import com.github.stefvanschie.inventoryframework.gui.GuiItem;
+import com.github.stefvanschie.inventoryframework.gui.type.ChestGui;
 import com.github.stefvanschie.inventoryframework.pane.StaticPane;
 import me.aleksilassila.islands.IslandsConfig;
 import me.aleksilassila.islands.utils.Messages;
@@ -33,8 +33,8 @@ public class IslandSettingsGUI extends PageGUI {
     }
 
     @Override
-    public Gui getMainGui() {
-        Gui gui = new Gui(3, Messages.get("gui.trust.TITLE"));
+    public ChestGui getMainGui() {
+        ChestGui gui = new ChestGui(3, Messages.get("gui.trust.TITLE"));
         gui.setOnTopClick(inventoryClickEvent -> inventoryClickEvent.setCancelled(true));
 
         addBackground(gui, Material.GRAY_STAINED_GLASS_PANE);
@@ -112,7 +112,7 @@ public class IslandSettingsGUI extends PageGUI {
     public void showPlayerMenu(OfflinePlayer offlinePlayer) {
         String uuid = offlinePlayer.getUniqueId().toString();
 
-        Gui gui = new Gui(4, Messages.get("gui.trust.player.TITLE", offlinePlayer.getName()));
+        ChestGui gui = new ChestGui(4, Messages.get("gui.trust.player.TITLE", offlinePlayer.getName()));
         gui.setOnTopClick(inventoryClickEvent -> inventoryClickEvent.setCancelled(true));
 
         addBackground(gui, Material.GRAY_STAINED_GLASS_PANE);
@@ -190,7 +190,7 @@ public class IslandSettingsGUI extends PageGUI {
     }
 
     public void showIslandProtectionMenu() {
-        Gui gui = new Gui(4, Messages.get("gui.trust.global.TITLE"));
+        ChestGui gui = new ChestGui(4, Messages.get("gui.trust.global.TITLE"));
         gui.setOnTopClick(inventoryClickEvent -> inventoryClickEvent.setCancelled(true));
 
         addBackground(gui, Material.GRAY_STAINED_GLASS_PANE);

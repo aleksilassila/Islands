@@ -1,7 +1,7 @@
 package me.aleksilassila.islands.GUIs;
 
-import com.github.stefvanschie.inventoryframework.Gui;
-import com.github.stefvanschie.inventoryframework.GuiItem;
+import com.github.stefvanschie.inventoryframework.gui.GuiItem;
+import com.github.stefvanschie.inventoryframework.gui.type.ChestGui;
 import com.github.stefvanschie.inventoryframework.pane.StaticPane;
 import me.aleksilassila.islands.IslandsConfig;
 import me.aleksilassila.islands.utils.BiomeMaterials;
@@ -24,8 +24,8 @@ public class VisitGUI extends PageGUI {
     }
 
     @Override
-    public Gui getMainGui() {
-        Gui gui = createPaginatedGUI(PAGE_HEIGHT, Messages.get("gui.visit.TITLE"), getPanes());
+    public ChestGui getMainGui() {
+        ChestGui gui = createPaginatedGUI(PAGE_HEIGHT, Messages.get("gui.visit.TITLE"), getPanes());
 
         StaticPane sort = new StaticPane(4, PAGE_HEIGHT - 1, 1, 1);
 
