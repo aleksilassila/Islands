@@ -7,7 +7,7 @@ that can be reset often without losing players' progress.
 This plugin is designed to function as your server's core plugin:
 For example it handles protection, homes, teleports / warps and has economy integration with handy GUIs for performing tasks.
 
-If you want to experience the plugin in game, you can hop on blucraft.mc.gg! (1.16.3)
+If you want to experience the plugin in game and have an awesome gaming experience, you can hop on crackcraftsmp.apexmc.co! (1.16.4)
 
 ## Features
 "Okay cool, islands. What's the point?" Here are some problems that this plugin solves.
