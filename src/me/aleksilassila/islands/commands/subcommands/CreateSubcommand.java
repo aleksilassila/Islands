@@ -32,7 +32,7 @@ public class CreateSubcommand extends AbstractCreateSubcommands {
 
         HashMap<Biome, List<Location>> availableLocations = Biomes.INSTANCE.availableLocations;
 
-        int previousIslands = IslandsConfig.getIslandIds(player.getUniqueId()).size();
+        int previousIslands = IslandsConfig.getOwnedIslands(player.getUniqueId()).size();
 
         int islandsLimit = plugin.getConfig().getInt("defaultIslandLimit", -1);
 

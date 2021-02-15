@@ -42,20 +42,20 @@ public class Listeners extends ChatUtils implements Listener {
     @EventHandler(priority = EventPriority.LOWEST)
     public void onPlayerJoin(PlayerJoinEvent event) {
         if (!event.getPlayer().hasPlayedBefore()) {
-            String spawnIsland = IslandsConfig.getSpawnIsland();
-
-            if (spawnIsland != null) {
-                event.getPlayer().teleport(IslandsConfig.getIslandSpawn(spawnIsland));
+            if (IslandsConfig.spawnIsland != null) {
+                Location l = IslandsConfig.getIslandSpawn(IslandsConfig.spawnIsland);
+                if (l != null)
+                    event.getPlayer().teleport(l);
             }
         }
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void onPlayerRespawn(PlayerRespawnEvent event) {
-        String spawnIsland = IslandsConfig.getSpawnIsland();
-
-        if (spawnIsland != null) {
-            event.setRespawnLocation(IslandsConfig.getIslandSpawn(spawnIsland));
+        if (IslandsConfig.spawnIsland != null) {
+            Location l = IslandsConfig.getIslandSpawn(IslandsConfig.spawnIsland);
+            if (l != null)
+                event.setRespawnLocation(l);
         }
     }
 

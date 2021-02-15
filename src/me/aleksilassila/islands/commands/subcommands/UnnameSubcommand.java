@@ -8,20 +8,19 @@ import org.bukkit.entity.Player;
 
 public class UnnameSubcommand extends AbstractIslandsWorldSubcommand {
     @Override
-    protected void runCommand(Player player, String[] args, boolean confirmed, String islandId) {
+    protected void runCommand(Player player, String[] args, boolean confirmed, IslandsConfig.Entry island) {
         if (args.length != 0) {
             Messages.send(player, "usage.UNNAME");
             return;
         }
 
-        if (!IslandsConfig.getConfig().contains(islandId + ".home")
-                || !IslandsConfig.getConfig().contains(islandId + ".UUID")) {
+        if (island.uuid == null) {
             player.sendMessage(Messages.get("error.ISLAND_NO_OWNER"));
             return;
         }
 
-        if (ownsIsland(player, islandId) || player.hasPermission(Permissions.bypass.unname)) {
-            IslandsConfig.unnameIsland(islandId);
+        if (player.getUniqueId().equals(island.uuid) || player.hasPermission(Permissions.bypass.unname)) {
+            island.unnameIsland();
             Messages.send(player, "success.UNNAMED");
         } else {
             player.sendMessage(Messages.get("error.UNAUTHORIZED"));

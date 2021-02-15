@@ -7,8 +7,8 @@ import me.aleksilassila.islands.commands.IslandCommands;
 import me.aleksilassila.islands.generation.Biomes;
 import me.aleksilassila.islands.generation.IslandGeneration;
 import me.aleksilassila.islands.generation.Shape;
-import me.aleksilassila.islands.protection.ProtectionListeners;
 import me.aleksilassila.islands.utils.*;
+import me.ryanhamshire.GriefPrevention.GriefPrevention;
 import net.milkbowl.vault.economy.Economy;
 import net.milkbowl.vault.permission.Permission;
 import org.bukkit.*;
@@ -36,6 +36,8 @@ public class Islands extends JavaPlugin {
     public static World islandsSourceWorld;
     public static World wildernessWorld;
 
+    public static GriefPrevention gp;
+
     private FileConfiguration biomesCache;
     private File biomesCacheFile;
 
@@ -54,6 +56,13 @@ public class Islands extends JavaPlugin {
     @Override
     public void onEnable() {
         instance = this;
+
+        if (Bukkit.getPluginManager().getPlugin("GriefPrevention") == null) {
+            getLogger().severe("WE HAVE NO GP INSTALLED");
+            return;
+        } else {
+            gp = (GriefPrevention) Bukkit.getPluginManager().getPlugin("GriefPrevention");
+        }
 
         if (!setupEconomy()) {
             getLogger().severe("No Vault or economy plugin found. Economy disabled.");
@@ -111,12 +120,20 @@ public class Islands extends JavaPlugin {
         new IslandCommands();
 
         new Listeners();
-        new ProtectionListeners();
 
         int pluginId = 8974;
         new Metrics(this, pluginId);
 
         getLogger().info("Islands enabled!");
+
+        // Save island configuration every 5 minutes
+        Bukkit.getScheduler().scheduleSyncRepeatingTask(this, IslandsConfig::updateEntries, 20 * 60 * 5, 20 * 60 * 5);
+    }
+
+    @Override
+    public void onDisable() {
+        IslandsConfig.updateEntries();
+        super.onDisable();
     }
 
     @Nullable
@@ -137,7 +154,7 @@ public class Islands extends JavaPlugin {
                 ? shape.getHeight() + islandSize / 2
                 : islandSize;
 
-        String islandId = IslandsConfig.createIsland(player.getUniqueId(), islandSize, height, biome);
+        IslandsConfig.Entry island = IslandsConfig.createIsland(player.getUniqueId(), islandSize, height, biome);
 
         try {
             boolean success = IslandGeneration.INSTANCE.copyIsland(
@@ -145,29 +162,29 @@ public class Islands extends JavaPlugin {
                     biome,
                     islandSize,
                     new Vector(
-                            IslandsConfig.getConfig().getInt(islandId + ".x"),
-                            IslandsConfig.getConfig().getInt(islandId + ".y"),
-                            IslandsConfig.getConfig().getInt(islandId + ".z")
+                            IslandsConfig.getConfig().getInt(island.islandId + ".x"),
+                            IslandsConfig.getConfig().getInt(island.islandId + ".y"),
+                            IslandsConfig.getConfig().getInt(island.islandId + ".z")
                     ),
                     false,
-                    islandId,
+                    island.islandId,
                     shape
             );
 
             if (!success) {
-                IslandsConfig.deleteIsland(islandId);
+                island.delete();
                 return null;
             }
 
-            return islandId;
+            return island.islandId;
         } catch (IllegalArgumentException e) {
-            IslandsConfig.deleteIsland(islandId);
+            island.delete();
             throw new IllegalArgumentException();
         }
 
     }
 
-    public boolean recreateIsland(String islandId, Biome biome, int islandSize, Player player) throws IllegalArgumentException {
+    public boolean recreateIsland(IslandsConfig.Entry island, Biome biome, int islandSize, Player player) throws IllegalArgumentException {
         // If random biome
         biome = Optional.ofNullable(biome).orElse(Biomes.getRandomBiome());
 
@@ -184,7 +201,10 @@ public class Islands extends JavaPlugin {
                 ? shape.getHeight() + islandSize / 2
                 : islandSize;
 
-        IslandsConfig.updateIsland(islandId, islandSize, height, biome);
+        island.size = islandSize;
+        island.height = height;
+        island.biome = biome;
+        island.shouldUpdate = true;
 
         try {
             return IslandGeneration.INSTANCE.copyIsland(
@@ -192,12 +212,12 @@ public class Islands extends JavaPlugin {
                     biome,
                     islandSize,
                     new Vector(
-                            IslandsConfig.getConfig().getInt(islandId + ".x"),
-                            IslandsConfig.getConfig().getInt(islandId + ".y"),
-                            IslandsConfig.getConfig().getInt(islandId + ".z")
+                            IslandsConfig.getConfig().getInt(island.islandId + ".x"),
+                            IslandsConfig.getConfig().getInt(island.islandId + ".y"),
+                            IslandsConfig.getConfig().getInt(island.islandId + ".z")
                     ),
                     true,
-                    islandId,
+                    island.islandId,
                     shape
             );
         } catch (IllegalArgumentException e) {

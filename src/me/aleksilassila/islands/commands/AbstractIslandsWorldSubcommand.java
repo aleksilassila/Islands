@@ -9,11 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public abstract class AbstractIslandsWorldSubcommand extends Subcommand {
-    protected abstract void runCommand(Player player, String[] args, boolean confirmed, String islandId);
-
-    protected boolean ownsIsland(Player player, String islandId) {
-        return IslandsConfig.getUUID(islandId).equals(player.getUniqueId().toString());
-    }
+    protected abstract void runCommand(Player player, String[] args, boolean confirmed, IslandsConfig.Entry island);
 
     @Override
     public void onCommand(Player player, String[] args, boolean confirmed) {
@@ -22,14 +18,14 @@ public abstract class AbstractIslandsWorldSubcommand extends Subcommand {
             return;
         }
 
-        String islandId = IslandsConfig.getIslandId(player.getLocation().getBlockX(), player.getLocation().getBlockZ());
+        IslandsConfig.Entry island = IslandsConfig.getEntry(player.getLocation().getBlockX(), player.getLocation().getBlockZ(), true);
 
-        if (islandId == null) {
+        if (island == null) {
             Messages.send(player, "error.NOT_ON_ISLAND");
             return;
         }
 
-        runCommand(player, args, confirmed, islandId);
+        runCommand(player, args, confirmed, island);
     }
 
     @Override

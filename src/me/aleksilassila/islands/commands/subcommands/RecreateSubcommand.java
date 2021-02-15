@@ -16,37 +16,37 @@ public class RecreateSubcommand extends AbstractCreateSubcommands {
 
     @Override
     protected void openGui(Player player) {
-        String islandId = getIslandId(player);
-        if (islandId == null) return;
+        IslandsConfig.Entry island = getIslandId(player);
+        if (island == null) return;
 
         CreateGUI gui = new CreateGUI(plugin, player, "recreate");
 
         if (plugin.econ != null && plugin.getConfig().getBoolean("economy.recreateSum")) {
-            double oldCost = plugin.islandPrices.getOrDefault(IslandsConfig.getConfig().getInt(islandId + ".size"), 0.0);
+            double oldCost = plugin.islandPrices.getOrDefault(island.size, 0.0);
             gui.setOldCost(oldCost);
         }
 
         gui.open();
     }
 
-    private String getIslandId(Player player) {
+    private IslandsConfig.Entry getIslandId(Player player) {
         if (!player.getWorld().equals(Islands.islandsWorld)) {
             player.sendMessage(Messages.get("error.WRONG_WORLD"));
             return null;
         }
 
-        String islandId = IslandsConfig.getIslandId(player.getLocation().getBlockX(), player.getLocation().getBlockZ());
+        IslandsConfig.Entry island = IslandsConfig.getEntry(player.getLocation().getBlockX(), player.getLocation().getBlockZ(), true);
 
-        if (islandId == null) {
+        if (island.islandId == null) {
             player.sendMessage(Messages.get("error.NOT_ON_ISLAND"));
             return null;
-        } else if (!IslandsConfig.getUUID(islandId).equals(player.getUniqueId().toString())
+        } else if (!player.getUniqueId().equals(island.uuid)
                 && !player.hasPermission(Permissions.bypass.recreate)) {
             player.sendMessage(Messages.get("error.UNAUTHORIZED"));
             return null;
         }
 
-        return islandId;
+        return island;
     }
 
     @Override
@@ -56,8 +56,8 @@ public class RecreateSubcommand extends AbstractCreateSubcommands {
             return;
         }
 
-        String islandId = getIslandId(player);
-        if (islandId == null) return;
+        IslandsConfig.Entry island = getIslandId(player);
+        if (island == null) return;
 
         double cost = 0.0;
 
@@ -66,7 +66,7 @@ public class RecreateSubcommand extends AbstractCreateSubcommands {
             cost += plugin.getConfig().getDouble("economy.recreateCost");
 
             if (plugin.getConfig().getBoolean("economy.recreateSum")) {
-                double oldCost = plugin.islandPrices.getOrDefault(IslandsConfig.getConfig().getInt(islandId + ".size"), 0.0);
+                double oldCost = plugin.islandPrices.getOrDefault(island.size, 0.0);
 
                 cost = Math.max(cost - oldCost, 0);
             }
@@ -102,7 +102,7 @@ public class RecreateSubcommand extends AbstractCreateSubcommands {
         }
 
         try {
-            boolean success = plugin.recreateIsland(islandId, targetBiome, islandSize, player);
+            boolean success = plugin.recreateIsland(island, targetBiome, islandSize, player);
 
             if (!success) {
                 player.sendMessage(Messages.get("error.ONGOING_QUEUE_EVENT"));

@@ -4,6 +4,8 @@ import com.sun.istack.internal.NotNull;
 import com.sun.istack.internal.Nullable;
 import me.aleksilassila.islands.generation.IslandGeneration;
 import me.aleksilassila.islands.utils.BiomeMaterials;
+import me.ryanhamshire.GriefPrevention.CreateClaimResult;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.block.Biome;
@@ -20,6 +22,9 @@ public enum IslandsConfig {
 
     public final int islandSpacing;
     public final int verticalSpacing;
+
+    public static final HashMap<String, Entry> entries = loadEntries();
+    public static String spawnIsland;
 
     private static FileConfiguration config;
     private static File configFile;
@@ -56,10 +61,52 @@ public enum IslandsConfig {
         }
     }
 
-    public static String createIsland(UUID uuid, int islandSize, int height, Biome biome) {
+    public static HashMap<String, Entry> loadEntries() {
+        HashMap<String, Entry> entries = new HashMap<>();
+        for (String islandId : getConfig().getKeys(false)) {
+            Entry e = new Entry(islandId);
+            entries.put(islandId, e);
+            if (e.isSpawn) spawnIsland = islandId;
+        }
+
+        return entries;
+    }
+
+    public static void updateEntries() {
+        for (String islandId : entries.keySet()) {
+            Entry e = entries.get(islandId);
+            if (e.shouldUpdate) {
+                e.writeToConfig();
+                e.shouldUpdate = false;
+            }
+        }
+
+        saveIslandsConfig();
+    }
+
+    @Nullable
+    public static Entry getEntry(int x, int z, boolean useRawCoordinates) {
+        if (!useRawCoordinates) return getEntry(x, z);
+
+        int xIndex = x / INSTANCE.islandSpacing;
+        int zIndex = z / INSTANCE.islandSpacing;
+
+        return getEntry(xIndex, zIndex);
+    }
+
+    @Nullable
+    public static Entry getEntry(int xIndex, int zIndex) {
+        for (Entry e : entries.values()) {
+            if (e.xIndex == xIndex && e.zIndex == zIndex) return e;
+        }
+
+        return null;
+    }
+
+    public static Entry createIsland(UUID uuid, int islandSize, int height, Biome biome) {
         int index = 0;
 
-        Set<String> islands = getConfig().getKeys(false);
+        Set<String> islands = entries.keySet();
 
         while (true) {
             int[] pos = placement.getIslandPos(index);
@@ -73,48 +120,20 @@ public enum IslandsConfig {
     }
 
     @NotNull
-    private static String addIsland(int xIndex, int zIndex, int islandSize, int height, UUID uuid, String name, Biome biome) {
-        int realX = xIndex * INSTANCE.islandSpacing + INSTANCE.islandSpacing / 2 - islandSize / 2;
-        int realY = getIslandY(xIndex, zIndex);
-        int realZ = zIndex * INSTANCE.islandSpacing + INSTANCE.islandSpacing / 2 - islandSize / 2;
-
-        int home = getNewHomeId(uuid);
-
+    private static Entry addIsland(int xIndex, int zIndex, int islandSize, int height, UUID uuid, String name, Biome biome) {
         String islandId = posToIslandId(xIndex, zIndex);
-
-        getConfig().set(islandId + ".xIndex", xIndex);
-        getConfig().set(islandId + ".zIndex", zIndex);
-
-        getConfig().set(islandId + ".x", realX);
-        getConfig().set(islandId + ".y", realY);
-        getConfig().set(islandId + ".z", realZ);
-
-        getConfig().set(islandId + ".spawnPoint.x", realX + islandSize / 2);
-        getConfig().set(islandId + ".spawnPoint.z", realZ + islandSize / 2);
-
-        getConfig().set(islandId + ".UUID", uuid.toString());
-        getConfig().set(islandId + ".name", name);
-        getConfig().set(islandId + ".home", home);
-        getConfig().set(islandId + ".size", islandSize);
-        getConfig().set(islandId + ".height", height);
-        getConfig().set(islandId + ".public", false);
-        getConfig().set(islandId + ".biome", biome.name());
-
-        getConfig().set(islandId + ".protect.building", true);
-        getConfig().set(islandId + ".protect.containers", true);
-        getConfig().set(islandId + ".protect.doors", true);
-        getConfig().set(islandId + ".protect.utility", true);
-
-        saveIslandsConfig();
-
-        return islandId;
+        Entry e = new Entry(xIndex, zIndex, islandSize, height, uuid, name, biome);
+        entries.put(islandId, e);
+        e.writeToConfig();
+        return e;
     }
 
     @Nullable
     public static String getIslandId(int x, int z) {
-        for (String islandId : getConfig().getKeys(false)) {
-            if (x / INSTANCE.islandSpacing == getConfig().getInt(islandId + ".xIndex")) {
-                if (z / INSTANCE.islandSpacing == getConfig().getInt(islandId + ".zIndex")) {
+        for (String islandId : entries.keySet()) {
+            Entry e = entries.get(islandId);
+            if (x / INSTANCE.islandSpacing == e.xIndex) {
+                if (z / INSTANCE.islandSpacing == e.zIndex) {
                     return islandId;
                 }
             }
@@ -124,14 +143,12 @@ public enum IslandsConfig {
     }
 
     @NotNull
-    public static List<String> getIslandIds(UUID uuid) {
+    public static List<String> getOwnedIslands(UUID uuid) {
         List<String> islands = new ArrayList<>();
 
-        for (String islandId : getConfig().getKeys(false)) {
-            String islandUUID = getConfig().getString(islandId + ".UUID");
-
-            if (uuid.toString().equals(islandUUID))
-                islands.add(islandId);
+        for (String islandId : entries.keySet()) {
+            Entry e = entries.get(islandId);
+            if (e.uuid == uuid) islands.add(islandId);
         }
 
         return islands;
@@ -141,21 +158,22 @@ public enum IslandsConfig {
     public static Map<String, Map<String, String>> getIslandsInfo(boolean publicOnly) {
         Map<String, Map<String, String>> islands = new HashMap<>();
 
-        for (String islandId : getConfig().getKeys(false)) {
-            boolean isPublic = getConfig().getBoolean(islandId + ".public");
+        for (String islandId : entries.keySet()) {
+            Entry e = entries.get(islandId);
+            boolean isPublic = e.isPublic;
 
             if (!publicOnly || isPublic) {
-                String name = isPublic ? getConfig().getString(islandId + ".name") : islandId;
-                String ownerUUID = getConfig().getString(islandId + ".UUID");
+                String name = isPublic ? e.name : islandId;
+                String ownerUUID = e.uuid.toString();
 
                 Map<String, String> values = new HashMap<>();
                 values.put("name", name);
                 values.put("owner", ownerUUID);
 
                 try {
-                    String biome = getConfig().getString(islandId + ".biome");
+                    String biome = e.biome.toString();
                     values.put("material", BiomeMaterials.valueOf(biome).name());
-                } catch (Exception e) {
+                } catch (Exception exception) {
                     values.put("material", BiomeMaterials.DEFAULT.name());
                 }
 
@@ -170,38 +188,25 @@ public enum IslandsConfig {
 
     @NotNull
     public static Map<String, Map<String, String>> getIslandsInfo(String uuid) {
-        Map<String, Map<String, String>> islands = new HashMap<>();
+        Map<String, Map<String, String>> islands = getIslandsInfo(false);
+        Map<String, Map<String, String>> finalIslands = new HashMap<>();
 
-        for (String islandId : getConfig().getKeys(false)) {
-            String ownerUUID = getConfig().getString(islandId + ".UUID");
-            if (!uuid.equalsIgnoreCase(ownerUUID)) continue;
-
-            String name = getConfig().getBoolean(islandId + ".public")
-                    ? getConfig().getString(islandId + ".name")
-                    : islandId;
-
-            Map<String, String> values = new HashMap<>();
-            values.put("name", name);
-
-            try {
-                String biome = getConfig().getString(islandId + ".biome");
-                values.put("material", BiomeMaterials.valueOf(biome).name());
-            } catch (Exception e) {
-                values.put("material", BiomeMaterials.DEFAULT.name());
-            }
-
-            islands.put(islandId, values);
+        for (String islandId : entries.keySet()) {
+            Entry e = entries.get(islandId);
+            if (islands.containsKey(islandId) && uuid.equals(e.uuid.toString()))
+                finalIslands.put(islandId, islands.get(islandId));
         }
 
-        return islands;
+        return finalIslands;
     }
 
     @NotNull
     public static Map<String, Integer> getPlayers() {
         Map<String, Integer> players = new HashMap<>();
 
-        for (String islandId : getConfig().getKeys(false)) {
-            String uuid = getConfig().getString(islandId + ".UUID");
+        for (String islandId : entries.keySet()) {
+            Entry e = entries.get(islandId);
+            String uuid = e.uuid.toString();
 
             if (uuid != null) {
                 if (players.containsKey(uuid)) {
@@ -217,8 +222,9 @@ public enum IslandsConfig {
 
     @Nullable
     public static String getIslandByName(String name) {
-        for (String islandId : getConfig().getKeys(false)) {
-            if (name.equalsIgnoreCase(getConfig().getString(islandId + ".name")) && getConfig().getBoolean(islandId + ".public")) {
+        for (String islandId : entries.keySet()) {
+            Entry e = entries.get(islandId);
+            if (name.equalsIgnoreCase(e.name) && e.isPublic) {
                 return islandId;
             }
         }
@@ -228,10 +234,10 @@ public enum IslandsConfig {
 
     @Nullable
     public static String getHomeIsland(UUID uuid, int homeId) {
-        List<String> allIslands = getIslandIds(uuid);
+        List<String> allIslands = getOwnedIslands(uuid);
 
         for (String islandId : allIslands) {
-            if (getConfig().getInt(islandId + ".home", -1) == homeId) {
+            if (entries.get(islandId).homeId == homeId) {
                 return islandId;
             }
         }
@@ -241,12 +247,12 @@ public enum IslandsConfig {
 
     @Nullable
     public static int getLowestHome(UUID uuid) {
-        List<String> allIslands = getIslandIds(uuid);
+        List<String> allIslands = getOwnedIslands(uuid);
 
         int lowestHome = -1;
 
         for (String islandId : allIslands) {
-            int home = getConfig().getInt(islandId + ".home", -1);
+            int home = entries.get(islandId).homeId;
 
             if (home != -1 && (home < lowestHome || lowestHome == -1)) {
                 lowestHome = home;
@@ -258,27 +264,16 @@ public enum IslandsConfig {
 
     @Nullable
     public static Location getIslandSpawn(String islandId) {
-        if (getConfig().getKeys(false).contains(islandId)) {
+        if (entries.containsKey(islandId)) {
             return new Location(
                     Islands.islandsWorld,
-                    getConfig().getInt(islandId + ".spawnPoint.x"),
-                    getConfig().getInt(islandId + ".y") + 100,
-                    getConfig().getInt(islandId + ".spawnPoint.z")
+                    entries.get(islandId).spawnPosition[0],
+                    entries.get(islandId).y + 100,
+                    entries.get(islandId).spawnPosition[1]
             );
         } else {
             return null;
         }
-    }
-
-    @Nullable
-    public static String getSpawnIsland() {
-        for (String islandId : getConfig().getKeys(false)) {
-            if (getConfig().getBoolean(islandId + ".isSpawn")) {
-                return islandId;
-            }
-        }
-
-        return null;
     }
 
     /**
@@ -293,77 +288,39 @@ public enum IslandsConfig {
         int zIndex = z / INSTANCE.islandSpacing;
         int islandLowY = getIslandY(xIndex, zIndex);
 
-        int islandSize = getConfig().getInt(posToIslandId(xIndex, zIndex)  + ".size");
+        Entry e = getEntry(xIndex, zIndex);
+        if (e == null)
+            return false;
 
-        int relativeX = x - (xIndex * INSTANCE.islandSpacing + INSTANCE.islandSpacing / 2 - islandSize / 2);
-        int relativeZ = z - (zIndex * INSTANCE.islandSpacing + INSTANCE.islandSpacing / 2 - islandSize / 2);
+        int relativeX = x - (xIndex * INSTANCE.islandSpacing + INSTANCE.islandSpacing / 2 - e.size / 2);
+        int relativeZ = z - (zIndex * INSTANCE.islandSpacing + INSTANCE.islandSpacing / 2 - e.size / 2);
         int relativeY = y - islandLowY;
 
-        if (relativeY <= islandSize / 2.0) {
-            return IslandGeneration.isBlockInIslandSphere(relativeX, relativeY, relativeZ, islandSize);
+        if (relativeY <= e.size / 2d) {
+            return IslandGeneration.isBlockInIslandSphere(relativeX, relativeY, relativeZ, e.size);
         } else {
-            return IslandGeneration.isBlockInIslandCylinder(relativeX, relativeZ, islandSize);
+            return IslandGeneration.isBlockInIslandCylinder(relativeX, relativeZ, e.size);
         }
-    }
-
-    @Nullable
-    public static String getBlockOwnerUUID(int x, int z) {
-        return getBlockOwnerUUID(x, z, false);
-    }
-
-    /**
-     * Get block owner.
-     *
-     * @param plotOnly If false, the space between islands will be considered
-     *                 as no man's land. If true, the whole plot belongs to the
-     *                 island owner.
-     */
-    @Nullable
-    public static String getBlockOwnerUUID(int x, int z, boolean plotOnly) {
-        int plotX = x / INSTANCE.islandSpacing;
-        int plotZ = z / INSTANCE.islandSpacing;
-
-        // Check if block is inside an island, not only inside plot
-        if (!plotOnly) {
-            int islandSize = getConfig().getInt(posToIslandId(plotX, plotZ) + ".size");
-
-            int relativeX = x - (plotX * INSTANCE.islandSpacing + INSTANCE.islandSpacing / 2 - islandSize / 2);
-            int relativeZ = z - (plotZ * INSTANCE.islandSpacing + INSTANCE.islandSpacing / 2 - islandSize / 2);
-
-            boolean isInside = IslandGeneration.isBlockInIslandCylinder(relativeX + 2, relativeZ + 2, islandSize + 4);
-
-            if (!isInside) return null;
-        }
-
-        return Optional.ofNullable(getConfig().getString(posToIslandId(plotX, plotZ) + ".UUID")).orElse("Server");
     }
 
     public static int getNewHomeId(UUID uuid) {
-        List<String> ids = getIslandIds(uuid);
         List<Integer> homeIds = new ArrayList<>();
 
-        for (String islandId : ids) {
-            int homeNumber = getConfig().getInt(islandId + ".home");
-            homeIds.add(homeNumber);
+        for (String islandId : getOwnedIslands(uuid)) {
+            homeIds.add(entries.get(islandId).homeId);
         }
 
-        int home = getNumberOfIslands(uuid) + 1;
-
-        for (int i = 1; i <= getNumberOfIslands(uuid) + 1; i++) {
-            if (!homeIds.contains(i)) home = i;
+        for (int i = 1; i < Integer.MAX_VALUE; i++) {
+            if (!homeIds.contains(i)) return i;
         }
 
-        return home;
+        return 0;
     }
 
     // UTILS
 
     private static int getIslandY(int xIndex, int zIndex) {
         return 10 + ((xIndex + zIndex) % 3) * INSTANCE.verticalSpacing;
-    }
-
-    public static int getNumberOfIslands(UUID uuid) {
-        return getIslandIds(uuid).size();
     }
 
     static String posToIslandId(int xIndex, int zIndex) {
@@ -375,176 +332,161 @@ public enum IslandsConfig {
         return Optional.ofNullable(getConfig().getString(islandId + ".UUID")).orElse("");
     }
 
-    // MANAGMENT
+    public static class Entry {
+        public String islandId;
+        public int xIndex;
+        public int zIndex;
+        public int size;
+        public int height;
+        public long claimId;
+        public Biome biome;
+        public UUID uuid;
+        public String name;
+        public String home;
+        public int homeId;
+        public boolean isPublic;
+        public int y;
+        public int[] spawnPosition;
+        public boolean isSpawn;
 
-    public static void updateIsland(String islandId, int islandSize, int height, Biome biome) {
-        int xIndex = getConfig().getInt(islandId + ".xIndex");
-        int zIndex = getConfig().getInt(islandId + ".zIndex");
+        boolean shouldUpdate = false;
 
-        int realX = xIndex * INSTANCE.islandSpacing + INSTANCE.islandSpacing / 2 - islandSize / 2;
-        int realZ = zIndex * INSTANCE.islandSpacing + INSTANCE.islandSpacing / 2 - islandSize / 2;
+        public Entry(String islandId) {
+            FileConfiguration fc = getConfig();
+            this.islandId = islandId;
 
-        getConfig().set(islandId + ".x", realX);
-        getConfig().set(islandId + ".z", realZ);
+            this.xIndex = fc.getInt(islandId + ".xIndex");
+            this.xIndex = fc.getInt(islandId + ".xIndex");
 
-        getConfig().set(islandId + ".size", islandSize);
-        getConfig().set(islandId + ".height", height);
-        getConfig().set(islandId + ".biome", biome.name());
+            String stringUuid = fc.getString(islandId + ".UUID");
 
-        saveIslandsConfig();
-    }
+            this.uuid = stringUuid != null ? UUID.fromString(stringUuid) : null;
+            this.name = fc.getString(islandId + ".name", islandId);
+            this.home = fc.getString(islandId + ".home");
+            this.size = fc.getInt(islandId + ".size");
+            this.height = fc.getInt(islandId + ".height");
+            this.isPublic = fc.getBoolean(islandId + ".public", false);
+            this.biome = Biome.valueOf(fc.getString(islandId + ".biome", "PLAINS"));
+            this.homeId = fc.getInt(islandId + ".home", getNewHomeId(uuid));
+            this.spawnPosition = new int[] {
+                    fc.getInt(islandId + ".spawnPoint.x"),
+                    fc.getInt(islandId + ".spawnPoint.z")
+            };
+            this.y = fc.getInt(islandId + ".y");
+            this.isSpawn = fc.getBoolean(islandId + ".isSpawn", false);
 
-    public static void addTrusted(String islandId, String uuid) {
-        if (!getConfig().contains(islandId + ".trusted." + uuid)) {
-            getConfig().set(islandId + ".trusted." + uuid + ".build", true);
-            getConfig().set(islandId + ".trusted." + uuid + ".accessContainers", false);
-            getConfig().set(islandId + ".trusted." + uuid + ".accessDoors", false);
-            getConfig().set(islandId + ".trusted." + uuid + ".accessUtility", false);
+            this.claimId = fc.getLong(islandId + ".claimId");
+        }
+
+        public Entry(int xIndex, int zIndex, int size, int height, UUID uuid, String name, Biome biome) {
+            this.xIndex = xIndex;
+            this.zIndex = zIndex;
+            this.size = size;
+            this.height = height;
+            this.uuid = uuid;
+            this.name = name;
+            this.biome = biome;
+            this.homeId = getNewHomeId(uuid);
+
+            int realX = xIndex * INSTANCE.islandSpacing + INSTANCE.islandSpacing / 2 - size / 2;
+            int realY = getIslandY(xIndex, zIndex);
+            int realZ = zIndex * INSTANCE.islandSpacing + INSTANCE.islandSpacing / 2 - size / 2;
+
+            CreateClaimResult r = Islands.gp.dataStore.createClaim(Islands.islandsWorld,
+                realX - size, realX + size,
+                realY - size, realY + size,
+                realZ - size, realZ + size,
+                uuid, null, new Random().nextLong(), Bukkit.getPlayer(uuid));
+
+            if (r.succeeded)
+                this.claimId = r.claim.getID();
+
+            this.spawnPosition = new int[2];
+
+            this.spawnPosition[0] = realX + size / 2;
+            this.spawnPosition[1] = realZ + size / 2;
+            this.isPublic = false;
+            this.isSpawn = false;
+
+        }
+
+        public void delete() {
+            getConfig().set(islandId, null);
+            Islands.gp.dataStore.deleteClaim(Islands.gp.dataStore.getClaim(claimId));
+            entries.remove(islandId);
+        }
+
+        public void writeToConfig() {
+            int realX = xIndex * INSTANCE.islandSpacing + INSTANCE.islandSpacing / 2 - size / 2;
+            int realZ = zIndex * INSTANCE.islandSpacing + INSTANCE.islandSpacing / 2 - size / 2;
+
+            String islandId = posToIslandId(xIndex, zIndex);
+
+            getConfig().set(islandId + ".xIndex", xIndex);
+            getConfig().set(islandId + ".zIndex", zIndex);
+
+            getConfig().set(islandId + ".x", realX);
+            getConfig().set(islandId + ".y", y);
+            getConfig().set(islandId + ".z", realZ);
+
+            getConfig().set(islandId + ".spawnPoint.x", spawnPosition[0]);
+            getConfig().set(islandId + ".spawnPoint.z", spawnPosition[1]);
+
+            getConfig().set(islandId + ".UUID", uuid.toString());
+            getConfig().set(islandId + ".name", name);
+            getConfig().set(islandId + ".home", homeId);
+            getConfig().set(islandId + ".size", size);
+            getConfig().set(islandId + ".height", height);
+            getConfig().set(islandId + ".public", isPublic);
+            getConfig().set(islandId + ".biome", biome.name());
+
+            getConfig().set(islandId + ".claimId", claimId);
+            getConfig().set(islandId + ".isSpawn", isSpawn);
 
             saveIslandsConfig();
         }
-    }
 
-    public static void removeTrusted(String islandId, String uuid) {
-        getConfig().set(islandId + ".trusted." + uuid, null);
-        saveIslandsConfig();
-    }
 
-    // Per player
-
-    public static void setBuildAccess(String islandId, String uuid, boolean value) {
-        getConfig().set(islandId + ".trusted." + uuid + ".build", value);
-        saveIslandsConfig();
-    }
-
-    public static void setContainerAccess(String islandId, String uuid, boolean value) {
-        getConfig().set(islandId + ".trusted." + uuid + ".accessContainers", value);
-        saveIslandsConfig();
-    }
-
-    public static void setDoorAccess(String islandId, String uuid, boolean value) {
-        getConfig().set(islandId + ".trusted." + uuid + ".accessDoors", value);
-        saveIslandsConfig();
-    }
-
-    public static void setUtilityAccess(String islandId, String uuid, boolean value) {
-        getConfig().set(islandId + ".trusted." + uuid + ".accessUtility", value);
-        saveIslandsConfig();
-    }
-
-    public static boolean canBuild(String islandId, String uuid) {
-        return getConfig().getBoolean(islandId + ".trusted." + uuid + ".build", false);
-    }
-
-    public static boolean canAccessContainers(String islandId, String uuid) {
-        return getConfig().getBoolean(islandId + ".trusted." + uuid + ".accessContainers", false);
-    }
-
-    public static boolean canAccessDoors(String islandId, String uuid) {
-        return getConfig().getBoolean(islandId + ".trusted." + uuid + ".accessDoors", false);
-    }
-
-    public static boolean canUseUtility(String islandId, String uuid) {
-        return getConfig().getBoolean(islandId + ".trusted." + uuid + ".accessUtility", false);
-    }
-
-    // Global for island
-    public static void setBuildProtection(String islandId, boolean protect) {
-        getConfig().set(islandId + ".protect.building", protect);
-        saveIslandsConfig();
-    }
-
-    public static void setContainerProtection(String islandId, boolean protect) {
-        getConfig().set(islandId + ".protect.containers", protect);
-        saveIslandsConfig();
-    }
-
-    public static void setDoorProtection(String islandId, boolean protect) {
-        getConfig().set(islandId + ".protect.doors", protect);
-        saveIslandsConfig();
-    }
-
-    public static void setUtilityProtection(String islandId, boolean protect) {
-        getConfig().set(islandId + ".protect.utility", protect);
-        saveIslandsConfig();
-    }
-
-    public static boolean buildProtection(String islandId) {
-        return getConfig().getBoolean(islandId + ".protect.building", true);
-    }
-
-    public static boolean containerProtection(String islandId) {
-        return getConfig().getBoolean(islandId + ".protect.containers", true);
-    }
-
-    public static boolean doorProtection(String islandId) {
-        return getConfig().getBoolean(islandId + ".protect.doors", true);
-    }
-
-    public static boolean utilityProtection(String islandId) {
-        return getConfig().getBoolean(islandId + ".protect.utility", true);
-    }
-
-    public static void setSpawnPoint(String islandId, int x, int z) {
-        getConfig().set(islandId + ".spawnPoint.x", x);
-        getConfig().set(islandId + ".spawnPoint.z", z);
-
-        saveIslandsConfig();
-    }
-
-    public static void unnameIsland(String islandId) {
-        int homeId = getConfig().getInt(islandId + ".home", -1);
-
-        getConfig().set(islandId + ".name", String.valueOf(homeId));
-        getConfig().set(islandId + ".public", false);
-
-        saveIslandsConfig();
-    }
-
-    public static void nameIsland(String islandId, String name){
-        getConfig().set(islandId + ".name", name);
-        getConfig().set(islandId + ".public", true);
-
-        saveIslandsConfig();
-    }
-
-    public static void giveIsland(String islandId, OfflinePlayer player) {
-        getConfig().set(islandId + ".home", getNewHomeId(player.getUniqueId()));
-        getConfig().set(islandId + ".UUID", player.getUniqueId().toString());
-
-        saveIslandsConfig();
-    }
-
-    public static void giveIsland(String islandId) {
-        getConfig().set(islandId + ".home", null);
-        getConfig().set(islandId + ".UUID", null);
-
-        saveIslandsConfig();
-    }
-
-    public static void deleteIsland(String islandId) {
-        getConfig().set(islandId, null);
-
-        saveIslandsConfig();
-    }
-
-    public static boolean setSpawnIsland(String islandId) {
-        if (getConfig().getConfigurationSection(islandId) == null) return false;
-
-        if (getConfig().getBoolean(islandId + ".isSpawn")) {
-            getConfig().set(islandId + ".isSpawn", false);
-            return true;
+        public void setSpawnPosition(int x, int z) {
+            spawnPosition = new int[] {x, z};
+            shouldUpdate = true;
         }
 
-        for (String island : getConfig().getKeys(false)) {
-            if (getConfig().getBoolean(island + ".isSpawn")) {
-                getConfig().set(island + ".isSpawn", false);
-            }
+        public void unnameIsland() {
+            name = String.valueOf(homeId);
+            isPublic = false;
+
+            shouldUpdate = true;
         }
 
-        getConfig().set(islandId + ".isSpawn", true);
-        saveIslandsConfig();
-        return true;
+        public void nameIsland(String name){
+            isPublic = true;
+            this.name = name;
+
+            shouldUpdate = true;
+        }
+
+        public void giveIsland(OfflinePlayer player) {
+            this.uuid = player.getUniqueId();
+            this.homeId = getNewHomeId(player.getUniqueId());
+
+            shouldUpdate = true;
+        }
+
+        public void makeServerOwned() {
+            this.uuid = null;
+            this.homeId = -1;
+
+            shouldUpdate = true;
+        }
+
+        public void setSpawnIsland() {
+            isSpawn = !isSpawn;
+            IslandsConfig.spawnIsland = isSpawn ? this.islandId : null;
+
+
+            shouldUpdate = true;
+        }
     }
 
     public static class placement {

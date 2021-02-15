@@ -9,13 +9,13 @@ import org.bukkit.entity.Player;
 
 public class ClearSubcommand extends AbstractIslandsWorldSubcommand {
     @Override
-    protected void runCommand(Player player, String[] args, boolean confirmed, String islandId) {
+    protected void runCommand(Player player, String[] args, boolean confirmed, IslandsConfig.Entry island) {
         if (args.length != 0) {
             Messages.send(player, "usage.CLEAR");
             return;
         }
 
-        if (!ownsIsland(player, islandId) && !player.hasPermission(Permissions.bypass.clear)) {
+        if (!player.getUniqueId().equals(island.uuid) && !player.hasPermission(Permissions.bypass.clear)) {
             Messages.send(player, "error.UNAUTHORIZED");
             return;
         }
@@ -25,12 +25,12 @@ public class ClearSubcommand extends AbstractIslandsWorldSubcommand {
             return;
         }
 
-        if (!IslandGeneration.INSTANCE.clearIsland(player, islandId)) {
+        if (!IslandGeneration.INSTANCE.clearIsland(player, island.islandId)) {
             player.sendMessage(Messages.get("error.ONGOING_QUEUE_EVENT"));
             return;
         }
 
-        IslandsConfig.deleteIsland(islandId);
+        island.delete();
         Messages.send(player, "success.DELETED");
     }
 

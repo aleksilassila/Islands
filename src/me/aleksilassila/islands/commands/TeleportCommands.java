@@ -122,7 +122,7 @@ public class TeleportCommands {
                 return true;
             }
 
-            List<String> ids = IslandsConfig.getIslandIds(player.getUniqueId());
+            List<String> ids = IslandsConfig.getOwnedIslands(player.getUniqueId());
             Map<String, Integer> idMap = new HashMap<>();
 
              for (String islandId : ids) {

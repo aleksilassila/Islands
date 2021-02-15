@@ -12,31 +12,30 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 public class SaveSubcommand extends AbstractIslandsWorldSubcommand {
     private final String SAVE_DIRECTORY = "plugins/Islands/saves/";
 
     @Override
-    protected void runCommand(Player player, String[] args, boolean confirmed, String islandId) {
+    protected void runCommand(Player player, String[] args, boolean confirmed, IslandsConfig.Entry island) {
         if (Islands.instance.worldEdit != null) {
-            String name = IslandsConfig.getConfig().getBoolean(islandId + ".public")
-                    ? IslandsConfig.getConfig().getString(islandId + ".name")
-                    : islandId;
+            String name = island.name;
 
-            int startX = IslandsConfig.getConfig().getInt(islandId + ".x");
-            int startY = IslandsConfig.getConfig().getInt(islandId + ".y");
-            int startZ = IslandsConfig.getConfig().getInt(islandId + ".z");
+            int startX = IslandsConfig.getConfig().getInt(island + ".x");
+            int startY = IslandsConfig.getConfig().getInt(island + ".y");
+            int startZ = IslandsConfig.getConfig().getInt(island + ".z");
 
-            int islandSize = IslandsConfig.getConfig().getInt(islandId + ".size");
+            int islandSize = IslandsConfig.getConfig().getInt(island + ".size");
 
             int height;
 
             try {
                 height = args.length == 1
                         ? Integer.parseInt(args[0])
-                        : IslandsConfig.getConfig().getInt(islandId + ".height");
+                        : IslandsConfig.getConfig().getInt(island + ".height");
             } catch (NumberFormatException e) {
-                height = IslandsConfig.getConfig().getInt(islandId + ".height");
+                height = IslandsConfig.getConfig().getInt(island + ".height");
             }
 
             if (height == 0) height = islandSize;

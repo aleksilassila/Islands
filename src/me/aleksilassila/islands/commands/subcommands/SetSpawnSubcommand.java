@@ -8,9 +8,9 @@ import org.bukkit.entity.Player;
 
 public class SetSpawnSubcommand extends AbstractIslandsWorldSubcommand {
     @Override
-    protected void runCommand(Player player, String[] args, boolean confirmed, String islandId) {
-        if (ownsIsland(player, islandId) || player.hasPermission(Permissions.bypass.setSpawn)) {
-            IslandsConfig.setSpawnPoint(islandId, player.getLocation().getBlockX(), player.getLocation().getBlockZ());
+    protected void runCommand(Player player, String[] args, boolean confirmed, IslandsConfig.Entry island) {
+        if (player.getUniqueId().equals(island.uuid) || player.hasPermission(Permissions.bypass.setSpawn)) {
+            island.setSpawnPosition(player.getLocation().getBlockX(), player.getLocation().getBlockZ());
 
             player.sendMessage(Messages.get("success.SPAWN_POINT_CHANGED"));
         } else {

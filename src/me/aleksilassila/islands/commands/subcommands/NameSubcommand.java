@@ -13,13 +13,13 @@ import java.util.List;
 
 public class NameSubcommand extends AbstractIslandsWorldSubcommand {
     @Override
-    protected void runCommand(Player player, String[] args, boolean confirmed, String islandId) {
+    protected void runCommand(Player player, String[] args, boolean confirmed, IslandsConfig.Entry island) {
         if (args.length != 1) {
             Messages.send(player, "usage.NAME");
             return;
         }
 
-        if (ownsIsland(player, islandId) || player.hasPermission(Permissions.bypass.name)) {
+        if (player.getUniqueId().equals(island.uuid) || player.hasPermission(Permissions.bypass.name)) {
             if (IslandsConfig.getIslandByName(args[0]) != null) {
                 player.sendMessage(Messages.get("error.NAME_TAKEN"));
                 return;
@@ -30,7 +30,7 @@ public class NameSubcommand extends AbstractIslandsWorldSubcommand {
                 return;
             }
 
-            IslandsConfig.nameIsland(islandId, args[0]);
+            IslandsConfig.entries.get(island).nameIsland(args[0]);
 
             player.sendMessage(Messages.get("success.NAME_CHANGED", args[0]));
         } else {
