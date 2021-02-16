@@ -21,11 +21,11 @@ public class GiveSubcommand extends AbstractIslandsWorldSubcommand {
             return;
         }
 
-        String previousUUID = IslandsConfig.getConfig().getString(island + ".UUID");
+        UUID previousUUID = island.uuid;
 
-        if ((previousUUID != null && previousUUID.equals(player.getUniqueId().toString()))
+        if ((previousUUID != null && previousUUID.equals(player.getUniqueId()))
                 || player.hasPermission(Permissions.bypass.give)) {
-            if (IslandsConfig.getConfig().getBoolean(island + ".public")) {
+            if (island.isPublic) {
                 if (!confirmed) {
                     player.sendMessage(Messages.get("info.CONFIRM"));
                     return;
@@ -33,19 +33,19 @@ public class GiveSubcommand extends AbstractIslandsWorldSubcommand {
 
                 if (args.length == 1) {
                     OfflinePlayer targetPlayer = Utils.getOfflinePlayer(args[0]);
-                    String previousName = previousUUID == null ? "Server" : Bukkit.getOfflinePlayer(UUID.fromString(previousUUID)).getName();
+                    String previousName = previousUUID == null ? "Server" : Bukkit.getOfflinePlayer(previousUUID).getName();
 
                     if (targetPlayer == null) {
                         player.sendMessage(Messages.get("error.NO_PLAYER_FOUND"));
                         return;
                     }
 
-                    IslandsConfig.entries.get(island).giveIsland(targetPlayer);
+                    island.giveIsland(targetPlayer);
                     player.sendMessage(Messages.get("success.OWNER_CHANGED", args[0]));
 
-                    Messages.send(targetPlayer, "success.ISLAND_RECEIVED", IslandsConfig.getConfig().getString(island + ".name"), previousName);
+                    Messages.send(targetPlayer, "success.ISLAND_RECEIVED", island.name, previousName);
                 } else {
-                    IslandsConfig.entries.get(island).makeServerOwned();
+                    island.giveToServer();
                     player.sendMessage(Messages.get("success.OWNER_REMOVED"));
                 }
             } else {

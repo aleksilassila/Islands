@@ -3,7 +3,9 @@ version: 4.8.3
 author: Aleksi Lassila
 main: me.aleksilassila.islands.Islands
 api-version: 1.15
-softdepend: [Vault, WorldEdit, GriefPrevention]
+softdepend: [Vault, WorldEdit]
+depend:
+  - GriefPrevention
 commands:
   island:
     description: Island managment
@@ -19,15 +21,6 @@ commands:
   homes:
     description: List homes
     usage: /<command>
-  trust:
-    description: Trust a player
-    usage: /<command> player
-  trusted:
-    description: List trusted players
-    usage: /<command>
-  untrust:
-    description: Untrust a player
-    usage: /<command> player
 
 permissions:
   islands.*:
@@ -45,7 +38,6 @@ permissions:
       islands.command.name: true
       islands.command.unname: true
       islands.command.home.*: true
-      islands.command.trust.*: true
       islands.command.visit: true
       islands.command.setspawn: true
       islands.command.save: true
@@ -53,7 +45,6 @@ permissions:
       islands.command.confirm: true
       islands.command.info: true
       islands.command.moderate: true
-      islands.command.settings: true
   islands.bypass.*:
     description: Access to all island bypasses
     children:
@@ -64,7 +55,6 @@ permissions:
       islands.bypass.give: true
       islands.bypass.name: true
       islands.bypass.unname: true
-      islands.bypass.trust: true
       islands.bypass.setspawn: true
       islands.bypass.untrust: true
       islands.bypass.protection: true
@@ -75,7 +65,6 @@ permissions:
       islands.bypass.queue: true
       islands.bypass.queue.limit: true
       islands.bypass.info: true
-      islands.bypass.settings: true
   islands.command.create.*:
     description: Create any island size (including defined sizes)
     children:
@@ -87,18 +76,6 @@ permissions:
     children:
       islands.command.home: true
       islands.command.home.list: true
-  islands.command.trust.*:
-    description: Access to trust commands
-    children:
-      islands.command.trust: true
-      islands.command.trust.list: true
-      islands.command.trust.containerTrust: true
-      islands.command.trust.doorTrust: true
-      islands.command.trust.utilityTrust: true
-      islands.command.trust.general.buildProtection: true
-      islands.command.trust.general.containerTrust: true
-      islands.command.trust.general.doorTrust: true
-      islands.command.trust.general.utilityTrust: true
 
   islands.command:
     description: Access to island command
@@ -127,30 +104,6 @@ permissions:
   islands.command.info:
     description: Access to island info command with limited functionality
     default: true
-  islands.command.settings:
-    description: Access to island settings
-    default: true
-  islands.command.trust.containerTrust:
-    description: Permission to containerTrust people
-    default: true
-  islands.command.trust.doorTrust:
-    description: Permission to doorTrust people
-    default: true
-  islands.command.trust.utilityTrust:
-    description: Permission to utilityTrust people
-    default: true
-  islands.command.trust.general.buildProtection:
-    description: Permission to enable / disable building in general on an island
-    default: "op"
-  islands.command.trust.general.containerTrust:
-    description: Permission to enable / disable container access in general on an island
-    default: true
-  islands.command.trust.general.doorTrust:
-    description: Permission to enable / disable door access in general on an island
-    default: true
-  islands.command.trust.general.utilityTrust:
-    description: Permission to enable / disable utility access in general on an island
-    default: true
   islands.command.create.custom:
     description: Access to island create custom size command
     default: "op"
@@ -168,15 +121,6 @@ permissions:
     default: "op"
   islands.command.moderate:
     description: Access moderate GUI
-    default: "op"
-  islands.command.trust:
-    description: Access to trust command
-    default: "op"
-  islands.command.trust.list:
-    description: Access to trusted command
-    default: "op"
-  islands.command.untrust:
-    description: Access to untrust command
     default: "op"
   islands.command.save:
     description: Access to islands save command
@@ -212,18 +156,6 @@ permissions:
   islands.bypass.info:
     description: Bypass island info command restrictions
     default: "op"
-  islands.bypass.trust:
-    description: Bypass trust restrictions
-    default: "op"
-  islands.bypass.untrust:
-    description: Bypass untrust restrictions
-    default: "op"
-  islands.bypass.trust.list:
-    description: Bypass trusted restrictions
-    default: "op"
-  islands.bypass.protection:
-    description: Bypass protection restrictions
-    default: "op"
   islands.bypass.plotprotection:
     description: Bypass protection limits inside your own plot (build outside of the island)
     default: "op"
@@ -238,7 +170,4 @@ permissions:
     default: "op"
   islands.bypass.queue.limit:
     description: Bypass queue limit
-    default: "op"
-  islands.bypass.settings:
-    description: Bypass settings restrictions
     default: "op"

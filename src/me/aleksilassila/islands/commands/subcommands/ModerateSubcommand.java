@@ -23,10 +23,10 @@ public class ModerateSubcommand extends Subcommand {
         }
 
         if (args[0].equalsIgnoreCase("teleport") || args[0].equalsIgnoreCase("tp")) {
-            Location location = IslandsConfig.getIslandSpawn(args[1]);
+            IslandsConfig.Entry e = IslandsConfig.entries.get(args[1]);
 
-            if (location != null) {
-                player.teleport(location);
+            if (e != null) {
+                player.teleport(e.getIslandSpawn());
             } else {
                 player.sendMessage(Messages.get("error.ISLAND_NOT_FOUND"));
             }

@@ -1,6 +1,7 @@
 package me.aleksilassila.islands;
 
 import me.aleksilassila.islands.utils.ChatUtils;
+import me.ryanhamshire.GriefPrevention.events.ClaimDeletedEvent;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -43,9 +44,7 @@ public class Listeners extends ChatUtils implements Listener {
     public void onPlayerJoin(PlayerJoinEvent event) {
         if (!event.getPlayer().hasPlayedBefore()) {
             if (IslandsConfig.spawnIsland != null) {
-                Location l = IslandsConfig.getIslandSpawn(IslandsConfig.spawnIsland);
-                if (l != null)
-                    event.getPlayer().teleport(l);
+                event.getPlayer().teleport(IslandsConfig.spawnIsland.getIslandSpawn());
             }
         }
     }
@@ -53,9 +52,7 @@ public class Listeners extends ChatUtils implements Listener {
     @EventHandler(priority = EventPriority.LOWEST)
     public void onPlayerRespawn(PlayerRespawnEvent event) {
         if (IslandsConfig.spawnIsland != null) {
-            Location l = IslandsConfig.getIslandSpawn(IslandsConfig.spawnIsland);
-            if (l != null)
-                event.setRespawnLocation(l);
+            event.setRespawnLocation(IslandsConfig.spawnIsland.getIslandSpawn());
         }
     }
 

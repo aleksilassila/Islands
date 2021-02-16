@@ -44,7 +44,7 @@ public class InfoSubcommand extends AbstractIslandsWorldSubcommand {
         if (extensiveInfo) {
             Messages.send(player, "info.ISLAND_INFO_HOME", island.homeId);
 
-//            if (island.contains("trusted")) {
+//            if (Islands.gp.dataStore.getClaim(island.claimId).) {
 //                Messages.send(player, "info.ISLAND_INFO_TRUSTED");
 //
 //                for (String trustedUUID : island.getConfigurationSection("trusted").getKeys(false)) {

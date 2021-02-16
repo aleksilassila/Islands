@@ -30,7 +30,7 @@ public class NameSubcommand extends AbstractIslandsWorldSubcommand {
                 return;
             }
 
-            IslandsConfig.entries.get(island).nameIsland(args[0]);
+            island.nameIsland(args[0]);
 
             player.sendMessage(Messages.get("success.NAME_CHANGED", args[0]));
         } else {

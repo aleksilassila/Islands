@@ -99,14 +99,14 @@ public class Islands extends JavaPlugin {
 
         initBiomesCache();
 
-        new ConfigMigrator();
-
         islandsWorld = getIslandsWorld();
         islandsSourceWorld = getSourceWorld();
 
         if (!getConfig().getBoolean("disableWilderness")) {
             wildernessWorld = getWilderness();
         }
+
+        new ConfigMigrator();
 
         // ISLANDS
         Messages.init();
@@ -157,14 +157,15 @@ public class Islands extends JavaPlugin {
         IslandsConfig.Entry island = IslandsConfig.createIsland(player.getUniqueId(), islandSize, height, biome);
 
         try {
+            int[][] ic = IslandsConfig.getIslandCorner(island.xIndex, island.zIndex, islandSize);
             boolean success = IslandGeneration.INSTANCE.copyIsland(
                     player,
                     biome,
                     islandSize,
                     new Vector(
-                            IslandsConfig.getConfig().getInt(island.islandId + ".x"),
-                            IslandsConfig.getConfig().getInt(island.islandId + ".y"),
-                            IslandsConfig.getConfig().getInt(island.islandId + ".z")
+                            ic[0][0],
+                            island.y,
+                            ic[0][1]
                     ),
                     false,
                     island.islandId,
@@ -204,17 +205,19 @@ public class Islands extends JavaPlugin {
         island.size = islandSize;
         island.height = height;
         island.biome = biome;
+        island.resizeClaim(islandSize);
         island.shouldUpdate = true;
 
         try {
+            int[][] ic = IslandsConfig.getIslandCorner(island.xIndex, island.zIndex, islandSize);
             return IslandGeneration.INSTANCE.copyIsland(
                     player,
                     biome,
                     islandSize,
                     new Vector(
-                            IslandsConfig.getConfig().getInt(island.islandId + ".x"),
-                            IslandsConfig.getConfig().getInt(island.islandId + ".y"),
-                            IslandsConfig.getConfig().getInt(island.islandId + ".z")
+                            ic[0][0],
+                            island.y,
+                            ic[0][1]
                     ),
                     true,
                     island.islandId,

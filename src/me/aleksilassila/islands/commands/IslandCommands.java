@@ -38,7 +38,6 @@ public class IslandCommands extends ChatUtils implements TabExecutor {
         subcommands.add(new HelpSubcommand(this));
         subcommands.add(new InfoSubcommand());
         subcommands.add(new ModerateSubcommand());
-        subcommands.add(new SettingsSubcommand());
 
         TeleportCommands teleportCommands = new TeleportCommands();
 
@@ -51,8 +50,6 @@ public class IslandCommands extends ChatUtils implements TabExecutor {
             subcommands.add(homeCommand);
             subcommands.add(homesCommand);
         }
-
-        new TrustCommands();
     }
 
     @Override
@@ -106,8 +103,8 @@ public class IslandCommands extends ChatUtils implements TabExecutor {
                 plugin.confirmations.put(player.getUniqueId().toString(), new ConfirmItem(issuedCommand, 8 * 1000));
             }
 
-            try {
                 target.onCommand(player, Arrays.copyOfRange(args, 1, args.length), confirmed);
+            try {
                 return true;
             } catch (Exception e) {
                 player.sendMessage(Messages.get("error.ERROR"));

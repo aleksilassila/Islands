@@ -61,10 +61,10 @@ public class TeleportCommands {
                 return true;
             }
 
-            String islandId = IslandsConfig.getIslandByName(args[0]);
+            IslandsConfig.Entry e = IslandsConfig.getIslandByName(args[0]);
 
-            if (islandId != null) {
-                player.teleport(IslandsConfig.getIslandSpawn(islandId));
+            if (e != null) {
+                player.teleport(e.getIslandSpawn());
                 player.sendTitle(Messages.get("success.VISIT_TITLE", args[0]), "", 10, 20 * 5, 10);
             } else {
                 player.sendMessage(Messages.get("error.ISLAND_NOT_FOUND"));
@@ -122,19 +122,18 @@ public class TeleportCommands {
                 return true;
             }
 
-            List<String> ids = IslandsConfig.getOwnedIslands(player.getUniqueId());
+            List<IslandsConfig.Entry> islands = IslandsConfig.getOwnedIslands(player.getUniqueId());
             Map<String, Integer> idMap = new HashMap<>();
 
-             for (String islandId : ids) {
-                 idMap.put(islandId, IslandsConfig.getConfig().getInt(islandId + ".home"));
+             for (IslandsConfig.Entry e : islands) {
+                 idMap.put(e.islandId, e.homeId);
              }
 
-            ids.sort(Comparator.comparingInt(idMap::get));
+            islands.sort(Comparator.comparingInt(e -> e.homeId));
 
-            player.sendMessage(Messages.get("success.HOMES_FOUND", ids.size()));
-            for (String islandId : ids) {
-                String name = IslandsConfig.getConfig().getString(islandId + ".name");
-                Messages.send(player, "success.HOME_ITEM", name, idMap.get(islandId));
+            player.sendMessage(Messages.get("success.HOMES_FOUND", islands.size()));
+            for (IslandsConfig.Entry e : islands) {
+                Messages.send(player, "success.HOME_ITEM", e.name, idMap.get(e.islandId));
             }
 
             return true;
@@ -217,24 +216,22 @@ public class TeleportCommands {
                 homeId = IslandsConfig.getLowestHome(player.getUniqueId());
             }
 
-            String islandId = IslandsConfig.getHomeIsland(player.getUniqueId(), homeId);
+            IslandsConfig.Entry island = IslandsConfig.getHomeIsland(player.getUniqueId(), homeId);
+
+            if (island == null) {
+                player.sendMessage(Messages.get("error.HOME_NOT_FOUND"));
+                return true;
+            }
 
             if (IslandGeneration.INSTANCE.queue.size() > 0
-                    && IslandGeneration.INSTANCE.queue.get(0).getIslandId().equals(islandId)
+                    && IslandGeneration.INSTANCE.queue.get(0).getIslandId().equals(island.islandId)
                     && !unfinishedIslandTeleports) {
                 Messages.send(player, "error.ISLAND_UNFINISHED");
                 return true;
             }
 
-            Location location = IslandsConfig.getIslandSpawn(islandId);
-
-            if (location != null) {
-                teleportNeutrals(player, location);
-
-                player.teleport(location);
-            } else {
-                player.sendMessage(Messages.get("error.HOME_NOT_FOUND"));
-            }
+            teleportNeutrals(player, island.getIslandSpawn());
+            player.teleport(island.getIslandSpawn());
 
             return true;
         }
