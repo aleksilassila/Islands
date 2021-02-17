@@ -3,9 +3,7 @@ version: 5.0.0
 author: Aleksi Lassila
 main: me.aleksilassila.islands.Islands
 api-version: 1.15
-softdepend: [Vault, WorldEdit]
-depend:
-  - GriefPrevention
+softdepend: [Vault, WorldEdit, GriefPrevention]
 commands:
   island:
     description: Island managment

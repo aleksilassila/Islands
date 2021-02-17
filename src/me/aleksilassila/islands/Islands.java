@@ -61,10 +61,9 @@ public class Islands extends JavaPlugin {
         instance = this;
 
         gpEnabled = getConfig().getBoolean("enableIslandProtection", true);
-        if (Bukkit.getPluginManager().getPlugin("GriefPrevention") == null
-                && !gpEnabled) {
-            getLogger().severe("WE HAVE NO GP INSTALLED");
-            return;
+        if (Bukkit.getPluginManager().getPlugin("GriefPrevention") == null) {
+            getLogger().severe("No GriefPrevention found. Island protection disabled.");
+            gpEnabled = false;
         } else {
             gp = (GriefPrevention) Bukkit.getPluginManager().getPlugin("GriefPrevention");
         }

@@ -346,9 +346,9 @@ public enum IslandsConfig {
             this.xIndex = fc.getInt(islandId + ".xIndex");
             this.zIndex = fc.getInt(islandId + ".zIndex");
 
-            String stringUuid = fc.getString(islandId + ".UUID");
-
-            this.uuid = stringUuid != null ? UUID.fromString(stringUuid) : null;
+            try {
+                this.uuid = UUID.fromString(fc.getString(islandId + ".UUID"));
+            } catch (Exception ignored) {}
             this.homeId = fc.getInt(islandId + ".home");
             this.name = fc.getString(islandId + ".name", String.valueOf(homeId));
             this.size = fc.getInt(islandId + ".size");
@@ -423,7 +423,7 @@ public enum IslandsConfig {
             getConfig().set(islandId + ".spawnPoint.x", spawnPosition[0]);
             getConfig().set(islandId + ".spawnPoint.z", spawnPosition[1]);
 
-            getConfig().set(islandId + ".UUID", uuid.toString());
+            getConfig().set(islandId + ".UUID", uuid == null ? "Server" : uuid.toString());
             getConfig().set(islandId + ".name", name);
             getConfig().set(islandId + ".home", homeId);
             getConfig().set(islandId + ".size", size);

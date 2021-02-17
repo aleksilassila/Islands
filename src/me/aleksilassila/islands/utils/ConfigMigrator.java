@@ -17,22 +17,32 @@ public class ConfigMigrator {
     }
 
     private void migrateIslandProtection() {
-        Islands.instance.getLogger().warning("REMOVING DEPRECATED ISLAND PROTECTION CONFIGURATION FROM islands.yml...");
+        boolean announce = false;
 
         for (String islandId : islandsConfig.getKeys(false)) {
-            if (islandsConfig.contains(islandId + ".protect")) islandsConfig.set(islandId + ".protect", null);
+            if (islandsConfig.contains(islandId + ".protect")) {
+                islandsConfig.set(islandId + ".protect", null);
+                announce = true;
+            }
         }
+        if (announce)
+            Islands.instance.getLogger().warning("REMOVING DEPRECATED ISLAND PROTECTION CONFIGURATION FROM islands.yml...");
 
         IslandsConfig.saveIslandsConfig();
     }
 
     private void migrateTrustedPlayers() {
-        Islands.instance.getLogger().warning("REMOVING DEPRECATED ISLAND TRUST CONFIGURATION FROM islands.yml...");
+        boolean announce = false;
 
         for (String islandId : islandsConfig.getKeys(false)) {
-            if (islandsConfig.get(islandId + ".trusted") instanceof List)
+            if (islandsConfig.get(islandId + ".trusted") instanceof List) {
                 islandsConfig.set(islandId + ".trusted.", null);
+                announce = true;
+            }
         }
+
+        if (announce)
+            Islands.instance.getLogger().warning("REMOVING DEPRECATED ISLAND TRUST CONFIGURATION FROM islands.yml...");
 
         IslandsConfig.saveIslandsConfig();
     }
