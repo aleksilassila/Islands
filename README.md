@@ -94,7 +94,7 @@ Admin tools help admins moderate their servers by giving them access to all isla
 
 Plugin supports GriefPrevention integration to protect all the islands from griefers.
 
-![Protection](screenshots/functionality/protection.png)
+![Protection](screenshots/functionality/protection.png?raw=true)
 
 ### Example Islands
 
