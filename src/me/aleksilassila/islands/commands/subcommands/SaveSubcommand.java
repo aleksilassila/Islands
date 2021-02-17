@@ -12,7 +12,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 
 public class SaveSubcommand extends AbstractIslandsWorldSubcommand {
     private final String SAVE_DIRECTORY = "plugins/Islands/saves/";

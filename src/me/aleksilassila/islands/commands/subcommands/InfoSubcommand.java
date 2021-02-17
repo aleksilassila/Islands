@@ -5,11 +5,7 @@ import me.aleksilassila.islands.IslandsConfig;
 import me.aleksilassila.islands.commands.AbstractIslandsWorldSubcommand;
 import me.aleksilassila.islands.utils.Messages;
 import me.aleksilassila.islands.utils.Permissions;
-import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
-
-import java.util.Optional;
-import java.util.UUID;
 
 public class InfoSubcommand extends AbstractIslandsWorldSubcommand {
     @Override

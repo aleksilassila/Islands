@@ -1,7 +1,6 @@
 package me.aleksilassila.islands;
 
 import me.aleksilassila.islands.utils.ChatUtils;
-import me.ryanhamshire.GriefPrevention.events.ClaimDeletedEvent;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.World;
