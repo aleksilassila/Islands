@@ -14,14 +14,16 @@ If you want to experience the plugin in game and have an awesome gaming experien
 
 **Griefing.**
 Every island is protected by default.
-The owner can `/trust` other players so that they can also interact with blocks and entities. 
+The owner can `/trust` other players so that they can also interact with blocks and entities.
+The plugin integrates with GriefPrevention to protect the islands,
+and shouldn't interfere with other claims or claimblocks in your server.
 
 **Resources.**
 Everyone hates monuments that are already raided by another player.
 This plugin allows resetting the survival world whenever you feel like it without losing your progress.
 Your islands and inventory are saved in a separate world, that you can access from anywhere.
 
-**"Project managment."**
+**"Project management."**
 Want to start a new base? Just create a new island. Tired of creating a new world multiple times
 to find the biome of your liking? Well, this plugin lets you choose that too. Personally I just
 like the idea of placing individual creations of mine on their own islands.
@@ -89,6 +91,10 @@ Economy integration allows you to set prices for different islands
 Admin tools help admins moderate their servers by giving them access to all islands via GUI
 
 ![Island Moderation](screenshots/functionality/moderation_gui.png?raw=true)
+
+Plugin supports GriefPrevention integration to protect all the islands from griefers.
+
+![Protection](screenshots/functionality/protection.png)
 
 ### Example Islands
 
