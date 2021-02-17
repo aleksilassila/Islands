@@ -176,13 +176,13 @@ public enum IslandsConfig {
     }
 
     @NotNull
-    public static Map<String, Map<String, String>> getIslandsInfo(String uuid) {
+    public static Map<String, Map<String, String>> getIslandsInfo(UUID uuid) {
         Map<String, Map<String, String>> islands = getIslandsInfo(false);
         Map<String, Map<String, String>> finalIslands = new HashMap<>();
 
         for (String islandId : entries.keySet()) {
             Entry e = entries.get(islandId);
-            if (islands.containsKey(islandId) && uuid.equals(e.uuid.toString()))
+            if (islands.containsKey(islandId) && uuid.equals(e.uuid))
                 finalIslands.put(islandId, islands.get(islandId));
         }
 
@@ -190,18 +190,15 @@ public enum IslandsConfig {
     }
 
     @NotNull
-    public static Map<String, Integer> getPlayers() {
-        Map<String, Integer> players = new HashMap<>();
+    public static Map<UUID, Integer> getIslandOwners() {
+        Map<UUID, Integer> players = new HashMap<>();
 
-        for (String islandId : entries.keySet()) {
-            Entry e = entries.get(islandId);
-            UUID uuid = e.uuid;
-
-            if (uuid != null) {
-                if (players.containsKey(uuid.toString())) {
-                    players.put(uuid.toString(), players.get(uuid.toString()) + 1);
+        for (Entry e : entries.values()) {
+            if (e.uuid != null) {
+                if (players.containsKey(e.uuid)) {
+                    players.put(e.uuid, players.get(e.uuid) + 1);
                 } else {
-                    players.put(uuid.toString(), 1);
+                    players.put(e.uuid, 1);
                 }
             }
         }
@@ -368,7 +365,7 @@ public enum IslandsConfig {
 
             this.claimId = fc.getLong(islandId + ".claimId", -1);
 
-            if (this.claimId == -1) {
+            if (this.claimId == -1 && Islands.gpEnabled) {
                 deleteClaims();
                 this.claimId = createClaims(xIndex, zIndex, size, uuid);
                 this.shouldUpdate = true;
@@ -388,7 +385,7 @@ public enum IslandsConfig {
 
             int realY = getIslandY(xIndex, zIndex);
 
-            this.claimId = createClaims(xIndex, zIndex, size, uuid);
+            this.claimId = Islands.gpEnabled ? createClaims(xIndex, zIndex, size, uuid) : -1;
 
             int[][] ic = getIslandCorner(xIndex, zIndex, size);
             this.spawnPosition = new int[] {
@@ -404,7 +401,8 @@ public enum IslandsConfig {
 
         public void delete() {
             getConfig().set(islandId, null);
-            deleteClaims();
+            if (Islands.gpEnabled)
+                deleteClaims();
             entries.remove(islandId);
 
             saveIslandsConfig();
@@ -470,8 +468,10 @@ public enum IslandsConfig {
         public void giveIsland(OfflinePlayer player) {
             this.uuid = player.getUniqueId();
             this.homeId = getNewHomeId(player.getUniqueId());
-            deleteClaims();
-            this.claimId = createClaims(xIndex, zIndex, size, player.getUniqueId());
+            if (Islands.gpEnabled) {
+                deleteClaims();
+                this.claimId = createClaims(xIndex, zIndex, size, player.getUniqueId());
+            }
 
             shouldUpdate = true;
         }
@@ -479,8 +479,10 @@ public enum IslandsConfig {
         public void giveToServer() {
             this.uuid = null;
             this.homeId = -1;
-            deleteClaims();
-            this.claimId = createClaims(xIndex, zIndex, size, null);
+            if (Islands.gpEnabled) {
+                deleteClaims();
+                this.claimId = createClaims(xIndex, zIndex, size, null);
+            }
 
             shouldUpdate = true;
         }
@@ -514,7 +516,6 @@ public enum IslandsConfig {
                 ipc[0][1], ipc[1][1],
                 null, null, null, null);
 
-
             if (r.succeeded) {
                 long claimId = r.claim.getID();
                 int[][] ic = getIslandCorner(xIndex, zIndex, size);
@@ -528,6 +529,11 @@ public enum IslandsConfig {
                 if (uuid != null) {
                     subClaim.setPermission(uuid.toString(), ClaimPermission.Build);
                     subClaim.managers.add(uuid.toString());
+
+                    if (Islands.instance.getConfig().getBoolean("GPAccessWholePlot")) {
+                        r.claim.setPermission(uuid.toString(), ClaimPermission.Build);
+                        r.claim.managers.add(uuid.toString());
+                    }
                 }
 
                 return claimId;

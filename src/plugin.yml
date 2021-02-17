@@ -1,5 +1,5 @@
 name: Islands
-version: 4.8.3
+version: 4.9.0
 author: Aleksi Lassila
 main: me.aleksilassila.islands.Islands
 api-version: 1.15
@@ -56,11 +56,7 @@ permissions:
       islands.bypass.name: true
       islands.bypass.unname: true
       islands.bypass.setspawn: true
-      islands.bypass.untrust: true
-      islands.bypass.protection: true
-      islands.bypass.plotprotection: true
       islands.bypass.home: true
-      islands.bypass.trust.list: true
       islands.bypass.economy: true
       islands.bypass.queue: true
       islands.bypass.queue.limit: true
@@ -155,9 +151,6 @@ permissions:
     default: "op"
   islands.bypass.info:
     description: Bypass island info command restrictions
-    default: "op"
-  islands.bypass.plotprotection:
-    description: Bypass protection limits inside your own plot (build outside of the island)
     default: "op"
   islands.bypass.home:
     description: Bypass home restrictions

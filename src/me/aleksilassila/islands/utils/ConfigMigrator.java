@@ -12,55 +12,26 @@ public class ConfigMigrator {
     public ConfigMigrator() {
         this.islandsConfig = IslandsConfig.getConfig();
 
-        boolean doTrustedMigraton = false;
-        boolean doProtectionMigration = false;
-
-        // Validate trusted
-        for (String islandId : islandsConfig.getKeys(false)) {
-            if (islandsConfig.get(islandId + ".trusted") instanceof List) {
-                doTrustedMigraton = true;
-            }
-
-            if (!islandsConfig.contains(islandId + ".protect")) {
-                doProtectionMigration = true;
-            }
-        }
-
-        if (doTrustedMigraton) migrateTrustedPlayers();
-        if (doProtectionMigration) migrateIslandProtection();
+        migrateTrustedPlayers();
+        migrateIslandProtection();
     }
 
     private void migrateIslandProtection() {
-        Islands.instance.getLogger().warning("ISLANDS.YML IS USING OLD SYNTAX FOR ISLAND PROTECTION. MIGRATING CONFIG...");
+        Islands.instance.getLogger().warning("REMOVING DEPRECATED ISLAND PROTECTION CONFIGURATION FROM islands.yml...");
 
         for (String islandId : islandsConfig.getKeys(false)) {
-            if (islandsConfig.contains(islandId + ".protect")) continue;
-
-            islandsConfig.set(islandId + ".protect.building", true);
-            islandsConfig.set(islandId + ".protect.containers", true);
-            islandsConfig.set(islandId + ".protect.doors", true);
-            islandsConfig.set(islandId + ".protect.utility", true);
+            if (islandsConfig.contains(islandId + ".protect")) islandsConfig.set(islandId + ".protect", null);
         }
 
         IslandsConfig.saveIslandsConfig();
     }
 
     private void migrateTrustedPlayers() {
-        Islands.instance.getLogger().warning("ISLANDS.YML IS USING OLD SYNTAX FOR TRUSTED PLAYERS. MIGRATING CONFIG...");
+        Islands.instance.getLogger().warning("REMOVING DEPRECATED ISLAND TRUST CONFIGURATION FROM islands.yml...");
 
         for (String islandId : islandsConfig.getKeys(false)) {
-            if (!islandsConfig.contains(islandId + ".trusted")) continue;
-            if (!(islandsConfig.get(islandId + ".trusted") instanceof List)) continue;
-
-            List<String> trustedList = islandsConfig.getStringList(islandId + ".trusted");
-            islandsConfig.set(islandId + ".trusted", null);
-
-            for (String uuid : trustedList) {
-                islandsConfig.set(islandId + ".trusted." + uuid + ".build", true);
-                islandsConfig.set(islandId + ".trusted." + uuid + ".accessContainers", false);
-                islandsConfig.set(islandId + ".trusted." + uuid + ".accessDoors", false);
-                islandsConfig.set(islandId + ".trusted." + uuid + ".accessUtility", false);
-            }
+            if (islandsConfig.get(islandId + ".trusted") instanceof List)
+                islandsConfig.set(islandId + ".trusted.", null);
         }
 
         IslandsConfig.saveIslandsConfig();

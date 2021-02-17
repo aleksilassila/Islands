@@ -74,3 +74,7 @@ disableRandomBiome: false               # Disable RANDOM biome in island creatio
 syncTime: true                          # Night skips will be synced between islands world and wilderness.
 homeSubcommand: false                   # If true, /home will become /island home. Useful if you are using other plugins that define /home
 locale: en                              # Available: en, zh_cn
+
+enableIslandProtection: true            # Enable GriefPrevention integration
+overrideGriefPreventionWorlds: true     # Override gp world mode settings for wilderness and islands worlds
+GPAccessWholePlot: false                # Allow players to build anywhere on the whole plot

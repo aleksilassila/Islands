@@ -33,7 +33,7 @@ public class ModerateSubcommand extends Subcommand {
         } else if (args[0].equalsIgnoreCase("player")) {
             OfflinePlayer targetPlayer = Utils.getOfflinePlayer(args[1]);
             if (targetPlayer != null)
-                new AdminGUI(player).showPlayerIslandsGui(targetPlayer.getUniqueId().toString());
+                new AdminGUI(player).showPlayerIslandsGui(targetPlayer.getUniqueId());
             else
                 Messages.send(player, "error.PLAYER_NOT_FOUND");
         }

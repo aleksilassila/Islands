@@ -8,6 +8,7 @@ import me.aleksilassila.islands.generation.Biomes;
 import me.aleksilassila.islands.generation.IslandGeneration;
 import me.aleksilassila.islands.generation.Shape;
 import me.aleksilassila.islands.utils.*;
+import me.ryanhamshire.GriefPrevention.ClaimsMode;
 import me.ryanhamshire.GriefPrevention.GriefPrevention;
 import net.milkbowl.vault.economy.Economy;
 import net.milkbowl.vault.permission.Permission;
@@ -28,6 +29,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class Islands extends JavaPlugin {
     public static Islands instance;
@@ -37,6 +39,7 @@ public class Islands extends JavaPlugin {
     public static World wildernessWorld;
 
     public static GriefPrevention gp;
+    public static boolean gpEnabled = true;
 
     private FileConfiguration biomesCache;
     private File biomesCacheFile;
@@ -57,7 +60,9 @@ public class Islands extends JavaPlugin {
     public void onEnable() {
         instance = this;
 
-        if (Bukkit.getPluginManager().getPlugin("GriefPrevention") == null) {
+        gpEnabled = getConfig().getBoolean("enableIslandProtection", true);
+        if (Bukkit.getPluginManager().getPlugin("GriefPrevention") == null
+                && !gpEnabled) {
             getLogger().severe("WE HAVE NO GP INSTALLED");
             return;
         } else {
@@ -104,6 +109,15 @@ public class Islands extends JavaPlugin {
 
         if (!getConfig().getBoolean("disableWilderness")) {
             wildernessWorld = getWilderness();
+        }
+
+        if (gpEnabled && getConfig().getBoolean("overrideGriefPreventionWorlds")) {
+            ConcurrentHashMap<World, ClaimsMode> modes = gp.config_claims_worldModes;
+
+            modes.put(islandsWorld, gpEnabled ? ClaimsMode.SurvivalRequiringClaims : ClaimsMode.Survival);
+
+            if (wildernessWorld != null)
+                modes.put(wildernessWorld, ClaimsMode.Survival);
         }
 
         new ConfigMigrator();
@@ -205,7 +219,8 @@ public class Islands extends JavaPlugin {
         island.size = islandSize;
         island.height = height;
         island.biome = biome;
-        island.resizeClaim(islandSize);
+        if (gpEnabled)
+            island.resizeClaim(islandSize);
         island.shouldUpdate = true;
 
         try {

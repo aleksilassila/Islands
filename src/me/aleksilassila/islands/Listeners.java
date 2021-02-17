@@ -13,6 +13,7 @@ import org.bukkit.event.block.BlockFromToEvent;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerPortalEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.event.world.TimeSkipEvent;
@@ -122,6 +123,17 @@ public class Listeners extends ChatUtils implements Listener {
             } else {
                 plugin.teleportCooldowns.put(player.getUniqueId().toString(), new Date().getTime());
             }
+        }
+    }
+
+    @EventHandler
+    private void checkIfPlayerLandsInWater(PlayerMoveEvent event) {
+        Location l;
+        if (event.getTo() == null) return;
+        else l = event.getTo();
+
+        if (l.getWorld() == Islands.wildernessWorld && plugin.playersWithNoFall.contains(event.getPlayer())) {
+            if (l.getBlock().isLiquid()) plugin.playersWithNoFall.remove(event.getPlayer());
         }
     }
 

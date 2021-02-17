@@ -7,7 +7,6 @@ import me.aleksilassila.islands.IslandsConfig;
 import me.aleksilassila.islands.utils.BiomeMaterials;
 import me.aleksilassila.islands.utils.Messages;
 import org.bukkit.Bukkit;
-import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
@@ -98,18 +97,18 @@ public class AdminGUI extends PageGUI {
         int PAGE_HEIGHT = 4;
 
         List<StaticPane> pages = new ArrayList<>();
-        Map<String, Integer> players = IslandsConfig.getPlayers();
+        Map<UUID, Integer> players = IslandsConfig.getIslandOwners();
 
         StaticPane pane = new StaticPane(0, 0, 9, PAGE_HEIGHT - 1);
 
         int itemCount = 0;
-        for (String uuid : players.keySet()) {
+        for (UUID uuid : players.keySet()) {
             if (pane.getItems().size() >= (PAGE_HEIGHT - 1) * 9) {
                 pages.add(pane);
                 pane = new StaticPane(0, 0, 9, PAGE_HEIGHT - 1);
             }
 
-            OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(UUID.fromString(uuid));
+            OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(uuid);
 
             String displayName = offlinePlayer.getName();
             if (displayName == null) continue;
@@ -139,10 +138,10 @@ public class AdminGUI extends PageGUI {
         addMainMenuButton(createPaginatedGUI(PAGE_HEIGHT, Messages.get("gui.admin.PLAYERS_TITLE"), pages)).show(player);
     }
 
-    public void showPlayerIslandsGui(String uuid) {
+    public void showPlayerIslandsGui(UUID uuid) {
         int PAGE_HEIGHT = 4;
 
-        String displayName = Bukkit.getOfflinePlayer(UUID.fromString(uuid)).getName();
+        String displayName = Bukkit.getOfflinePlayer(uuid).getName();
         if (displayName == null) return;
 
         List<StaticPane> pages = new ArrayList<>();
