@@ -153,11 +153,10 @@ public enum IslandsConfig {
 
             if (!publicOnly || e.isPublic) {
                 String name = e.isPublic ? e.name : islandId;
-                UUID ownerUUID = e.uuid;
 
                 Map<String, String> values = new HashMap<>();
                 values.put("name", name);
-                values.put("owner", ownerUUID != null ? ownerUUID.toString() : "Server");
+                values.put("owner", e.uuid != null ? e.uuid.toString() : "Server");
 
                 try {
                     String biome = e.biome.toString();
