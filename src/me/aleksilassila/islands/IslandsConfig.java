@@ -527,11 +527,11 @@ public enum IslandsConfig {
                 null, r.claim, null, null).claim;
                 if (uuid != null) {
                     subClaim.setPermission(uuid.toString(), ClaimPermission.Build);
-                    subClaim.managers.add(uuid.toString());
+                    addClaimManager(subClaim, uuid.toString());
 
                     if (Islands.instance.getConfig().getBoolean("GPAccessWholePlot")) {
                         r.claim.setPermission(uuid.toString(), ClaimPermission.Build);
-                        r.claim.managers.add(uuid.toString());
+                        addClaimManager(r.claim, uuid.toString());
                     }
                 }
 
@@ -539,6 +539,13 @@ public enum IslandsConfig {
             } else {
                 Islands.instance.getLogger().severe("Error creating claim for island at plot " + xIndex + ", " + zIndex);
                 return -1;
+            }
+        }
+
+        private static void addClaimManager(Claim claim, String uuid) {
+            if (!claim.managers.contains(uuid)) {
+                claim.managers.add(uuid);
+                Islands.gp.dataStore.saveClaim(claim);
             }
         }
 
