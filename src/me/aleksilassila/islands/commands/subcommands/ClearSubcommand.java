@@ -25,7 +25,7 @@ public class ClearSubcommand extends AbstractIslandsWorldSubcommand {
             return;
         }
 
-        if (!IslandGeneration.INSTANCE.clearIsland(player, island.islandId)) {
+        if (!IslandGeneration.INSTANCE.clearIsland(player, island)) {
             player.sendMessage(Messages.get("error.ONGOING_QUEUE_EVENT"));
             return;
         }

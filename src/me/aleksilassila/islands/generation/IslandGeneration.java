@@ -112,11 +112,11 @@ public enum IslandGeneration {
         return true;
     }
 
-    public boolean clearIsland(Player player, String islandId) {
+    public boolean clearIsland(Player player, IslandsConfig.Entry island) {
         if (!canAddQueueItem(player))
             return false;
 
-        ClearTask task = new ClearTask(player, islandId);
+        CopyTask task = new CopyTask(player, island);
 
         if (queue.size() == 0) {
             task.runTaskTimer(plugin, 0, buildDelay);
@@ -194,84 +194,6 @@ public enum IslandGeneration {
         }
     }
 
-    class ClearTask extends Task {
-        private final Player player;
-        private final int xIndex;
-        private final int zIndex;
-        private final String islandId;
-
-        private int index = 0;
-
-        public ClearTask(Player player, String islandId) {
-            this.player = player;
-            this.xIndex = Integer.parseInt(islandId.split("x")[0]);
-            this.zIndex = Integer.parseInt(islandId.split("x")[1]);
-            this.islandId = islandId;
-        }
-
-
-        @Override
-        public Player getPlayer() {
-            return player;
-        }
-
-        @Override
-        public String getIslandId() {
-            return islandId;
-        }
-
-        @Override
-        public void run() {
-            for (int count = 0; count < rowsClearedPerDelay; count++) {
-                int relativeX = index / IslandsConfig.INSTANCE.islandSpacing;
-                int relativeZ = index - relativeX * IslandsConfig.INSTANCE.islandSpacing;
-
-                int realX = xIndex * IslandsConfig.INSTANCE.islandSpacing + relativeX;
-                int realZ = zIndex * IslandsConfig.INSTANCE.islandSpacing + relativeZ;
-
-                boolean skipDelay = true;
-
-                for (int y = 256; y >= 0; y--) {
-                    Block target = Islands.islandsWorld.getBlockAt(
-                            realX,
-                            y,
-                            realZ
-                    );
-
-                    if (!target.isEmpty()) {
-                        target.setType(Material.AIR);
-                        skipDelay = false;
-                    }
-                    target.setBiome(Biome.PLAINS);
-                }
-
-                if (skipDelay) count--;
-
-                if (index >= IslandsConfig.INSTANCE.islandSpacing * IslandsConfig.INSTANCE.islandSpacing) {
-                    Messages.send(player, "success.CLEARING_DONE");
-
-                    queue.remove(this);
-
-                    if (queue.size() > 0) {
-                        Task nextTask = queue.get(0);
-                        nextTask.runTaskTimer(plugin, 0, buildDelay);
-                    }
-
-                    this.cancel();
-                    break;
-                } else if (index == IslandsConfig.INSTANCE.islandSpacing * IslandsConfig.INSTANCE.islandSpacing / 4) {
-                    Messages.send(player, "info.CLEARING_STATUS", 25);
-                } else if (index == IslandsConfig.INSTANCE.islandSpacing * IslandsConfig.INSTANCE.islandSpacing / 2) {
-                    Messages.send(player, "info.CLEARING_STATUS", 50);
-                } else if (index == IslandsConfig.INSTANCE.islandSpacing * IslandsConfig.INSTANCE.islandSpacing / 4 * 3) {
-                    Messages.send(player, "info.CLEARING_STATUS", 75);
-                }
-
-                index++;
-            }
-        }
-    }
-
     class CopyTask extends Task {
         private final Player player;
         private final IslandsConfig.Entry island;
@@ -282,9 +204,11 @@ public enum IslandGeneration {
         private boolean paste;
         private int index = 0;
 
-        private final boolean useShapes;
+        private int radius;
 
-        private final int[][] randomPositions;
+        private boolean useShapes = false;
+
+        private int[][] randomPositions = null;
 
         public CopyTask(Player player, Location sourceLocation, IslandsConfig.Entry island, boolean paste, boolean clear, boolean useShapes) {
             int[][] corners = IslandsConfig.getIslandCorner(island.xIndex, island.zIndex, island.size);
@@ -297,13 +221,34 @@ public enum IslandGeneration {
 
             this.player = player;
             this.island = island;
+            this.radius = island.size / 2;
 
             this.clear = clear;
             this.paste = paste;
 
             this.useShapes = useShapes;
 
-            this.randomPositions = Utils.randomStalactitePositions(island.size, density);
+            // Stalactite positions + one in the middle
+            int[][] items = Utils.randomStalactitePositions(island.size, density);
+            this.randomPositions = new int[items.length + 1][2];
+            System.arraycopy(items, 0, randomPositions, 0, items.length);
+            randomPositions[randomPositions.length - 1] = new int[] {radius, radius};
+        }
+
+        // For clearing tasks only
+        public CopyTask(Player player, IslandsConfig.Entry island) {
+            int[][] corners = IslandsConfig.getIslandCorner(island.xIndex, island.zIndex, island.size);
+            this.l = new CopyLocation(corners[0][0],
+                    island.y,
+                    corners[0][1],
+                    0, 0, 0);
+
+            this.player = player;
+            this.island = island;
+            this.radius = island.size / 2;
+
+            this.clear = true;
+            this.paste = false;
         }
 
         @Override
@@ -318,21 +263,24 @@ public enum IslandGeneration {
 
         @Override
         public void run() {
-            int radius = island.size / 2;
+            int maxYAdd = (int) (island.size / 2d + 4 * 0.7 + 8);
+
             if (clear) { // Clear the area first if necessary
                 for (int count = 0; count < rowsClearedPerDelay; count++) {
                     int x = index % island.size;
                     int z = index / island.size;
 
                     boolean skipDelay = true;
-                    for (int y = 1; y <= island.size; y--) {
+                    for (int y = (int) -(island.size / 2d + 4 * 0.7 + 8); y <= island.size; y++) {
                         CopyLocation nl = l.add(x, y, z);
 
-                        if (!nl.getTarget().isAir()) { // If there's block there, clear it
-                            nl.setTarget(Material.AIR);
+                        Block i = nl.getIslandBlock();
+
+                        if (!i.getType().isAir()) { // If there's block there, clear it
+                            i.setType(Material.AIR);
                             skipDelay = false; // Don't skip the delay between iterations, normally true
                         }
-                        nl.setTarget(Biome.PLAINS); // Clear biome
+                        i.setBiome(Biome.PLAINS); // Clear biome
                     }
 
                     if (skipDelay) count--;
@@ -342,6 +290,7 @@ public enum IslandGeneration {
 
                         index = 0;
                         clear = false;
+
                         break;
                     } else if (index == IslandsConfig.INSTANCE.islandSpacing * IslandsConfig.INSTANCE.islandSpacing / 4) {
                         Messages.send(player, "info.CLEARING_STATUS", 25);
@@ -357,32 +306,47 @@ public enum IslandGeneration {
                 return;
             }
 
+            if (!paste) {
+                queue.remove(this);
+
+                if (queue.size() > 0) {
+                    Task nextTask = queue.get(0);
+                    nextTask.runTaskTimer(plugin, 0, buildDelay);
+                }
+
+                this.cancel();
+                return;
+            }
+
             // Paste the blocks
-            if (!paste) return;
             for (int count = 0; count < rowsBuiltPerDelay; count++) {
                 int x = index % island.size;
                 int z = index / island.size;
 
-                for (int y = (int) Math.round(1 - modifyNoise(0.8, island.size)); y <= island.size; y++) {
+                for (int y = island.size; y >= -(maxYAdd); y--) {
                     CopyLocation nl = this.l.add(x, y, z);
+                    Block i = nl.getIslandBlock();
+                    Block s = nl.getSourceBlock();
 
-                    BlockData data = nl.getSourceData();
+                    BlockData data = s.getBlockData();
 
                     // Check if block should be replaced according to config.yml
-                    if (replacementMap.containsKey(nl.getSource())) {
-                        data = replacementMap.get(nl.getSource()).createBlockData();
+                    if (replacementMap.containsKey(s.getType())) {
+                        data = replacementMap.get(s.getType()).createBlockData();
                     }
 
                     double yAdd = getShapeNoise(Islands.islandsWorld, x, z, randomPositions, island.size);
 
                     if ((y > radius && isBlockInIslandShape(x, y, z, island.size)) ||
                             (radius - y < yAdd && y <= radius)) {
-                        nl.setTarget(data);
+                        i.setBlockData(data);
+                        if (data.getMaterial().isAir()) // Remove floating stalactite here
+                            if (y <= 0 && radius - y - yAdd < 8) break;
                     } else {
-                        nl.setTarget(Material.AIR);
+                        i.setType(Material.AIR);
                     }
 
-                    nl.copyBiome();
+                    i.setBiome(s.getBiome());
                 }
 
                 // If done
@@ -391,15 +355,9 @@ public enum IslandGeneration {
                     Islands.islandsWorld.getChunkAt(l.getBlockX() + radius, l.getBlockZ() + radius);
 
                     player.sendMessage(Messages.get("success.GENERATION_DONE"));
-                    queue.remove(this);
 
-                    if (queue.size() > 0) {
-                        Task nextTask = queue.get(0);
-                        nextTask.runTaskTimer(plugin, 0, buildDelay);
-                    }
-
-                    this.cancel();
-                    return;
+                    paste = false;
+                    break;
                 } else if (index == island.size * island.size / 4) {
                     player.sendMessage(Messages.get("info.GENERATION_STATUS", 25));
                 } else if (index == island.size * island.size / 2) {
@@ -411,6 +369,46 @@ public enum IslandGeneration {
                 index++;
             }
         }
+    }
+
+    private static final double curvature = 5;
+    private static final int density = 13;
+
+    static FastNoiseLite generalShape;
+    static FastNoiseLite stalactite;
+    static double getShapeNoise(World world, int x, int z, int[][] positions, int size)  {
+        double factor = Math.max(0, 1 - Math.sqrt((Math.pow(x - size / 2d, 2) + Math.pow(z - size / 2d, 2)) / (Math.pow(size, 2) / 4d)));
+        if (factor <= 0) return 0;
+
+        if (generalShape == null) { // Randomize the general shape
+            generalShape = new FastNoiseLite((int) Math.round(world.getSeed() / (double) Long.MAX_VALUE * Integer.MAX_VALUE)); // *Troll face*
+            generalShape.SetNoiseType(FastNoiseLite.NoiseType.Perlin);
+            generalShape.SetFrequency(0.09f);
+            generalShape.SetFractalOctaves(2);
+        }
+
+        if (stalactite == null) { // Randomize stalactite
+            stalactite = new FastNoiseLite((int) Math.round(world.getSeed() / (double) Long.MAX_VALUE * Integer.MAX_VALUE)); // *Troll face*
+            stalactite.SetNoiseType(FastNoiseLite.NoiseType.ValueCubic);
+            stalactite.SetFrequency(0.2f);
+            stalactite.SetFractalOctaves(2);
+            stalactite.SetFractalGain(0.2f);
+        }
+
+        double base = size / 2d * (0.5 * Math.pow(factor, 2.5 / curvature) + 0.5 * Math.pow(factor, curvature / 1.4));
+        double details1 = generalShape.GetNoise(x, z) * 4;
+
+        float spacing = size / (float) (density + 1);
+
+        double dist = spacing;
+        for (int[] pos : positions) {
+            double d = Math.sqrt(Math.pow(x - pos[0], 2) + Math.pow(z - pos[1], 2));
+            dist = Math.min(d / spacing, dist);
+        }
+
+        double details2 = 8 * (1 / Math.pow(dist + 1, 2)) * (1 + stalactite.GetNoise(x, z));
+
+        return base + Math.pow(factor, 0.2) * details1 + Math.pow(factor, 0.1) * details2;
     }
 
     /**
@@ -459,102 +457,31 @@ public enum IslandGeneration {
                 <= Math.pow(islandSize / 2.0, 2);
     }
 
-    class CopyLocation extends Location {
-        double tx, ty, tz;
-        public CopyLocation(double x, double y, double z, double tx, double ty, double tz) {
-            super(Islands.islandsWorld, x, y, z);
-            this.tx = tx;
-            this.ty = ty;
-            this.tz = tz;
+    static class CopyLocation extends Location {
+        double sx, sy, sz;
+
+        /**
+         * @param ix islandsWorld x
+         * @param sx islandsSourceWorld x
+         */
+        public CopyLocation(double ix, double iy, double iz, double sx, double sy, double sz) {
+            super(Islands.islandsWorld, ix, iy, iz);
+            this.sx = sx;
+            this.sy = sy;
+            this.sz = sz;
         }
 
         @Override
         public CopyLocation add(double x, double y, double z) {
-            return new CopyLocation(getX() + x, getY() + y, getZ() + z, tx + x, ty + y, tz + z);
+            return new CopyLocation(getX() + x, getY() + y, getZ() + z, sx + x, sy + y, sz + z);
         }
 
-        public Material getSource() {
-            return Islands.islandsSourceWorld.getBlockAt((int) Math.round(tx), (int) Math.round(ty), (int) Math.round(tz)).getType();
+        public Block getIslandBlock() {
+            return Islands.islandsWorld.getBlockAt(this);
         }
 
-        public BlockData getSourceData() {
-            return Islands.islandsSourceWorld.getBlockAt((int) Math.round(tx), (int) Math.round(ty), (int) Math.round(tz)).getBlockData();
+        public Block getSourceBlock() {
+            return Islands.islandsSourceWorld.getBlockAt((int) Math.round(sx), (int) Math.round(sy), (int) Math.round(sz));
         }
-
-        public Material getTarget() {
-            return Islands.islandsWorld.getBlockAt(this).getType();
-        }
-
-        public int getHighestY() {
-            int y = 254;
-            while (y > 0) {
-                Material material = Islands.islandsSourceWorld.getBlockAt(getBlockX(), y, getBlockZ()).getBlockData().getMaterial();
-                if (!material.isAir() && !material.isBurnable()) break;
-                y--;
-            }
-
-            return y;
-        }
-
-        public void setTarget(Material material) {
-            Islands.islandsWorld.getBlockAt(this).setType(material);
-        }
-
-        public void setTarget(BlockData data) {
-            Islands.islandsWorld.getBlockAt(this).setBlockData(data);
-        }
-
-        public void setTarget(Biome biome) {
-            Islands.islandsWorld.getBlockAt(this).setBiome(biome);
-        }
-
-        public void copyBiome() {
-            Islands.islandsWorld.getBlockAt(this).setBiome(
-                    Islands.islandsSourceWorld.getBlockAt((int) Math.round(tx), (int) Math.round(ty), (int) Math.round(tz)).getBiome());
-        }
-    }
-
-    private static final double curvature = 5;
-    private static final int density = 13;
-
-    static FastNoiseLite generalShape;
-    static FastNoiseLite stalactite;
-    static double getShapeNoise(World world, int x, int z, int[][] positions, int size)  {
-        double factor = Math.max(0, 1 - Math.sqrt((Math.pow(x - size / 2d, 2) + Math.pow(z - size / 2d, 2)) / (Math.pow(size, 2) / 4d)));
-        if (factor <= 0) return 0;
-
-        if (generalShape == null) { // Randomize the general shape
-            generalShape = new FastNoiseLite((int) Math.round(world.getSeed() / (double) Long.MAX_VALUE * Integer.MAX_VALUE)); // *Troll face*
-            generalShape.SetNoiseType(FastNoiseLite.NoiseType.Perlin);
-            generalShape.SetFrequency(0.09f);
-            generalShape.SetFractalOctaves(2);
-        }
-
-        if (stalactite == null) { // Randomize stalactite
-            stalactite = new FastNoiseLite((int) Math.round(world.getSeed() / (double) Long.MAX_VALUE * Integer.MAX_VALUE)); // *Troll face*
-            stalactite.SetNoiseType(FastNoiseLite.NoiseType.ValueCubic);
-            stalactite.SetFrequency(0.2f);
-            stalactite.SetFractalOctaves(2);
-            stalactite.SetFractalGain(0.2f);
-        }
-
-        double base = size / 2d * (0.5 * Math.pow(factor, 2.5 / curvature) + 0.5 * Math.pow(factor, curvature / 1.4));
-        double details1 = generalShape.GetNoise(x, z) * 4;
-
-        float spacing = size / (float) (density + 1);
-
-        double dist = spacing;
-        for (int[] pos : positions) {
-            double d = Math.sqrt(Math.pow(x - pos[0], 2) + Math.pow(z - pos[1], 2));
-            dist = Math.min(d / spacing, dist);
-        }
-
-        double details2 = 8 * (1 / Math.pow(dist + 1, 2)) * (1 + stalactite.GetNoise(x, z));
-
-        return base + Math.pow(factor, 0.2) * details1 + Math.pow(factor, 0.1) * details2;
-    }
-
-    static private double modifyNoise(double value, int islandSize) {
-        return value * (islandSize / 6d);
     }
 }
