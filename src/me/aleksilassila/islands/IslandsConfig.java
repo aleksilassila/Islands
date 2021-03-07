@@ -382,8 +382,6 @@ public enum IslandsConfig {
             this.biome = biome;
             this.homeId = getNewHomeId(uuid);
 
-            int realY = getIslandY(xIndex, zIndex);
-
             this.claimId = Islands.gpEnabled ? createClaims(xIndex, zIndex, size, uuid) : -1;
 
             int[][] ic = getIslandCorner(xIndex, zIndex, size);
@@ -391,7 +389,8 @@ public enum IslandsConfig {
                     ic[0][0] + size / 2,
                     ic[0][1] + size / 2
             };
-            this.y = realY;
+
+            this.y = getIslandY(xIndex, zIndex);
 
             this.isPublic = false;
             this.isSpawn = false;

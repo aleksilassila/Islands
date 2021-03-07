@@ -32,7 +32,7 @@ generation:
   islandGridVerticalSpacing: 50         # Vertical space between two islands next to each other.
   generationDelayInTicks: 0.3           # 2 Will generate 1 row per 2 ticks, 0.5 will generate 2 rows per 1 tick.
   maxVariationsPerBiome: 5              # Max locations generated for each biome, lower the value to speed up server startup.
-  clearSpeedMultiplier: 3               # Removing blocks should be faster than placing them, so you might swant to speed up clearing.
+  clearSpeedMultiplier: 3               # Removing blocks should be faster than placing them, so you might want to speed up clearing.
   minBiomeSize: 80                      # Minimum width of biome block so that it gets picked up by the generator and added as available variation.
                                         # Should be the same as the biggest island size being generated. Read more in Wiki > How does it work
 
@@ -78,3 +78,5 @@ locale: en                              # Available: en, zh_cn
 enableIslandProtection: true            # Enable GriefPrevention integration
 overrideGriefPreventionWorlds: true     # Override gp world mode settings for wilderness and islands worlds
 GPAccessWholePlot: false                # Allow players to build anywhere on the whole plot
+
+useProceduralShapes: true
