@@ -34,6 +34,9 @@ public enum IslandGeneration {
     private final double stalactiteSpacing;
     private final int stalactiteHeight;
 
+    static FastNoiseLite generalShape;
+    static FastNoiseLite stalactite;
+
     private final Map<Material, Material> replacementMap = new HashMap<>();
 
     IslandGeneration() {
@@ -214,6 +217,10 @@ public enum IslandGeneration {
 
         private int[][] randomPositions = null;
 
+        // Noise offsets
+        private int o1;
+        private int o2;
+
         public CopyTask(Player player, Location sourceLocation, IslandsConfig.Entry island, boolean paste, boolean clear, boolean useShapes) {
             int[][] corners = IslandsConfig.getIslandCorner(island.xIndex, island.zIndex, island.size);
             this.l = new CopyLocation(corners[0][0],
@@ -237,6 +244,10 @@ public enum IslandGeneration {
             this.randomPositions = new int[items.length + 1][2];
             System.arraycopy(items, 0, randomPositions, 0, items.length);
             randomPositions[randomPositions.length - 1] = new int[] {radius, radius};
+
+            Random r = new Random();
+            o1 = r.nextInt(50000);
+            o2 = r.nextInt(50000);
         }
 
         // For clearing tasks only
@@ -374,44 +385,44 @@ public enum IslandGeneration {
                 index++;
             }
         }
+
+
+        private static final double curvature = 5;
+
+        double getShapeNoise(World world, int x, int z, int[][] positions, int size)  {
+            double factor = Math.max(0, 1 - Math.sqrt((Math.pow(x - size / 2d, 2) + Math.pow(z - size / 2d, 2)) / (Math.pow(size, 2) / 4d)));
+            if (factor <= 0) return 0;
+
+            if (generalShape == null) { // Randomize the general shape
+                generalShape = new FastNoiseLite((int) Math.round(world.getSeed() / (double) Long.MAX_VALUE * Integer.MAX_VALUE)); // *Troll face*
+                generalShape.SetNoiseType(FastNoiseLite.NoiseType.Perlin);
+                generalShape.SetFrequency(0.09f);
+                generalShape.SetFractalOctaves(2);
+            }
+
+            if (stalactite == null) { // Randomize stalactite
+                stalactite = new FastNoiseLite((int) Math.round(world.getSeed() / (double) Long.MAX_VALUE * Integer.MAX_VALUE)); // *Troll face*
+                stalactite.SetNoiseType(FastNoiseLite.NoiseType.ValueCubic);
+                stalactite.SetFrequency(0.2f);
+                stalactite.SetFractalOctaves(2);
+                stalactite.SetFractalGain(0.2f);
+            }
+
+            double base = size / 2d * (0.5 * Math.pow(factor, 2.5 / curvature) + 0.5 * Math.pow(factor, curvature / 1.4));
+            double generalDetails = generalShape.GetNoise(x + o1, z + o2) * 4;
+
+            double dist = stalactiteSpacing;
+            for (int[] pos : positions) {
+                double d = Math.sqrt(Math.pow(x - pos[0], 2) + Math.pow(z - pos[1], 2));
+                dist = Math.min(d / stalactiteSpacing, dist);
+            }
+
+            double fineDetails = stalactiteHeight * (1 / Math.pow(dist + 1, 2)) * (1 + stalactite.GetNoise(x + o1, z + o2));
+
+            return base + Math.pow(factor, 0.2) * generalDetails + Math.pow(factor, 0.1) * fineDetails;
+        }
     }
 
-    private static final double curvature = 5;
-
-    static FastNoiseLite generalShape;
-    static FastNoiseLite stalactite;
-    double getShapeNoise(World world, int x, int z, int[][] positions, int size)  {
-        double factor = Math.max(0, 1 - Math.sqrt((Math.pow(x - size / 2d, 2) + Math.pow(z - size / 2d, 2)) / (Math.pow(size, 2) / 4d)));
-        if (factor <= 0) return 0;
-
-        if (generalShape == null) { // Randomize the general shape
-            generalShape = new FastNoiseLite((int) Math.round(world.getSeed() / (double) Long.MAX_VALUE * Integer.MAX_VALUE)); // *Troll face*
-            generalShape.SetNoiseType(FastNoiseLite.NoiseType.Perlin);
-            generalShape.SetFrequency(0.09f);
-            generalShape.SetFractalOctaves(2);
-        }
-
-        if (stalactite == null) { // Randomize stalactite
-            stalactite = new FastNoiseLite((int) Math.round(world.getSeed() / (double) Long.MAX_VALUE * Integer.MAX_VALUE)); // *Troll face*
-            stalactite.SetNoiseType(FastNoiseLite.NoiseType.ValueCubic);
-            stalactite.SetFrequency(0.2f);
-            stalactite.SetFractalOctaves(2);
-            stalactite.SetFractalGain(0.2f);
-        }
-
-        double base = size / 2d * (0.5 * Math.pow(factor, 2.5 / curvature) + 0.5 * Math.pow(factor, curvature / 1.4));
-        double generalDetails = generalShape.GetNoise(x, z) * 4;
-
-        double dist = stalactiteSpacing;
-        for (int[] pos : positions) {
-            double d = Math.sqrt(Math.pow(x - pos[0], 2) + Math.pow(z - pos[1], 2));
-            dist = Math.min(d / stalactiteSpacing, dist);
-        }
-
-        double fineDetails = stalactiteHeight * (1 / Math.pow(dist + 1, 2)) * (1 + stalactite.GetNoise(x, z));
-
-        return base + Math.pow(factor, 0.2) * generalDetails + Math.pow(factor, 0.1) * fineDetails;
-    }
 
     /**
      * Check if the block is inside the egg-shape (not sphere!!) of the island,
