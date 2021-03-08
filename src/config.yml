@@ -35,6 +35,8 @@ generation:
   clearSpeedMultiplier: 3               # Removing blocks should be faster than placing them, so you might want to speed up clearing.
   minBiomeSize: 80                      # Minimum width of biome block so that it gets picked up by the generator and added as available variation.
                                         # Should be the same as the biggest island size being generated. Read more in Wiki > How does it work
+  stalactiteLength: 8                   # Length of procedural stalactite hanging from islands
+  stalactiteSpacing: 4                  # Average distance between hanging stalactites
 
 biomeBlacklist:                         # These biomes do not get picked up by island generator.
   - DEEP_OCEAN                          # Ocean biomes work poorly with islands.
@@ -73,10 +75,9 @@ unfinishedIslandTeleports: true         # Deny teleports to island that are stil
 disableRandomBiome: false               # Disable RANDOM biome in island creation
 syncTime: true                          # Night skips will be synced between islands world and wilderness.
 homeSubcommand: false                   # If true, /home will become /island home. Useful if you are using other plugins that define /home
+useProceduralShapes: true               # Procedurally generate hanging stalactite underneath islands.
 locale: en                              # Available: en, zh_cn
 
 enableIslandProtection: true            # Enable GriefPrevention integration
 overrideGriefPreventionWorlds: true     # Override gp world mode settings for wilderness and islands worlds
 GPAccessWholePlot: false                # Allow players to build anywhere on the whole plot
-
-useProceduralShapes: true

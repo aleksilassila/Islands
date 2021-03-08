@@ -40,22 +40,21 @@ public class Utils {
          return targetBiome;
     }
 
-    public static int[][] randomStalactitePositions(int size, int density) {
-        float spacing = size / (float) (density + 1);
+    public static int[][] randomStalactitePositions(int size, double spacing) {
         ArrayList<FastNoiseLite.Vector2> positions = new ArrayList<>();
 
         FastNoiseLite noise = new FastNoiseLite();
         noise.SetSeed(new Random().nextInt());
         noise.SetFrequency(1);
         noise.SetDomainWarpType(FastNoiseLite.DomainWarpType.BasicGrid);
-        noise.SetDomainWarpAmp(spacing);
+        noise.SetDomainWarpAmp((float) spacing);
 
-
+        int density = (int) (size / spacing) - 1;
         for (int i = 0; i < density * density; i++) {
-            float x = ((i % density) + 1) * spacing;
-            float z = ((i / density) + 1) * spacing;
+            double x = ((i % density) + 1) * spacing;
+            double z = ((int) (i / density) + 1) * spacing;
 
-            FastNoiseLite.Vector2 v = new FastNoiseLite.Vector2(x, z);
+            FastNoiseLite.Vector2 v = new FastNoiseLite.Vector2((float) x, (float) z);
             noise.DomainWarp(v);
             positions.add(v);
         }

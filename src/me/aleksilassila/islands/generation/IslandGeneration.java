@@ -31,6 +31,8 @@ public enum IslandGeneration {
     private int rowsBuiltPerDelay = 1;
     private final int rowsClearedPerDelay;
     public boolean proceduralShapes;
+    private final double stalactiteSpacing;
+    private final int stalactiteHeight;
 
     private final Map<Material, Material> replacementMap = new HashMap<>();
 
@@ -39,6 +41,8 @@ public enum IslandGeneration {
 
         double delay = plugin.getConfig().getDouble("generation.generationDelayInTicks");
         proceduralShapes = plugin.getConfig().getBoolean("useProceduralShapes", false);
+        stalactiteHeight = plugin.getConfig().getInt("generation.stalactiteLength", 8);
+        stalactiteSpacing = plugin.getConfig().getDouble("generation.stalactiteSpacing", 2);
 
         if (delay < 1.0) {
             this.buildDelay = 1;
@@ -75,7 +79,7 @@ public enum IslandGeneration {
         }
     }
 
-    public boolean copyIsland(Player player, IslandsConfig.Entry updatedIsland, boolean shouldClearArea) {
+    public boolean copyIsland(Player player, IslandsConfig.Entry updatedIsland, boolean shouldClearArea, boolean noShape) {
         if (Biomes.INSTANCE.availableLocations.getOrDefault(updatedIsland.biome, new ArrayList<>()).size() == 0)
             throw new IllegalArgumentException();
 
@@ -101,7 +105,7 @@ public enum IslandGeneration {
 
         sourceLocation.setY(centerY);
 
-        CopyTask task = new CopyTask(player, sourceLocation, updatedIsland, true, shouldClearArea, true);
+        CopyTask task = new CopyTask(player, sourceLocation, updatedIsland, true, shouldClearArea, !noShape);
 
         if (queue.size() == 0) {
             task.runTaskTimer(plugin, 0, buildDelay);
@@ -204,7 +208,7 @@ public enum IslandGeneration {
         private boolean paste;
         private int index = 0;
 
-        private int radius;
+        private final int radius;
 
         private boolean useShapes = false;
 
@@ -226,10 +230,10 @@ public enum IslandGeneration {
             this.clear = clear;
             this.paste = paste;
 
-            this.useShapes = useShapes;
+            this.useShapes = proceduralShapes && useShapes;
 
             // Stalactite positions + one in the middle
-            int[][] items = Utils.randomStalactitePositions(island.size, density);
+            int[][] items = Utils.randomStalactitePositions(island.size, stalactiteSpacing);
             this.randomPositions = new int[items.length + 1][2];
             System.arraycopy(items, 0, randomPositions, 0, items.length);
             randomPositions[randomPositions.length - 1] = new int[] {radius, radius};
@@ -263,7 +267,7 @@ public enum IslandGeneration {
 
         @Override
         public void run() {
-            int maxYAdd = (int) (island.size / 2d + 4 * 0.7 + 8);
+            int maxYAdd = (int) (island.size / 2d + 4 * 0.7 + stalactiteHeight);
 
             if (clear) { // Clear the area first if necessary
                 for (int count = 0; count < rowsClearedPerDelay; count++) {
@@ -271,7 +275,7 @@ public enum IslandGeneration {
                     int z = index / island.size;
 
                     boolean skipDelay = true;
-                    for (int y = (int) -(island.size / 2d + 4 * 0.7 + 8); y <= island.size; y++) {
+                    for (int y = -maxYAdd; y <= island.size; y++) {
                         CopyLocation nl = l.add(x, y, z);
 
                         Block i = nl.getIslandBlock();
@@ -323,7 +327,7 @@ public enum IslandGeneration {
                 int x = index % island.size;
                 int z = index / island.size;
 
-                for (int y = island.size; y >= -(maxYAdd); y--) {
+                for (int y = island.size; y >= -maxYAdd; y--) {
                     CopyLocation nl = this.l.add(x, y, z);
                     Block i = nl.getIslandBlock();
                     Block s = nl.getSourceBlock();
@@ -337,14 +341,15 @@ public enum IslandGeneration {
 
                     double yAdd = getShapeNoise(Islands.islandsWorld, x, z, randomPositions, island.size);
 
-                    if ((y > radius && isBlockInIslandShape(x, y, z, island.size)) ||
-                            (radius - y < yAdd && y <= radius)) {
+                    if (!useShapes || (y > radius)) {
+                        if (isBlockInIslandShape(x, y, z, island.size))
+                            i.setBlockData(data);
+                        else i.setType(Material.AIR);
+                    } else if (radius - y < yAdd) {
                         i.setBlockData(data);
                         if (data.getMaterial().isAir()) // Remove floating stalactite here
                             if (y <= 0 && radius - y - yAdd < 8) break;
-                    } else {
-                        i.setType(Material.AIR);
-                    }
+                    } else i.setType(Material.AIR);
 
                     i.setBiome(s.getBiome());
                 }
@@ -372,11 +377,10 @@ public enum IslandGeneration {
     }
 
     private static final double curvature = 5;
-    private static final int density = 13;
 
     static FastNoiseLite generalShape;
     static FastNoiseLite stalactite;
-    static double getShapeNoise(World world, int x, int z, int[][] positions, int size)  {
+    double getShapeNoise(World world, int x, int z, int[][] positions, int size)  {
         double factor = Math.max(0, 1 - Math.sqrt((Math.pow(x - size / 2d, 2) + Math.pow(z - size / 2d, 2)) / (Math.pow(size, 2) / 4d)));
         if (factor <= 0) return 0;
 
@@ -396,19 +400,17 @@ public enum IslandGeneration {
         }
 
         double base = size / 2d * (0.5 * Math.pow(factor, 2.5 / curvature) + 0.5 * Math.pow(factor, curvature / 1.4));
-        double details1 = generalShape.GetNoise(x, z) * 4;
+        double generalDetails = generalShape.GetNoise(x, z) * 4;
 
-        float spacing = size / (float) (density + 1);
-
-        double dist = spacing;
+        double dist = stalactiteSpacing;
         for (int[] pos : positions) {
             double d = Math.sqrt(Math.pow(x - pos[0], 2) + Math.pow(z - pos[1], 2));
-            dist = Math.min(d / spacing, dist);
+            dist = Math.min(d / stalactiteSpacing, dist);
         }
 
-        double details2 = 8 * (1 / Math.pow(dist + 1, 2)) * (1 + stalactite.GetNoise(x, z));
+        double fineDetails = stalactiteHeight * (1 / Math.pow(dist + 1, 2)) * (1 + stalactite.GetNoise(x, z));
 
-        return base + Math.pow(factor, 0.2) * details1 + Math.pow(factor, 0.1) * details2;
+        return base + Math.pow(factor, 0.2) * generalDetails + Math.pow(factor, 0.1) * fineDetails;
     }
 
     /**

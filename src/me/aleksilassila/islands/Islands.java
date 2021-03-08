@@ -6,7 +6,6 @@ import com.sun.istack.internal.Nullable;
 import me.aleksilassila.islands.commands.IslandCommands;
 import me.aleksilassila.islands.generation.Biomes;
 import me.aleksilassila.islands.generation.IslandGeneration;
-import me.aleksilassila.islands.generation.Shape;
 import me.aleksilassila.islands.utils.*;
 import me.ryanhamshire.GriefPrevention.ClaimsMode;
 import me.ryanhamshire.GriefPrevention.GriefPrevention;
@@ -54,7 +53,6 @@ public class Islands extends JavaPlugin {
     public Map<Integer, Double> islandPrices;
 
     public Map<String, Integer> definedIslandSizes;
-    public Map<Integer, List<Shape>> definedIslandShapes;
 
     @Override
     public void onEnable() {
@@ -78,7 +76,7 @@ public class Islands extends JavaPlugin {
 
         worldEdit = (WorldEditPlugin) Bukkit.getPluginManager().getPlugin("WorldEdit");
         if (worldEdit == null) {
-            getLogger().severe("No WorldEdit found. Island shapes disabled.");
+            getLogger().severe("No WorldEdit found. Island saving to schematic files disabled.");
         }
 
         new UpdateChecker(this, 84303).getVersion(version -> {
@@ -128,7 +126,6 @@ public class Islands extends JavaPlugin {
         confirmations = new HashMap<>();
 
         definedIslandSizes = setupSizes();
-        definedIslandShapes = Shape.loadAllShapes();
 
         new IslandCommands();
 
@@ -154,23 +151,18 @@ public class Islands extends JavaPlugin {
         // If random biome
         biome = Optional.ofNullable(biome).orElse(Biomes.getRandomBiome());
 
-        Shape shape = definedIslandShapes.getOrDefault(islandSize, null) != null
-                ? definedIslandShapes.get(islandSize).get(new Random().nextInt(definedIslandShapes.get(islandSize).size()))
-                : null;
-
+        boolean noShape = false;
         if (getConfig().contains("excludeShapes", true)
                 && getConfig().getStringList("excludeShapes").contains(biome.name())) {
-            shape = null;
+            noShape = true;
         }
 
-        int height = shape != null
-                ? shape.getHeight() + islandSize / 2
-                : islandSize;
+        int height = islandSize;
 
         IslandsConfig.Entry island = IslandsConfig.createIsland(player.getUniqueId(), islandSize, height, biome);
 
         try {
-            boolean success = IslandGeneration.INSTANCE.copyIsland(player, island, false);
+            boolean success = IslandGeneration.INSTANCE.copyIsland(player, island, false, noShape);
 
             if (!success) {
                 island.delete();
@@ -189,18 +181,13 @@ public class Islands extends JavaPlugin {
         // If random biome
         biome = Optional.ofNullable(biome).orElse(Biomes.getRandomBiome());
 
-        Shape shape = definedIslandShapes.getOrDefault(islandSize, null) != null
-                ? definedIslandShapes.get(islandSize).get(new Random().nextInt(definedIslandShapes.get(islandSize).size()))
-                : null;
-
+        boolean noShape = false;
         if (getConfig().contains("excludeShapes", true)
                 && getConfig().getStringList("excludeShapes").contains(biome.name())) {
-            shape = null;
+            noShape = true;
         }
 
-        int height = shape != null
-                ? shape.getHeight() + islandSize / 2
-                : islandSize;
+        int height = islandSize;
 
         island.size = islandSize;
         island.height = height;
@@ -210,7 +197,7 @@ public class Islands extends JavaPlugin {
         island.shouldUpdate = true;
 
         try {
-            return IslandGeneration.INSTANCE.copyIsland(player, island, true);
+            return IslandGeneration.INSTANCE.copyIsland(player, island, true, noShape);
 
         } catch (IllegalArgumentException e) {
             throw new IllegalArgumentException();
@@ -453,7 +440,9 @@ public class Islands extends JavaPlugin {
                 getLogger().warning("Config is missing " + defaultKey);
                 return true;
             } else {
-                getLogger().severe("Config is missing section " + defaultKey + ". Disabling Islands.");
+                getLogger().severe("Config is missing section " + defaultKey +
+                        ". You can find all the required values in Islands wiki: " +
+                        "https://github.com/aleksilassila/Islands/wiki/config.yml. Disabling Islands.");
                 return false;
             }
         } else if (DONT_VALIDATE.contains(defaultKey)) {
@@ -466,7 +455,9 @@ public class Islands extends JavaPlugin {
         } else {
             for (String key : defaultSection.getKeys(false)) {
                 if (!section.getKeys(false).contains(key)) {
-                    getLogger().severe("Config is missing key " + defaultKey + "." + key + ". Disabling islands.");
+                    getLogger().severe("Config is missing key " + defaultKey + "." + key +
+                            ". You can find all the required values in Islands wiki: " +
+                            "https://github.com/aleksilassila/Islands/wiki/config.yml. Disabling Islands.");
                     return false;
                 }
             }
@@ -474,8 +465,4 @@ public class Islands extends JavaPlugin {
 
         return true;
     }
-
-    // TODO:
-    //  - Island generation in custom locations outside of the grid. Bigger sizes.
-    //  - Fix giant trees cutting off from top.
 }
