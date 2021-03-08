@@ -50,7 +50,7 @@ biomeBlacklist:                         # These biomes do not get picked up by i
   - GRAVELLY_MOUNTAINS
   - MODIFIED_GRAVELLY_MOUNTAINS
 
-excludeShapes:                          # These biomes won't use custom shapes at all.
+excludeShapes:                          # These biomes will always use the default round shape.
   - LUKEWARM_OCEAN
   - OCEAN
   - FROZEN_OCEAN
@@ -60,7 +60,7 @@ excludeShapes:                          # These biomes won't use custom shapes a
 
 disableMobsOnIslands: true
 tpCooldownTime: 10                      # /home and /visit cooldown after damage.
-illegalIslandNames:                     # Blocked island names. Useful if you want to reserve name for "official" island
+illegalIslandNames:                     # Blocked island names. Useful if you want to reserve a name for "official" island
 #  - spawn
 wildernessCoordinateMultiplier: 4       # Player's x and z coordinates gets multiplied by this value when they jump to wilderness.
 voidTeleport: true                      # If disabled, void kills again in islandsWorld
