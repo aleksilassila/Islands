@@ -161,7 +161,7 @@ public class Islands extends JavaPlugin {
         IslandsConfig.Entry island = IslandsConfig.createIsland(player.getUniqueId(), islandSize, height, biome);
 
         try {
-            boolean success = IslandGeneration.INSTANCE.copyIsland(player, island, false, noShape);
+            boolean success = IslandGeneration.INSTANCE.copyIsland(player, island, false, noShape, island.size);
 
             if (!success) {
                 island.delete();
@@ -188,6 +188,7 @@ public class Islands extends JavaPlugin {
 
         int height = islandSize;
 
+        int oldSize = island.size;
         island.size = islandSize;
         island.height = height;
         island.biome = biome;
@@ -196,7 +197,7 @@ public class Islands extends JavaPlugin {
         island.shouldUpdate = true;
 
         try {
-            return IslandGeneration.INSTANCE.copyIsland(player, island, true, noShape);
+            return IslandGeneration.INSTANCE.copyIsland(player, island, true, noShape, oldSize);
 
         } catch (IllegalArgumentException e) {
             throw new IllegalArgumentException();

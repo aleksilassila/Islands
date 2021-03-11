@@ -82,7 +82,7 @@ public enum IslandGeneration {
         }
     }
 
-    public boolean copyIsland(Player player, IslandsConfig.Entry updatedIsland, boolean shouldClearArea, boolean noShape) {
+    public boolean copyIsland(Player player, IslandsConfig.Entry updatedIsland, boolean shouldClearArea, boolean noShape, int oldSize) {
         if (Biomes.INSTANCE.availableLocations.getOrDefault(updatedIsland.biome, new ArrayList<>()).size() == 0)
             throw new IllegalArgumentException();
 
@@ -108,7 +108,7 @@ public enum IslandGeneration {
 
         sourceLocation.setY(centerY);
 
-        CopyTask task = new CopyTask(player, sourceLocation, updatedIsland, true, shouldClearArea, !noShape);
+        CopyTask task = new CopyTask(player, sourceLocation, updatedIsland, true, shouldClearArea, !noShape, oldSize);
 
         if (queue.size() == 0) {
             task.runTaskTimer(plugin, 0, buildDelay);
@@ -205,13 +205,15 @@ public enum IslandGeneration {
         private final Player player;
         private final IslandsConfig.Entry island;
 
-        CopyLocation l;
+        CopyLocation copyLocation;
+        CopyLocation clearLocation;
 
         private boolean clear;
         private boolean paste;
         private int index = 0;
 
         private final int radius;
+        private final int clearSize;
 
         private boolean useShapes = false;
 
@@ -221,18 +223,30 @@ public enum IslandGeneration {
         private int o1;
         private int o2;
 
-        public CopyTask(Player player, Location sourceLocation, IslandsConfig.Entry island, boolean paste, boolean clear, boolean useShapes) {
+        public CopyTask(Player player, Location sourceLocation, IslandsConfig.Entry island, boolean paste, boolean clear, boolean useShapes, int clearSize) {
             int[][] corners = IslandsConfig.getIslandCorner(island.xIndex, island.zIndex, island.size);
-            this.l = new CopyLocation(corners[0][0],
+            int[][] clearCorners = IslandsConfig.getIslandCorner(island.xIndex, island.zIndex, clearSize);
+
+            this.copyLocation = new CopyLocation(corners[0][0],
                     island.y,
                     corners[0][1],
                     sourceLocation.getBlockX() - island.size / 2,
                     sourceLocation.getBlockY() - island.size / 2,
                     sourceLocation.getBlockZ() - island.size / 2);
 
+            this.clearLocation = new CopyLocation(clearCorners[0][0],
+                    island.y,
+                    clearCorners[0][1],
+                    sourceLocation.getBlockX() - clearSize / 2,
+                    sourceLocation.getBlockY() - clearSize / 2,
+                    sourceLocation.getBlockZ() - clearSize / 2);
+
+            System.out.println(clearCorners[0][0] + ", " + clearCorners[0][1]);
+
             this.player = player;
             this.island = island;
             this.radius = island.size / 2;
+            this.clearSize = clearSize;
 
             this.clear = clear;
             this.paste = paste;
@@ -250,10 +264,10 @@ public enum IslandGeneration {
             o2 = r.nextInt(50000);
         }
 
-        // For clearing tasks only
+        // For clear command only
         public CopyTask(Player player, IslandsConfig.Entry island) {
             int[][] corners = IslandsConfig.getIslandCorner(island.xIndex, island.zIndex, island.size);
-            this.l = new CopyLocation(corners[0][0],
+            this.clearLocation = new CopyLocation(corners[0][0],
                     island.y,
                     corners[0][1],
                     0, 0, 0);
@@ -261,6 +275,7 @@ public enum IslandGeneration {
             this.player = player;
             this.island = island;
             this.radius = island.size / 2;
+            this.clearSize = island.size;
 
             this.clear = true;
             this.paste = false;
@@ -279,28 +294,28 @@ public enum IslandGeneration {
         @Override
         public void run() {
             int maxYAdd = (int) (island.size / 2d + 4 * 0.7 + stalactiteHeight);
+            int maxYAddClear = (int) (clearSize / 2d + 4 * 0.7 + stalactiteHeight);
 
             if (clear) { // Clear the area first if necessary
                 for (int count = 0; count < rowsClearedPerDelay; count++) {
-                    int x = index % island.size;
-                    int z = index / island.size;
+                    int x = index % clearSize;
+                    int z = index / clearSize;
 
                     boolean skipDelay = true;
-                    for (int y = -maxYAdd; y <= island.size; y++) {
-                        CopyLocation nl = l.add(x, y, z);
+                    for (int y = -maxYAddClear; y <= clearSize; y++) {
+                        CopyLocation l = clearLocation.add(x, y, z);
+                        Block ib = l.getIslandBlock();
 
-                        Block i = nl.getIslandBlock();
-
-                        if (!i.getType().isAir()) { // If there's block there, clear it
-                            i.setType(Material.AIR);
+                        if (!ib.getType().isAir()) { // If there's block there, clear it
+                            ib.setType(Material.AIR);
                             skipDelay = false; // Don't skip the delay between iterations, normally true
                         }
-                        i.setBiome(Biome.PLAINS); // Clear biome
+                        ib.setBiome(Biome.PLAINS); // Clear biome
                     }
 
                     if (skipDelay) count--;
 
-                    if (z >= island.size) {
+                    if (z >= clearSize) {
                         Messages.send(player, "success.CLEARING_DONE");
 
                         index = 0;
@@ -339,36 +354,36 @@ public enum IslandGeneration {
                 int z = index / island.size;
 
                 for (int y = island.size; y >= -maxYAdd; y--) {
-                    CopyLocation nl = this.l.add(x, y, z);
-                    Block i = nl.getIslandBlock();
-                    Block s = nl.getSourceBlock();
+                    CopyLocation l = copyLocation.add(x, y, z);
+                    Block ib = l.getIslandBlock();
+                    Block sb = l.getSourceBlock();
 
-                    BlockData data = s.getBlockData();
+                    BlockData data = sb.getBlockData();
 
                     // Check if block should be replaced according to config.yml
-                    if (replacementMap.containsKey(s.getType())) {
-                        data = replacementMap.get(s.getType()).createBlockData();
+                    if (replacementMap.containsKey(sb.getType())) {
+                        data = replacementMap.get(sb.getType()).createBlockData();
                     }
 
                     double yAdd = getShapeNoise(Islands.islandsWorld, x, z, randomPositions, island.size);
 
                     if (!useShapes || (y > radius)) {
                         if (isBlockInIslandShape(x, y, z, island.size))
-                            i.setBlockData(data);
-                        else i.setType(Material.AIR);
+                            ib.setBlockData(data);
+                        else ib.setType(Material.AIR);
                     } else if (radius - y < yAdd) {
-                        i.setBlockData(data);
+                        ib.setBlockData(data);
                         if (data.getMaterial().isAir()) // Remove floating stalactite here
                             if (y <= 0 && radius - y - yAdd < 8) break;
-                    } else i.setType(Material.AIR);
+                    } else ib.setType(Material.AIR);
 
-                    i.setBiome(s.getBiome());
+                    ib.setBiome(sb.getBiome());
                 }
 
                 // If done
                 if (index >= island.size * island.size) {
                     // Update lighting
-                    Islands.islandsWorld.getChunkAt(l.getBlockX() + radius, l.getBlockZ() + radius);
+                    Islands.islandsWorld.getChunkAt(copyLocation.getBlockX() + radius, copyLocation.getBlockZ() + radius);
 
                     player.sendMessage(Messages.get("success.GENERATION_DONE"));
 
