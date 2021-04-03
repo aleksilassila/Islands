@@ -25,7 +25,7 @@ public class ModerateSubcommand extends Subcommand {
             IslandsConfig.Entry e = IslandsConfig.entries.get(args[1]);
 
             if (e != null) {
-                player.teleport(e.getIslandSpawn());
+                e.teleport(player);
             } else {
                 player.sendMessage(Messages.get("error.ISLAND_NOT_FOUND"));
             }

@@ -188,7 +188,7 @@ public class AdminGUI extends PageGUI {
         IslandsConfig.Entry e = IslandsConfig.entries.get(islandId);
 
         if (e != null) {
-            player.teleport(e.getIslandSpawn());
+            e.teleport(player);
         } else {
             player.sendMessage(Messages.get("error.ISLAND_NOT_FOUND"));
         }

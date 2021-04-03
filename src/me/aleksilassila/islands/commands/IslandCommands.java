@@ -103,8 +103,8 @@ public class IslandCommands extends ChatUtils implements TabExecutor {
                 plugin.confirmations.put(player.getUniqueId().toString(), new ConfirmItem(issuedCommand, 8 * 1000));
             }
 
-                target.onCommand(player, Arrays.copyOfRange(args, 1, args.length), confirmed);
             try {
+                target.onCommand(player, Arrays.copyOfRange(args, 1, args.length), confirmed);
                 return true;
             } catch (Exception e) {
                 player.sendMessage(Messages.get("error.ERROR"));

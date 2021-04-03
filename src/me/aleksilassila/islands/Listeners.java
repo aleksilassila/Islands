@@ -44,7 +44,7 @@ public class Listeners extends ChatUtils implements Listener {
     public void onPlayerJoin(PlayerJoinEvent event) {
         if (!event.getPlayer().hasPlayedBefore()) {
             if (IslandsConfig.spawnIsland != null) {
-                event.getPlayer().teleport(IslandsConfig.spawnIsland.getIslandSpawn());
+                IslandsConfig.spawnIsland.teleport(event.getPlayer());
             }
         }
     }
@@ -53,6 +53,7 @@ public class Listeners extends ChatUtils implements Listener {
     public void onPlayerRespawn(PlayerRespawnEvent event) {
         if (IslandsConfig.spawnIsland != null) {
             event.setRespawnLocation(IslandsConfig.spawnIsland.getIslandSpawn());
+            if (islandDamage) plugin.playersWithNoFall.add(event.getPlayer());
         }
     }
 

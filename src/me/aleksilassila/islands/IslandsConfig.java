@@ -14,6 +14,7 @@ import org.bukkit.block.Biome;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.entity.Player;
 
 import java.io.File;
 import java.io.IOException;
@@ -24,6 +25,7 @@ public enum IslandsConfig {
 
     public final int islandSpacing;
     public final int verticalSpacing;
+    public final boolean islandDamage;
 
     public static HashMap<String, Entry> entries;
     public static Entry spawnIsland = null;
@@ -34,6 +36,7 @@ public enum IslandsConfig {
     IslandsConfig() {
         this.islandSpacing = Islands.instance.getConfig().getInt("generation.islandGridSpacing");
         this.verticalSpacing = Islands.instance.getConfig().getInt("generation.islandGridVerticalSpacing");
+        this.islandDamage = Islands.instance.getConfig().getBoolean("islandDamage");
     }
 
     public static FileConfiguration getConfig() {
@@ -560,6 +563,12 @@ public enum IslandsConfig {
                 Islands.gp.dataStore.deleteClaim(c);
             }
             this.claimId = -1;
+        }
+
+        public void teleport(Player player) {
+            if (!INSTANCE.islandDamage)
+                Islands.instance.playersWithNoFall.add(player);
+            player.teleport(getIslandSpawn());
         }
     }
 

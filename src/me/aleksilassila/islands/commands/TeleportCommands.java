@@ -64,7 +64,7 @@ public class TeleportCommands {
             IslandsConfig.Entry e = IslandsConfig.getIslandByName(args[0]);
 
             if (e != null) {
-                player.teleport(e.getIslandSpawn());
+                e.teleport(player);
                 player.sendTitle(Messages.get("success.VISIT_TITLE", args[0]), "", 10, 20 * 5, 10);
             } else {
                 player.sendMessage(Messages.get("error.ISLAND_NOT_FOUND"));
@@ -231,7 +231,7 @@ public class TeleportCommands {
             }
 
             teleportNeutrals(player, island.getIslandSpawn());
-            player.teleport(island.getIslandSpawn());
+            island.teleport(player);
 
             return true;
         }
