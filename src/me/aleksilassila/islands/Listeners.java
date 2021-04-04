@@ -132,8 +132,9 @@ public class Listeners extends ChatUtils implements Listener {
         if (event.getTo() == null) return;
         else l = event.getTo();
 
-        if (l.getWorld() == Islands.wildernessWorld && plugin.playersWithNoFall.contains(event.getPlayer())) {
-            if (l.getBlock().isLiquid()) plugin.playersWithNoFall.remove(event.getPlayer());
+        if (plugin.playersWithNoFall.contains(event.getPlayer())) {
+            if (l.getWorld() == Islands.wildernessWorld || (islandDamage && l.getWorld() == Islands.islandsWorld))
+                if (l.getBlock().isLiquid()) plugin.playersWithNoFall.remove(event.getPlayer());
         }
     }
 

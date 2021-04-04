@@ -314,8 +314,8 @@ public enum IslandGeneration {
                             ib.setType(Material.AIR);
                             skipDelay = false; // Don't skip the delay between iterations, normally true
                         }
-                        ib.setBiome(Biome.PLAINS); // Clear biome
                     }
+                    clearBiome(clearLocation.add(x, 0, z).getIslandBlock(), Biome.PLAINS);
 
                     if (skipDelay) count--;
 
@@ -384,6 +384,17 @@ public enum IslandGeneration {
                     ib.setBiome(sb.getBiome());
                 }
 
+                // Extend biomes up and down
+                Biome upBiome = copyLocation.add(x, island.size, z).getSourceBlock().getBiome();
+                Biome downBiome = copyLocation.add(x, -maxYAdd, z).getSourceBlock().getBiome();
+                Block ib = copyLocation.add(x, 0, z).getIslandBlock();
+                for (int y = ib.getY() + island.size; y < 256; y++)
+                    Islands.islandsWorld.setBiome(ib.getX(), y, ib.getZ(), upBiome);
+                for (int y = ib.getY() - maxYAdd; y > 0; y--)
+                    Islands.islandsWorld.setBiome(ib.getX(), y, ib.getZ(), downBiome);
+
+
+
                 // If done
                 if (index >= island.size * island.size) {
                     // Update lighting
@@ -405,6 +416,11 @@ public enum IslandGeneration {
             }
         }
 
+        void clearBiome(Block block, Biome biome) {
+            for (int y = 0; y < 256; y++) {
+                block.getWorld().setBiome(block.getX(), y, block.getZ(), biome);
+            }
+        }
 
         private static final double curvature = 5;
 
