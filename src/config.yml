@@ -1,4 +1,4 @@
-islandsWorldName: world
+islandsWorldName: world                 # If this is something else than world, you have to do /mvimport on the world so that gp knows about it
 wildernessWorldName: wilderness
 
 defaultIslandLimit: 2                   # -1 to disable limit

@@ -36,7 +36,7 @@ public enum IslandsConfig {
     IslandsConfig() {
         this.islandSpacing = Islands.instance.getConfig().getInt("generation.islandGridSpacing");
         this.verticalSpacing = Islands.instance.getConfig().getInt("generation.islandGridVerticalSpacing");
-        this.islandDamage = Islands.instance.getConfig().getBoolean("islandDamage");
+        this.islandDamage = Islands.instance.getConfig().getBoolean("islandDamage", false);
     }
 
     public static FileConfiguration getConfig() {
@@ -436,7 +436,6 @@ public enum IslandsConfig {
             getConfig().set(islandId + ".isSpawn", isSpawn);
         }
 
-
         public void setSpawnPosition(int x, int z) {
             spawnPosition = new int[] {x, z};
             shouldUpdate = true;
@@ -566,7 +565,7 @@ public enum IslandsConfig {
         }
 
         public void teleport(Player player) {
-            if (!INSTANCE.islandDamage)
+            if (INSTANCE.islandDamage)
                 Islands.instance.playersWithNoFall.add(player);
             player.teleport(getIslandSpawn());
         }

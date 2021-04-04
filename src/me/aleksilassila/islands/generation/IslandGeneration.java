@@ -101,7 +101,11 @@ public enum IslandGeneration {
 
             Material material = Islands.islandsSourceWorld.getBlockAt(centerX, centerY, centerZ).getBlockData().getMaterial();
             if (!material.isAir() && !material.isBurnable())
-                break;
+                if (material != Material.MUSHROOM_STEM
+                        && material != Material.BROWN_MUSHROOM_BLOCK
+                        && material != Material.RED_MUSHROOM_BLOCK) {
+                    break;
+                }
 
             centerY--;
         }
