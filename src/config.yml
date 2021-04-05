@@ -76,6 +76,7 @@ disableRandomBiome: false               # Disable RANDOM biome in island creatio
 syncTime: true                          # Night skips will be synced between islands world and wilderness.
 homeSubcommand: false                   # If true, /home will become /island home. Useful if you are using other plugins that define /home
 useProceduralShapes: true               # Procedurally generate hanging stalactite underneath islands.
+overrideBedSpawns: false                # When true, players respawn on spawn island instead of their beds.
 locale: en                              # Available: en, zh_cn
 
 enableIslandProtection: true            # Enable GriefPrevention integration

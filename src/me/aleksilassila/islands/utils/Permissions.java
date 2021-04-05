@@ -9,13 +9,7 @@ public class Permissions {
         public static final String name = "islands.bypass.name";                // Name any island
         public static final String unname = "islands.bypass.unname";            // Unname any island
         public static final String setSpawn = "islands.bypass.setspawn";        // Set any island's spawn
-        public static final String settings = "islands.bypass.settings";        // Use settings anywhere
 
-        public static final String trust = "islands.bypass.trust";
-        public static final String untrust = "islands.bypass.untrust";
-        public static final String listTrusted = "islands.bypass.trust.list";
-
-        public static final String interactEverywhere = "islands.bypass.protection";
         public static final String interactInPlot = "islands.bypass.plotprotection";
         public static final String home = "islands.bypass.home";
         public static final String economy = "islands.bypass.economy";
@@ -41,21 +35,9 @@ public class Permissions {
         public static final String confirm = "islands.command.confirm";
         public static final String info = "islands.command.info";
         public static final String moderate = "islands.command.moderate";
-        public static final String settings = "islands.command.settings";
 
         public static final String home = "islands.command.home";
         public static final String listHomes = "islands.command.home.list";
-        public static final String trust = "islands.command.trust";
-        public static final String listTrusted = "islands.command.trust.list";
         public static final String visit = "islands.command.visit";
-
-        public static final String containerTrust = "islands.command.trust.containerTrust";
-        public static final String doorTrust = "islands.command.trust.doorTrust";
-        public static final String utilityTrust = "islands.command.trust.utilityTrust";
-
-        public static final String generalBuildProtection = "islands.command.trust.general.buildProtection";
-        public static final String generalContainerTrust = "islands.command.trust.general.containerTrust";
-        public static final String generalDoorTrust = "islands.command.trust.general.doorTrust";
-        public static final String generalUtilityTrust = "islands.command.trust.general.utilityTrust";
     }
 }

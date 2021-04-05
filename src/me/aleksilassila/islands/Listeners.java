@@ -1,6 +1,7 @@
 package me.aleksilassila.islands;
 
 import me.aleksilassila.islands.utils.ChatUtils;
+import me.aleksilassila.islands.utils.Messages;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -27,6 +28,7 @@ public class Listeners extends ChatUtils implements Listener {
     private final boolean islandDamage;
     private final boolean restrictFlow;
     private final boolean syncTime;
+    private final boolean overrideBedSpawns;
 
     public Listeners() {
         this.plugin = Islands.instance;
@@ -36,6 +38,7 @@ public class Listeners extends ChatUtils implements Listener {
         this.disableMobs = plugin.getConfig().getBoolean("disableMobsOnIslands");
         this.islandDamage = plugin.getConfig().getBoolean("islandDamage");
         this.syncTime = plugin.getConfig().getBoolean("syncTime");
+        this.overrideBedSpawns = plugin.getConfig().getBoolean("overrideBedSpawns");
 
         plugin.getServer().getPluginManager().registerEvents(this, plugin);
     }
@@ -51,6 +54,7 @@ public class Listeners extends ChatUtils implements Listener {
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void onPlayerRespawn(PlayerRespawnEvent event) {
+        if (event.isBedSpawn() && !overrideBedSpawns) return;
         if (IslandsConfig.spawnIsland != null) {
             event.setRespawnLocation(IslandsConfig.spawnIsland.getIslandSpawn());
             if (islandDamage) plugin.playersWithNoFall.add(event.getPlayer());
@@ -110,7 +114,8 @@ public class Listeners extends ChatUtils implements Listener {
 
                 player.teleport(location);
 
-                player.sendTitle("", ChatColor.GOLD + "Type /home to get back to your island.", (int)(20 * 0.5), 20 * 5, (int)(20 * 0.5));
+                player.sendTitle(Messages.get("success.WILDERNESS_TELEPORT_TITLE"),
+                        Messages.get("success.WILDERNESS_TELEPORT_SUBTITLE"), (int)(20 * 0.5), 20 * 5, (int)(20 * 0.5));
 
                 plugin.playersWithNoFall.add(player);
 

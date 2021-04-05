@@ -4,6 +4,7 @@ import com.sun.istack.internal.NotNull;
 import com.sun.istack.internal.Nullable;
 import me.aleksilassila.islands.generation.IslandGeneration;
 import me.aleksilassila.islands.utils.BiomeMaterials;
+import me.aleksilassila.islands.utils.Permissions;
 import me.ryanhamshire.GriefPrevention.Claim;
 import me.ryanhamshire.GriefPrevention.ClaimPermission;
 import me.ryanhamshire.GriefPrevention.CreateClaimResult;
@@ -530,7 +531,10 @@ public enum IslandsConfig {
                     subClaim.setPermission(uuid.toString(), ClaimPermission.Build);
                     addClaimManager(subClaim, uuid.toString());
 
-                    if (Islands.instance.getConfig().getBoolean("GPAccessWholePlot")) {
+                    Player p = Bukkit.getOfflinePlayer(uuid).getPlayer();
+
+                    if (Islands.instance.getConfig().getBoolean("GPAccessWholePlot") ||
+                            (p != null && p.hasPermission(Permissions.bypass.interactInPlot))) {
                         r.claim.setPermission(uuid.toString(), ClaimPermission.Build);
                         addClaimManager(r.claim, uuid.toString());
                     }
