@@ -36,9 +36,6 @@ public class Islands extends JavaPlugin {
     public static World islandsSourceWorld;
     public static World wildernessWorld;
 
-    public static GriefPrevention gp;
-    public static boolean gpEnabled = true;
-
     private FileConfiguration biomesCache;
     private File biomesCacheFile;
 
@@ -56,14 +53,6 @@ public class Islands extends JavaPlugin {
     @Override
     public void onEnable() {
         instance = this;
-
-        gpEnabled = getConfig().getBoolean("enableIslandProtection", true);
-        if (Bukkit.getPluginManager().getPlugin("GriefPrevention") == null) {
-            getLogger().severe("No GriefPrevention found. Island protection disabled.");
-            gpEnabled = false;
-        } else {
-            gp = (GriefPrevention) Bukkit.getPluginManager().getPlugin("GriefPrevention");
-        }
 
         if (!setupEconomy()) {
             getLogger().severe("No Vault or economy plugin found. Economy disabled.");
@@ -107,17 +96,6 @@ public class Islands extends JavaPlugin {
             wildernessWorld = getWilderness();
         }
 
-        if (gpEnabled && getConfig().getBoolean("overrideGriefPreventionWorlds")) {
-            ConcurrentHashMap<World, ClaimsMode> modes = gp.config_claims_worldModes;
-
-            modes.put(islandsWorld, gpEnabled ? ClaimsMode.SurvivalRequiringClaims : ClaimsMode.Survival);
-
-            if (wildernessWorld != null)
-                modes.put(wildernessWorld, ClaimsMode.Survival);
-        }
-
-        new ConfigMigrator();
-
         // ISLANDS
         Messages.init();
 
@@ -126,17 +104,27 @@ public class Islands extends JavaPlugin {
 
         definedIslandSizes = setupSizes();
 
-        new IslandCommands();
-
-        new Listeners();
-
         int pluginId = 8974;
         new Metrics(this, pluginId);
 
         getLogger().info("Islands enabled!");
 
+        Bukkit.getScheduler().scheduleSyncDelayedTask(this, this::initialise);
+
         // Save island configuration every 5 minutes
         Bukkit.getScheduler().scheduleSyncRepeatingTask(this, IslandsConfig::updateEntries, 20 * 60 * 5, 20 * 60 * 5);
+    }
+
+    // This will be ran when all the plugins are loaded.
+    public void initialise() {
+        getLogger().info("Initialising commands and configuration");
+        GPWrapper.initialise();
+
+        // Init islands config
+        IslandsConfig.getConfig();
+
+        new IslandCommands();
+        new Listeners();
     }
 
     @Override
@@ -192,7 +180,7 @@ public class Islands extends JavaPlugin {
         island.size = islandSize;
         island.height = height;
         island.biome = biome;
-        if (gpEnabled)
+        if (GPWrapper.enabled)
             island.resizeClaim(islandSize);
         island.shouldUpdate = true;
 

@@ -368,7 +368,7 @@ public enum IslandsConfig {
 
             this.claimId = fc.getLong(islandId + ".claimId", -1);
 
-            if (this.claimId == -1 && Islands.gpEnabled) {
+            if (this.claimId == -1 && GPWrapper.enabled) {
                 deleteClaims();
                 this.claimId = createClaims(xIndex, zIndex, size, uuid);
                 this.shouldUpdate = true;
@@ -386,7 +386,7 @@ public enum IslandsConfig {
             this.biome = biome;
             this.homeId = getNewHomeId(uuid);
 
-            this.claimId = Islands.gpEnabled ? createClaims(xIndex, zIndex, size, uuid) : -1;
+            this.claimId = GPWrapper.enabled ? createClaims(xIndex, zIndex, size, uuid) : -1;
 
             int[][] ic = getIslandCorner(xIndex, zIndex, size);
             this.spawnPosition = new int[] {
@@ -403,7 +403,7 @@ public enum IslandsConfig {
 
         public void delete() {
             getConfig().set(islandId, null);
-            if (Islands.gpEnabled)
+            if (GPWrapper.enabled)
                 deleteClaims();
             entries.remove(islandId);
 
@@ -469,7 +469,7 @@ public enum IslandsConfig {
         public void giveIsland(OfflinePlayer player) {
             this.uuid = player.getUniqueId();
             this.homeId = getNewHomeId(player.getUniqueId());
-            if (Islands.gpEnabled) {
+            if (GPWrapper.enabled) {
                 deleteClaims();
                 this.claimId = createClaims(xIndex, zIndex, size, player.getUniqueId());
             }
@@ -480,7 +480,7 @@ public enum IslandsConfig {
         public void giveToServer() {
             this.uuid = null;
             this.homeId = -1;
-            if (Islands.gpEnabled) {
+            if (GPWrapper.enabled) {
                 deleteClaims();
                 this.claimId = createClaims(xIndex, zIndex, size, null);
             }
@@ -498,12 +498,12 @@ public enum IslandsConfig {
         public void resizeClaim(int islandSize) {
             int[][] ic = getIslandCorner(xIndex, zIndex, islandSize);
 
-            Claim c = Islands.gp.dataStore.getClaimAt(new Location(
+            Claim c = GPWrapper.gp.dataStore.getClaimAt(new Location(
                     Islands.islandsWorld,
                     spawnPosition[0],
                     50,
                     spawnPosition[1]), true, false, null);
-            Islands.gp.dataStore.resizeClaim(c,
+            GPWrapper.gp.dataStore.resizeClaim(c,
                     ic[0][0], ic[1][0],
                     0, 255,
                     ic[0][1], ic[1][1], Bukkit.getPlayer(uuid));
@@ -511,7 +511,7 @@ public enum IslandsConfig {
 
         private static long createClaims(int xIndex, int zIndex, int size, UUID uuid) {
             int[][] ipc = getIslandPlotCorner(xIndex, zIndex);
-            CreateClaimResult r = Islands.gp.dataStore.createClaim(Islands.islandsWorld,
+            CreateClaimResult r = GPWrapper.gp.dataStore.createClaim(Islands.islandsWorld,
                 ipc[0][0], ipc[1][0],
                 0, 255,
                 ipc[0][1], ipc[1][1],
@@ -522,7 +522,7 @@ public enum IslandsConfig {
                 int[][] ic = getIslandCorner(xIndex, zIndex, size);
 
 
-                Claim subClaim = Islands.gp.dataStore.createClaim(Islands.islandsWorld,
+                Claim subClaim = GPWrapper.gp.dataStore.createClaim(Islands.islandsWorld,
                 ic[0][0], ic[1][0],
                 0, 255,
                 ic[0][1], ic[1][1],
@@ -550,20 +550,20 @@ public enum IslandsConfig {
         private static void addClaimManager(Claim claim, String uuid) {
             if (!claim.managers.contains(uuid)) {
                 claim.managers.add(uuid);
-                Islands.gp.dataStore.saveClaim(claim);
+                GPWrapper.gp.dataStore.saveClaim(claim);
             }
         }
 
         private void deleteClaims() {
-            Claim c = Islands.gp.dataStore.getClaim(this.claimId);
+            Claim c = GPWrapper.gp.dataStore.getClaim(this.claimId);
 
             if (c == null) {
                 int[][] ic = getIslandCorner(xIndex, zIndex, size);
-                c = Islands.gp.dataStore.getClaimAt(new Location(Islands.islandsWorld, ic[0][0], 50, ic[0][1]), true, true, null);
+                c = GPWrapper.gp.dataStore.getClaimAt(new Location(Islands.islandsWorld, ic[0][0], 50, ic[0][1]), true, true, null);
             }
 
             if (c != null) {
-                Islands.gp.dataStore.deleteClaim(c);
+                GPWrapper.gp.dataStore.deleteClaim(c);
             }
             this.claimId = -1;
         }
