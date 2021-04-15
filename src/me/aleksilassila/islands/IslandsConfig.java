@@ -444,10 +444,11 @@ public enum IslandsConfig {
 
         @NotNull
         public Location getIslandSpawn() {
+            int highest = Islands.islandsWorld.getHighestBlockAt(spawnPosition[0], spawnPosition[1]).getY();
             return new Location(
                     Islands.islandsWorld,
                     spawnPosition[0],
-                    y + 100,
+                    highest + 80,
                     spawnPosition[1]
             );
         }
