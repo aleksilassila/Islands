@@ -17,6 +17,7 @@ import java.util.*;
 public class IslandCommands extends ChatUtils implements TabExecutor {
     private final Islands plugin;
     public final Set<Subcommand> subcommands;
+    int confirmTimeout;
 
     public IslandCommands() {
         this.plugin = Islands.instance;
@@ -42,6 +43,7 @@ public class IslandCommands extends ChatUtils implements TabExecutor {
         TeleportCommands teleportCommands = new TeleportCommands();
 
         boolean homePrefix = plugin.getConfig().getBoolean("homeSubcommand");
+        confirmTimeout = plugin.getConfig().getInt("confirmTimeout", 8);
 
         TeleportCommands.HomeCommand homeCommand = teleportCommands.new HomeCommand(homePrefix);
         TeleportCommands.HomesCommand homesCommand = teleportCommands.new HomesCommand(homePrefix);
@@ -100,7 +102,7 @@ public class IslandCommands extends ChatUtils implements TabExecutor {
                 confirmed = true;
             } else {
                 String issuedCommand = String.join(" ", label, String.join(" ", args));
-                plugin.confirmations.put(player.getUniqueId().toString(), new ConfirmItem(issuedCommand, 8 * 1000));
+                plugin.confirmations.put(player.getUniqueId().toString(), new ConfirmItem(issuedCommand, confirmTimeout * 1000L));
             }
 
             try {

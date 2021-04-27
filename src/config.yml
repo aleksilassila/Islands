@@ -77,6 +77,7 @@ syncTime: true                          # Night skips will be synced between isl
 homeSubcommand: false                   # If true, /home will become /island home. Useful if you are using other plugins that define /home
 useProceduralShapes: true               # Procedurally generate hanging stalactite underneath islands.
 overrideBedSpawns: false                # When true, players respawn on spawn island instead of their beds.
+confirmTimeout: 8                       # How long /is confirm is available
 locale: en                              # Available: en, zh_cn
 
 enableIslandProtection: true            # Enable GriefPrevention integration
