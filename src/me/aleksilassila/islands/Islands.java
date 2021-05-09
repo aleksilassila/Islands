@@ -6,9 +6,10 @@ import com.sun.istack.internal.Nullable;
 import me.aleksilassila.islands.commands.IslandCommands;
 import me.aleksilassila.islands.generation.Biomes;
 import me.aleksilassila.islands.generation.IslandGeneration;
-import me.aleksilassila.islands.utils.*;
-import me.ryanhamshire.GriefPrevention.ClaimsMode;
-import me.ryanhamshire.GriefPrevention.GriefPrevention;
+import me.aleksilassila.islands.utils.ConfirmItem;
+import me.aleksilassila.islands.utils.Messages;
+import me.aleksilassila.islands.utils.Permissions;
+import me.aleksilassila.islands.utils.UpdateChecker;
 import net.milkbowl.vault.economy.Economy;
 import net.milkbowl.vault.permission.Permission;
 import org.bukkit.*;
@@ -27,7 +28,6 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
 
 public class Islands extends JavaPlugin {
     public static Islands instance;
@@ -44,6 +44,7 @@ public class Islands extends JavaPlugin {
     public WorldEditPlugin worldEdit = null;
 
     public Set<Player> playersWithNoFall = new HashSet<>();
+    public HashMap<Player, Location> wildernessPositions = new HashMap<>();
     public HashMap<String, ConfirmItem> confirmations;
     public Map<String, Long> teleportCooldowns;
     public Map<Integer, Double> islandPrices;

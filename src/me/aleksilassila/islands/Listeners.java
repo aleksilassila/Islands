@@ -2,7 +2,6 @@ package me.aleksilassila.islands;
 
 import me.aleksilassila.islands.utils.ChatUtils;
 import me.aleksilassila.islands.utils.Messages;
-import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
@@ -12,10 +11,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockFromToEvent;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
-import org.bukkit.event.player.PlayerJoinEvent;
-import org.bukkit.event.player.PlayerMoveEvent;
-import org.bukkit.event.player.PlayerPortalEvent;
-import org.bukkit.event.player.PlayerRespawnEvent;
+import org.bukkit.event.player.*;
 import org.bukkit.event.world.TimeSkipEvent;
 
 import java.util.Date;
@@ -29,6 +25,7 @@ public class Listeners extends ChatUtils implements Listener {
     private final boolean restrictFlow;
     private final boolean syncTime;
     private final boolean overrideBedSpawns;
+    private final boolean preserveWildernessPositions;
 
     public Listeners() {
         this.plugin = Islands.instance;
@@ -39,6 +36,7 @@ public class Listeners extends ChatUtils implements Listener {
         this.islandDamage = plugin.getConfig().getBoolean("islandDamage");
         this.syncTime = plugin.getConfig().getBoolean("syncTime");
         this.overrideBedSpawns = plugin.getConfig().getBoolean("overrideBedSpawns");
+        this.preserveWildernessPositions = plugin.getConfig().getBoolean("preserveWildernessPositions");
 
         plugin.getServer().getPluginManager().registerEvents(this, plugin);
     }
@@ -102,14 +100,20 @@ public class Listeners extends ChatUtils implements Listener {
                     targetWorld = Islands.wildernessWorld;
                 }
 
-                Location location = player.getLocation();
+                Location location;
+                if (preserveWildernessPositions && Islands.instance.wildernessPositions.containsKey(player)) {
+                    location = Islands.instance.wildernessPositions.get(player);
+                } else {
+                    location = player.getLocation();
+
+                    int teleportMultiplier = plugin.getConfig().getInt("wildernessCoordinateMultiplier") <= 0
+                            ? 4 : plugin.getConfig().getInt("wildernessCoordinateMultiplier");
+
+                    location.setX(location.getBlockX() * teleportMultiplier);
+                    location.setZ(location.getBlockZ() * teleportMultiplier);
+                }
+
                 location.setWorld(targetWorld);
-
-                int teleportMultiplier = plugin.getConfig().getInt("wildernessCoordinateMultiplier") <= 0
-                        ? 4 : plugin.getConfig().getInt("wildernessCoordinateMultiplier");
-
-                location.setX(location.getBlockX() * teleportMultiplier);
-                location.setZ(location.getBlockZ() * teleportMultiplier);
                 location.setY(targetWorld.getHighestBlockYAt(location) + 40);
 
                 player.teleport(location);
@@ -156,5 +160,14 @@ public class Listeners extends ChatUtils implements Listener {
         } else if (event.getWorld().equals(Islands.wildernessWorld)) {
             Islands.islandsWorld.setTime(targetTime);
         }
+    }
+
+    @EventHandler
+    private void onWorldChange(PlayerTeleportEvent event) {
+        if (!preserveWildernessPositions) return;
+        if (Islands.wildernessWorld == event.getFrom().getWorld())
+            if (event.getTo() != null && Islands.wildernessWorld != event.getTo().getWorld()) {
+                Islands.instance.wildernessPositions.put(event.getPlayer(), event.getFrom());
+            }
     }
 }

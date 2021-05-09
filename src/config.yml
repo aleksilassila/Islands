@@ -68,6 +68,7 @@ islandDamage: false                     # Enable / disable damage on islands
 restrictIslandBlockFlows: true          # Let water / lava only flow inside a sphere containing island
 disableWilderness: false                # Disable wilderness, do not touch unless you know what you are doing
 allowHomeOnlyFromOverworld: true        # Disable /home in nether and end
+preserveWildernessPositions: false      # If enabled, players will continue where they left in the wilderness. Resets on server restarts.
 disableNeutralTeleports: false          # Disable teleporting neutrals from wilderness to islands with /home command
 teleportAllNameTagged: true             # Enable teleportation of all entities that have been named with name tags
 neutralTeleportRange: 2                 # How far neutrals are being teleported around the player
