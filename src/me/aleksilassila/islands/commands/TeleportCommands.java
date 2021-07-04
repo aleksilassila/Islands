@@ -22,9 +22,11 @@ import java.util.*;
 
 public class TeleportCommands {
     private final Islands plugin;
+    private final boolean allowHomeOnlyFromOverworld;
 
     public TeleportCommands() {
         this.plugin = Islands.instance;
+        this.allowHomeOnlyFromOverworld = plugin.getConfig().getBoolean("allowHomeOnlyFromOverworld");
 
         new VisitCommand();
     }
@@ -48,6 +50,16 @@ public class TeleportCommands {
 
             if (!player.hasPermission(Permissions.command.visit)) {
                 player.sendMessage(Messages.get("error.NO_PERMISSION"));
+                return true;
+            }
+
+            if (!worldCheck(player)) {
+                player.sendMessage(Messages.get("info.IN_OVERWORLD"));
+                return true;
+            }
+
+            if (!surfaceCheck(player)) {
+                player.sendMessage(Messages.get("info.ON_SURFACE"));
                 return true;
             }
 
@@ -141,7 +153,6 @@ public class TeleportCommands {
     }
 
     public class HomeCommand extends Subcommand implements CommandExecutor {
-        private final boolean allowHomeOnlyFromOverworld;
         private final boolean disableNeutralTeleports;
         private final boolean enableAllTaggedTeleports;
         private final int neutralTeleportRange;
@@ -152,7 +163,6 @@ public class TeleportCommands {
                 plugin.getCommand("home").setExecutor(this);
             }
 
-            this.allowHomeOnlyFromOverworld = plugin.getConfig().getBoolean("allowHomeOnlyFromOverworld");
             this.disableNeutralTeleports = plugin.getConfig().getBoolean("disableNeutralTeleports");
             this.enableAllTaggedTeleports = plugin.getConfig().getBoolean("teleportAllNameTagged");
             this.neutralTeleportRange = plugin.getConfig().getInt("neutralTeleportRange");
@@ -189,23 +199,14 @@ public class TeleportCommands {
                 return true;
             }
 
-            if (allowHomeOnlyFromOverworld && !player.getWorld().getEnvironment().equals(World.Environment.NORMAL)
-                    && !player.hasPermission(Permissions.bypass.home)) {
+            if (!worldCheck(player)) {
                 player.sendMessage(Messages.get("info.IN_OVERWORLD"));
                 return true;
             }
 
-            if (!player.hasPermission(Permissions.bypass.home)) {
-                // Check if is on surface
-                Location playerLocation = player.getLocation();
-
-                for (int y = playerLocation.getBlockY(); y < player.getWorld().getHighestBlockYAt(playerLocation); y++) {
-                    playerLocation.setY(y);
-                    if (player.getWorld().getBlockAt(playerLocation).getBlockData().getMaterial().equals(Material.STONE)) {
-                        player.sendMessage(Messages.get("info.ON_SURFACE"));
-                        return true;
-                    }
-                }
+            if (!surfaceCheck(player)) {
+                player.sendMessage(Messages.get("info.ON_SURFACE"));
+                return true;
             }
 
             int homeId;
@@ -300,6 +301,29 @@ public class TeleportCommands {
         }
 
         return true;
+    }
+
+    /**
+     * Check if player is on surface
+     */
+    private boolean surfaceCheck(Player player) {
+        if (player.hasPermission(Permissions.bypass.home)) return true;
+
+        Location playerLocation = player.getLocation();
+
+        for (int y = playerLocation.getBlockY(); y < player.getWorld().getHighestBlockYAt(playerLocation); y++) {
+            playerLocation.setY(y);
+            if (player.getWorld().getBlockAt(playerLocation).getBlockData().getMaterial().equals(Material.STONE)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    private boolean worldCheck(Player player) {
+        if (!allowHomeOnlyFromOverworld) return true;
+        return player.getWorld().getEnvironment().equals(World.Environment.NORMAL);
     }
 
     private int teleportCooldown(Player player) {
