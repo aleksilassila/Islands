@@ -79,7 +79,7 @@ homeSubcommand: false                   # If true, /home will become /island hom
 useProceduralShapes: true               # Procedurally generate hanging stalactite underneath islands.
 overrideBedSpawns: false                # When true, players respawn on spawn island instead of their beds.
 confirmTimeout: 8                       # How long /is confirm is available
-locale: en                              # Available: en, zh_cn, ru, es
+locale: en                              # Available: en, zh_cn, ru, es, pt_br
 
 enableIslandProtection: true            # Enable GriefPrevention integration
 overrideGriefPreventionWorlds: true     # Override gp world mode settings for wilderness and islands worlds
