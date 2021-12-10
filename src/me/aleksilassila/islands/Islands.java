@@ -239,17 +239,15 @@ public class Islands extends JavaPlugin {
     World getIslandsWorld() {
         String name = Optional.ofNullable(getConfig().getString("islandsWorldName")).orElse("world");
 
-        for (World world : Bukkit.getWorlds()) {
-            if (world.getName().equals(name)) {
-                getLogger().info("Islands world set to " + name);
-                return world;
-            }
-        }
-
-        getLogger().info("No islands world found. Creating one called " + name + "...");
-
+        boolean exists = worldExists(name);
         World world = new WorldCreator(name).createWorld();
-        world.setDifficulty(Difficulty.NORMAL);
+
+        if (exists) {
+            getLogger().info("Islands world set to " + name);
+        } else {
+            getLogger().info("No islands world found. Creating one called " + name + "...");
+            world.setDifficulty(Difficulty.NORMAL);
+        }
 
         return world;
     }
@@ -257,40 +255,37 @@ public class Islands extends JavaPlugin {
     World getWilderness() {
         String name = Optional.ofNullable(getConfig().getString("wildernessWorldName")).orElse("wilderness");
 
-        for (World world : Bukkit.getWorlds()) {
-            if (world.getName().equals(name)) {
-                getLogger().info("Wilderness world set to " + name);
-                return world;
-            }
-        }
-
-        getLogger().info("No wilderness found. Creating one called " + name + "...");
-
+        boolean exists = worldExists(name);
         World world = new WorldCreator(name).createWorld();
-        world.setDifficulty(Difficulty.HARD);
+
+        if (exists) {
+            getLogger().info("Wilderness world set to " + name);
+        } else {
+            getLogger().info("No wilderness found. Creating one called " + name + "...");
+            world.setDifficulty(Difficulty.HARD);
+        }
 
         return world;
     }
 
     World getSourceWorld() {
-        for (World world : Bukkit.getServer().getWorlds()) {
-            if (world.getName().equals("islandsSource")) {
-                getLogger().info("Islands source world set to islandsSource");
-                return world;
-            }
-        }
+        boolean exists = worldExists("islandsSource");
 
         WorldCreator wc = new WorldCreator("islandsSource");
+        World world;
 
-        wc.environment(World.Environment.NORMAL);
-        wc.type(WorldType.NORMAL);
-        wc.generateStructures(false);
+        if (exists) {
+            getLogger().info("Islands source world set to islandsSource");
+            world = wc.createWorld();
+        } else {
+            getLogger().info("No islands source world found. Creating one...");
 
-        World world = wc.createWorld();
-
-        world.setDifficulty(Difficulty.PEACEFUL);
-
-        getLogger().info("Islands source world set to islandsSource");
+            wc.environment(World.Environment.NORMAL);
+            wc.type(WorldType.NORMAL);
+            wc.generateStructures(false);
+            world = wc.createWorld();
+            world.setDifficulty(Difficulty.PEACEFUL);
+        }
 
         return world;
     }
@@ -453,5 +448,17 @@ public class Islands extends JavaPlugin {
         }
 
         return true;
+    }
+
+    public boolean worldExists(String name) {
+        try {
+            for (File f : Bukkit.getWorldContainer().listFiles()) {
+                if (f.getName().equals(name)) return true;
+            }
+        } catch (NullPointerException e) {
+            return false;
+        }
+
+        return false;
     }
 }

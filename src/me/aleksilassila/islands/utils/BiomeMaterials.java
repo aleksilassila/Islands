@@ -82,7 +82,27 @@ public enum BiomeMaterials {
     CRIMSON_FOREST(Material.CRIMSON_STEM),
     WARPED_FOREST(Material.WARPED_STEM),
     BASALT_DELTAS(Material.BASALT),
-    DEFAULT(null);
+    WINDSWEPT_HILLS(Material.STONE),
+    SNOWY_PLAINS(Material.SNOW_BLOCK),
+    SPARSE_JUNGLE(Material.JUNGLE_LOG),
+    STONY_SHORE(Material.STONE),
+    OLD_GROWTH_PINE_TAIGA(Material.SPRUCE_LOG),
+    WINDSWEPT_FOREST(Material.GRASS_BLOCK),
+    WOODED_BADLANDS(Material.OAK_LOG),
+    WINDSWEPT_GRAVELLY_HILLS(Material.GRAVEL),
+    OLD_GROWTH_BIRCH_FOREST(Material.BIRCH_LOG),
+    OLD_GROWTH_SPRUCE_TAIGA(Material.SPRUCE_LOG),
+    WINDSWEPT_SAVANNA(Material.ACACIA_LOG),
+    DRIPSTONE_CAVES(Material.POINTED_DRIPSTONE),
+    LUSH_CAVES(Material.CAVE_VINES),
+    MEADOW(Material.GRASS_BLOCK),
+    GROVE(Material.SPRUCE_LOG),
+    SNOWY_SLOPES(Material.SNOW_BLOCK),
+    FROZEN_PEAKS(Material.ICE),
+    JAGGED_PEAKS(Material.STONE),
+    STONY_PEAKS(Material.STONE),
+    DEFAULT(null),
+    CUSTOM(null);
 
     Material material;
 
