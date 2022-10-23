@@ -1,4 +1,7 @@
-out/
 .idea/
 .DS_Store
 server/
+.gradle/
+build/
+target/
+out/
