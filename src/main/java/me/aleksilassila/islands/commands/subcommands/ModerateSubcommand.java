@@ -1,8 +1,9 @@
 package me.aleksilassila.islands.commands.subcommands;
 
+import me.aleksilassila.islands.Entry;
 import me.aleksilassila.islands.GUIs.AdminGUI;
 import me.aleksilassila.islands.Islands;
-import me.aleksilassila.islands.IslandsConfig;
+import me.aleksilassila.islands.Plugin;
 import me.aleksilassila.islands.commands.Subcommand;
 import me.aleksilassila.islands.utils.Messages;
 import me.aleksilassila.islands.utils.Permissions;
@@ -14,15 +15,19 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ModerateSubcommand extends Subcommand {
+    public ModerateSubcommand(Islands islands) {
+        super(islands);
+    }
+
     @Override
     public void onCommand(Player player, String[] args, boolean confirmed) {
         if (args.length < 2) {
-            new AdminGUI(player).open();
+            new AdminGUI(islands, player).open();
             return;
         }
 
         if (args[0].equalsIgnoreCase("teleport") || args[0].equalsIgnoreCase("tp")) {
-            IslandsConfig.Entry e = IslandsConfig.entries.get(args[1]);
+            Entry e = islands.islandsConfig.entries.get(args[1]);
 
             if (e != null) {
                 e.teleport(player);
@@ -32,7 +37,7 @@ public class ModerateSubcommand extends Subcommand {
         } else if (args[0].equalsIgnoreCase("player")) {
             OfflinePlayer targetPlayer = Utils.getOfflinePlayer(args[1]);
             if (targetPlayer != null)
-                new AdminGUI(player).showPlayerIslandsGui(targetPlayer.getUniqueId());
+                new AdminGUI(islands, player).showPlayerIslandsGui(targetPlayer.getUniqueId());
             else
                 Messages.send(player, "error.PLAYER_NOT_FOUND");
         }
@@ -49,7 +54,7 @@ public class ModerateSubcommand extends Subcommand {
             if (args[0].equalsIgnoreCase("teleport") || args[0].equalsIgnoreCase("tp")) {
                 availableArgs.add("<IslandId>");
             } else if (args[0].equalsIgnoreCase("player")) {
-                for (Player p : Islands.instance.getServer().getOnlinePlayers()) {
+                for (Player p : Plugin.instance.getServer().getOnlinePlayers()) {
                     availableArgs.add(p.getDisplayName());
                 }
             }

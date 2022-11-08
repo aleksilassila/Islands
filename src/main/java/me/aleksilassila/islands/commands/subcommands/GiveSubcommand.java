@@ -1,6 +1,7 @@
 package me.aleksilassila.islands.commands.subcommands;
 
-import me.aleksilassila.islands.IslandsConfig;
+import me.aleksilassila.islands.Entry;
+import me.aleksilassila.islands.Islands;
 import me.aleksilassila.islands.commands.AbstractIslandsWorldSubcommand;
 import me.aleksilassila.islands.utils.Messages;
 import me.aleksilassila.islands.utils.Permissions;
@@ -13,8 +14,12 @@ import java.util.List;
 import java.util.UUID;
 
 public class GiveSubcommand extends AbstractIslandsWorldSubcommand {
+    public GiveSubcommand(Islands islands) {
+        super(islands);
+    }
+
     @Override
-    protected void runCommand(Player player, String[] args, boolean confirmed, IslandsConfig.Entry island) {
+    protected void runCommand(Player player, String[] args, boolean confirmed, Entry island) {
         if ((args.length != 1 && !player.hasPermission(Permissions.bypass.give))
                 || (player.hasPermission(Permissions.bypass.give) && args.length > 1)) {
             Messages.send(player, "usage.GIVE");

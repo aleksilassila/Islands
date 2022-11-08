@@ -1,5 +1,6 @@
 package me.aleksilassila.islands.commands.subcommands;
 
+import me.aleksilassila.islands.Islands;
 import me.aleksilassila.islands.commands.IslandCommands;
 import me.aleksilassila.islands.commands.Subcommand;
 import me.aleksilassila.islands.utils.Messages;
@@ -10,7 +11,8 @@ import java.util.List;
 public class HelpSubcommand extends Subcommand {
     IslandCommands commands;
 
-    public HelpSubcommand(IslandCommands commands) {
+    public HelpSubcommand(Islands islands, IslandCommands commands) {
+        super(islands);
         this.commands = commands;
     }
 

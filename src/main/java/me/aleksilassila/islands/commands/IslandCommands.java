@@ -1,6 +1,7 @@
 package me.aleksilassila.islands.commands;
 
 import me.aleksilassila.islands.Islands;
+import me.aleksilassila.islands.Plugin;
 import me.aleksilassila.islands.commands.subcommands.*;
 import me.aleksilassila.islands.utils.ChatUtils;
 import me.aleksilassila.islands.utils.ConfirmItem;
@@ -15,38 +16,38 @@ import org.jetbrains.annotations.Nullable;
 import java.util.*;
 
 public class IslandCommands extends ChatUtils implements TabExecutor {
-    private final Islands plugin;
-    public final Set<Subcommand> subcommands;
+    private final Plugin plugin;
+    private final Islands islands;
+    public final Set<Subcommand> subcommands = new HashSet<>();
     int confirmTimeout;
 
-    public IslandCommands() {
-        this.plugin = Islands.instance;
+    public IslandCommands(Islands islands) {
+        this.islands = islands;
+        this.plugin = islands.plugin;
 
         plugin.getCommand("island").setExecutor(this);
 
-        subcommands = new HashSet<>();
+        subcommands.add(new CreateSubcommand(islands));
+        subcommands.add(new RecreateSubcommand(islands));
+        subcommands.add(new ClearSubcommand(islands));
+        subcommands.add(new NameSubcommand(islands));
+        subcommands.add(new UnnameSubcommand(islands));
+        subcommands.add(new GiveSubcommand(islands));
+        subcommands.add(new SetSpawnSubcommand(islands));
+        subcommands.add(new SaveSubcommand(islands));
+        subcommands.add(new SetSpawnIslandSubcommand(islands));
+        subcommands.add(new ConfirmSubcommand(islands));
+        subcommands.add(new HelpSubcommand(islands, this));
+        subcommands.add(new InfoSubcommand(islands));
+        subcommands.add(new ModerateSubcommand(islands));
 
-        subcommands.add(new CreateSubcommand());
-        subcommands.add(new RecreateSubcommand());
-        subcommands.add(new ClearSubcommand());
-        subcommands.add(new NameSubcommand());
-        subcommands.add(new UnnameSubcommand());
-        subcommands.add(new GiveSubcommand());
-        subcommands.add(new SetSpawnSubcommand());
-        subcommands.add(new SaveSubcommand());
-        subcommands.add(new SetSpawnIslandSubcommand());
-        subcommands.add(new ConfirmSubcommand());
-        subcommands.add(new HelpSubcommand(this));
-        subcommands.add(new InfoSubcommand());
-        subcommands.add(new ModerateSubcommand());
-
-        TeleportCommands teleportCommands = new TeleportCommands();
+        TeleportCommands teleportCommands = new TeleportCommands(islands);
 
         boolean homePrefix = plugin.getConfig().getBoolean("homeSubcommand");
         confirmTimeout = plugin.getConfig().getInt("confirmTimeout", 8);
 
-        TeleportCommands.HomeCommand homeCommand = teleportCommands.new HomeCommand(homePrefix);
-        TeleportCommands.HomesCommand homesCommand = teleportCommands.new HomesCommand(homePrefix);
+        TeleportCommands.HomeCommand homeCommand = teleportCommands.new HomeCommand(islands, homePrefix);
+        TeleportCommands.HomesCommand homesCommand = teleportCommands.new HomesCommand(islands, homePrefix);
 
         if (homePrefix) {
             subcommands.add(homeCommand);
@@ -84,25 +85,25 @@ public class IslandCommands extends ChatUtils implements TabExecutor {
             boolean confirmed = false;
 
             if (target.getName().equalsIgnoreCase("confirm")) {
-                if (!plugin.confirmations.containsKey(player.getUniqueId().toString())) {
+                if (!islands.confirmations.containsKey(player.getUniqueId().toString())) {
                     player.sendMessage(Messages.get("info.CONFIRM_ERROR"));
                     return true;
                 }
 
-                String targetCommand = plugin.confirmations.get(player.getUniqueId().toString()).command;
+                String targetCommand = islands.confirmations.get(player.getUniqueId().toString()).command;
 
-                if (plugin.confirmations.get(player.getUniqueId().toString()).expired()) {
+                if (islands.confirmations.get(player.getUniqueId().toString()).expired()) {
                     player.sendMessage(Messages.get("info.CONFIRM_EXPIRED"));
                     return true;
                 }
 
                 target = getSubcommand(targetCommand);
-                plugin.confirmations.remove(player.getUniqueId().toString());
+                islands.confirmations.remove(player.getUniqueId().toString());
                 args = Arrays.copyOfRange(targetCommand.split(" "), 1, targetCommand.split(" ").length);
                 confirmed = true;
             } else {
                 String issuedCommand = String.join(" ", label, String.join(" ", args));
-                plugin.confirmations.put(player.getUniqueId().toString(), new ConfirmItem(issuedCommand, confirmTimeout * 1000L));
+                islands.confirmations.put(player.getUniqueId().toString(), new ConfirmItem(issuedCommand, confirmTimeout * 1000L));
             }
 
             try {

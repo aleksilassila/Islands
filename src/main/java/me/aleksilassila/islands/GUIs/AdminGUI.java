@@ -3,7 +3,8 @@ package me.aleksilassila.islands.GUIs;
 import com.github.stefvanschie.inventoryframework.gui.GuiItem;
 import com.github.stefvanschie.inventoryframework.gui.type.ChestGui;
 import com.github.stefvanschie.inventoryframework.pane.StaticPane;
-import me.aleksilassila.islands.IslandsConfig;
+import me.aleksilassila.islands.Entry;
+import me.aleksilassila.islands.Islands;
 import me.aleksilassila.islands.utils.BiomeMaterials;
 import me.aleksilassila.islands.utils.Messages;
 import org.bukkit.Bukkit;
@@ -20,7 +21,8 @@ import java.util.UUID;
 public class AdminGUI extends PageGUI {
     private final Player player;
 
-    public AdminGUI(Player player) {
+    public AdminGUI(Islands islands, Player player) {
+        super(islands);
         this.player = player;
     }
 
@@ -56,7 +58,7 @@ public class AdminGUI extends PageGUI {
         int PAGE_HEIGHT = 4;
 
         List<StaticPane> pages = new ArrayList<>();
-        Map<String, Map<String, String>> publicIslands = IslandsConfig.getIslandsInfo(false);
+        Map<String, Map<String, String>> publicIslands = islands.islandsConfig.getIslandsInfo(false);
         List<String> sortedSet = new ArrayList<>(publicIslands.keySet());
 
         StaticPane pane = new StaticPane(0, 0, 9, PAGE_HEIGHT - 1);
@@ -77,14 +79,15 @@ public class AdminGUI extends PageGUI {
             }
 
             pane.addItem(new GuiItem(createGuiItem(BiomeMaterials.valueOf(publicIslands.get(islandId).get("material")).getMaterial(),
-                        Messages.get("gui.admin.ISLANDS_NAME", publicIslands.get(islandId).get("name")),
-                        "Server".equals(displayName),
-                        Messages.get("gui.admin.ISLANDS_LORE", displayName, Integer.parseInt(publicIslands.get(islandId).get("public")))),
-                        event -> {
-                            if (!(event.getWhoClicked() instanceof Player)) return; // Dunno if this is necessary in practice, cows don't click inventories
+                    Messages.get("gui.admin.ISLANDS_NAME", publicIslands.get(islandId).get("name")),
+                    "Server".equals(displayName),
+                    Messages.get("gui.admin.ISLANDS_LORE", displayName, Integer.parseInt(publicIslands.get(islandId).get("public")))),
+                    event -> {
+                        if (!(event.getWhoClicked() instanceof Player))
+                            return; // Dunno if this is necessary in practice, cows don't click inventories
 
-                            teleportIsland(islandId);
-                        }), (itemCount % (9 * (PAGE_HEIGHT - 1))) % 9, (itemCount % (9 * (PAGE_HEIGHT - 1))) / 9);
+                        teleportIsland(islandId);
+                    }), (itemCount % (9 * (PAGE_HEIGHT - 1))) % 9, (itemCount % (9 * (PAGE_HEIGHT - 1))) / 9);
             itemCount++;
         }
 
@@ -97,7 +100,7 @@ public class AdminGUI extends PageGUI {
         int PAGE_HEIGHT = 4;
 
         List<StaticPane> pages = new ArrayList<>();
-        Map<UUID, Integer> players = IslandsConfig.getIslandOwners();
+        Map<UUID, Integer> players = islands.islandsConfig.getIslandOwners();
 
         StaticPane pane = new StaticPane(0, 0, 9, PAGE_HEIGHT - 1);
 
@@ -126,7 +129,8 @@ public class AdminGUI extends PageGUI {
 
             pane.addItem(new GuiItem(skull,
                     event -> {
-                        if (!(event.getWhoClicked() instanceof Player)) return; // Dunno if this is necessary in practice, cows don't click inventories
+                        if (!(event.getWhoClicked() instanceof Player))
+                            return; // Dunno if this is necessary in practice, cows don't click inventories
 
                         showPlayerIslandsGui(uuid);
                     }), (itemCount % (9 * (PAGE_HEIGHT - 1))) % 9, (itemCount % (9 * (PAGE_HEIGHT - 1))) / 9);
@@ -145,7 +149,7 @@ public class AdminGUI extends PageGUI {
         if (displayName == null) return;
 
         List<StaticPane> pages = new ArrayList<>();
-        Map<String, Map<String, String>> islands = IslandsConfig.getIslandsInfo(uuid);
+        Map<String, Map<String, String>> islands = this.islands.islandsConfig.getIslandsInfo(uuid);
 
         StaticPane pane = new StaticPane(0, 0, 9, PAGE_HEIGHT - 1);
 
@@ -157,14 +161,15 @@ public class AdminGUI extends PageGUI {
             }
 
             pane.addItem(new GuiItem(createGuiItem(BiomeMaterials.valueOf(islands.get(islandId).get("material")).getMaterial(),
-                        Messages.get("gui.admin.ISLAND_NAME", islands.get(islandId).get("name")),
-                        false,
-                        Messages.get("gui.admin.ISLAND_LORE", islandId)),
-                        event -> {
-                            if (!(event.getWhoClicked() instanceof Player)) return; // Dunno if this is necessary in practice, cows don't click inventories
+                    Messages.get("gui.admin.ISLAND_NAME", islands.get(islandId).get("name")),
+                    false,
+                    Messages.get("gui.admin.ISLAND_LORE", islandId)),
+                    event -> {
+                        if (!(event.getWhoClicked() instanceof Player))
+                            return; // Dunno if this is necessary in practice, cows don't click inventories
 
-                            teleportIsland(islandId);
-                        }), (itemCount % (9 * (PAGE_HEIGHT - 1))) % 9, (itemCount % (9 * (PAGE_HEIGHT - 1))) / 9);
+                        teleportIsland(islandId);
+                    }), (itemCount % (9 * (PAGE_HEIGHT - 1))) % 9, (itemCount % (9 * (PAGE_HEIGHT - 1))) / 9);
             itemCount++;
         }
 
@@ -185,7 +190,7 @@ public class AdminGUI extends PageGUI {
     }
 
     private void teleportIsland(String islandId) {
-        IslandsConfig.Entry e = IslandsConfig.entries.get(islandId);
+        Entry e = islands.islandsConfig.entries.get(islandId);
 
         if (e != null) {
             e.teleport(player);

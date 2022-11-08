@@ -2,9 +2,9 @@ package me.aleksilassila.islands.commands.subcommands;
 
 import me.aleksilassila.islands.GUIs.CreateGUI;
 import me.aleksilassila.islands.Islands;
-import me.aleksilassila.islands.IslandsConfig;
 import me.aleksilassila.islands.commands.AbstractCreateSubcommands;
-import me.aleksilassila.islands.generation.Biomes;
+import me.aleksilassila.islands.plugins.Economy;
+import me.aleksilassila.islands.plugins.VaultPermissions;
 import me.aleksilassila.islands.utils.Messages;
 import me.aleksilassila.islands.utils.Permissions;
 import me.aleksilassila.islands.utils.Utils;
@@ -16,11 +16,18 @@ import java.util.HashMap;
 import java.util.List;
 
 public class CreateSubcommand extends AbstractCreateSubcommands {
-    private final Islands plugin = Islands.instance;
+    private final Economy economy;
+    private final VaultPermissions vaultPermissions;
+
+    public CreateSubcommand(Islands islands) {
+        super(islands);
+        this.economy = islands.economy;
+        this.vaultPermissions = islands.vaultPermissions;
+    }
 
     @Override
     protected void openGui(Player player) {
-            new CreateGUI(plugin, player, "create").open();
+        new CreateGUI(islands, player, "create").open();
     }
 
     @Override
@@ -30,16 +37,16 @@ public class CreateSubcommand extends AbstractCreateSubcommands {
             return;
         }
 
-        HashMap<Biome, List<Location>> availableLocations = Biomes.INSTANCE.availableLocations;
+        HashMap<Biome, List<Location>> availableLocations = islands.sourceWorld.getAvailableLocations();
 
-        int previousIslands = IslandsConfig.getOwnedIslands(player.getUniqueId()).size();
+        int previousIslands = islands.islandsConfig.getOwnedIslands(player.getUniqueId()).size();
 
-        int islandsLimit = plugin.getConfig().getInt("defaultIslandLimit", -1);
+        int islandsLimit = islands.plugin.getConfig().getInt("defaultIslandLimit", -1);
 
-        if (plugin.perms != null) {
-            for (String group : plugin.perms.getGroups()) {
-                if (plugin.perms.playerInGroup(player, group)) {
-                    islandsLimit = Math.max(plugin.getConfig().getInt("groupLimits." + group, -1), islandsLimit);
+        if (vaultPermissions.isEnabled()) {
+            for (String group : vaultPermissions.getPermissions().getGroups()) {
+                if (vaultPermissions.getPermissions().playerInGroup(player, group)) {
+                    islandsLimit = Math.max(islands.plugin.getConfig().getInt("groupLimits." + group, -1), islandsLimit);
                 }
             }
         }
@@ -49,8 +56,7 @@ public class CreateSubcommand extends AbstractCreateSubcommands {
             return;
         }
 
-        if (plugin.econ != null && !hasFunds(player, plugin.islandPrices.getOrDefault(islandSize, 0.0))) {
-            player.sendMessage(Messages.get("error.INSUFFICIENT_FUNDS"));
+        if (!economy.canCreate(player, islandSize)) {
             return;
         }
 
@@ -76,7 +82,7 @@ public class CreateSubcommand extends AbstractCreateSubcommands {
         String islandId;
 
         try {
-            islandId = plugin.createNewIsland(targetBiome, islandSize, player);
+            islandId = islands.islandsWorld.createNewIsland(targetBiome, islandSize, player);
         } catch (IllegalArgumentException e) {
             player.sendMessage(Messages.get("error.NO_LOCATIONS_FOR_BIOME"));
 
@@ -88,7 +94,7 @@ public class CreateSubcommand extends AbstractCreateSubcommands {
             return;
         }
 
-        if (plugin.econ != null) pay(player, plugin.islandPrices.getOrDefault(islandSize, 0.0));
+        economy.pay(player, economy.islandPrices.getOrDefault(islandSize, 0.0)); // FIXME maybe purchase(islandSize) instead?
         player.sendTitle(Messages.get("success.ISLAND_GEN_TITLE"), Messages.get("success.ISLAND_GEN_SUBTITLE"), 10, 20 * 7, 10);
     }
 

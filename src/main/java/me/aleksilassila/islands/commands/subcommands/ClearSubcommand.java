@@ -1,15 +1,19 @@
 package me.aleksilassila.islands.commands.subcommands;
 
-import me.aleksilassila.islands.IslandsConfig;
+import me.aleksilassila.islands.Entry;
+import me.aleksilassila.islands.Islands;
 import me.aleksilassila.islands.commands.AbstractIslandsWorldSubcommand;
-import me.aleksilassila.islands.generation.IslandGeneration;
 import me.aleksilassila.islands.utils.Messages;
 import me.aleksilassila.islands.utils.Permissions;
 import org.bukkit.entity.Player;
 
 public class ClearSubcommand extends AbstractIslandsWorldSubcommand {
+    public ClearSubcommand(Islands islands) {
+        super(islands);
+    }
+
     @Override
-    protected void runCommand(Player player, String[] args, boolean confirmed, IslandsConfig.Entry island) {
+    protected void runCommand(Player player, String[] args, boolean confirmed, Entry island) {
         if (args.length != 0) {
             Messages.send(player, "usage.CLEAR");
             return;
@@ -25,7 +29,7 @@ public class ClearSubcommand extends AbstractIslandsWorldSubcommand {
             return;
         }
 
-        if (!IslandGeneration.INSTANCE.clearIsland(player, island)) {
+        if (!islands.generator.clearIsland(player, island)) {
             player.sendMessage(Messages.get("error.ONGOING_QUEUE_EVENT"));
             return;
         }

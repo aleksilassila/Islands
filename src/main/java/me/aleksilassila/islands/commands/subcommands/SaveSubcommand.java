@@ -1,7 +1,8 @@
 package me.aleksilassila.islands.commands.subcommands;
 
+import me.aleksilassila.islands.Entry;
 import me.aleksilassila.islands.Islands;
-import me.aleksilassila.islands.IslandsConfig;
+import me.aleksilassila.islands.Plugin;
 import me.aleksilassila.islands.commands.AbstractIslandsWorldSubcommand;
 import me.aleksilassila.islands.utils.Messages;
 import me.aleksilassila.islands.utils.Permissions;
@@ -16,25 +17,29 @@ import java.util.List;
 public class SaveSubcommand extends AbstractIslandsWorldSubcommand {
     private final String SAVE_DIRECTORY = "plugins/Islands/saves/";
 
+    public SaveSubcommand(Islands islands) {
+        super(islands);
+    }
+
     @Override
-    protected void runCommand(Player player, String[] args, boolean confirmed, IslandsConfig.Entry island) {
-        if (Islands.instance.worldEdit != null) {
+    protected void runCommand(Player player, String[] args, boolean confirmed, Entry island) {
+        if (Plugin.instance.worldEdit != null) {
             String name = island.name;
 
-            int startX = IslandsConfig.getConfig().getInt(island + ".x");
-            int startY = IslandsConfig.getConfig().getInt(island + ".y");
-            int startZ = IslandsConfig.getConfig().getInt(island + ".z");
+            int startX = islands.islandsConfig.getConfig().getInt(island + ".x");
+            int startY = islands.islandsConfig.getConfig().getInt(island + ".y");
+            int startZ = islands.islandsConfig.getConfig().getInt(island + ".z");
 
-            int islandSize = IslandsConfig.getConfig().getInt(island + ".size");
+            int islandSize = islands.islandsConfig.getConfig().getInt(island + ".size");
 
             int height;
 
             try {
                 height = args.length == 1
                         ? Integer.parseInt(args[0])
-                        : IslandsConfig.getConfig().getInt(island + ".height");
+                        : islands.islandsConfig.getConfig().getInt(island + ".height");
             } catch (NumberFormatException e) {
-                height = IslandsConfig.getConfig().getInt(island + ".height");
+                height = islands.islandsConfig.getConfig().getInt(island + ".height");
             }
 
             if (height == 0) height = islandSize;
@@ -55,7 +60,7 @@ public class SaveSubcommand extends AbstractIslandsWorldSubcommand {
                 return;
             }
 
-            if (SaveHandler.saveSchematic(file, Islands.islandsWorld, startX, startY, startZ, islandSize, height))
+            if (SaveHandler.saveSchematic(file, islands.islandsWorld.getWorld(), startX, startY, startZ, islandSize, height))
                 player.sendMessage(Messages.get("success.ISLAND_SAVED", name, islandSize, height));
             else
                 player.sendMessage(Messages.get("error.ISLAND_SAVE_ERROR", name));

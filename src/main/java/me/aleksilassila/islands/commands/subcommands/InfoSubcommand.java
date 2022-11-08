@@ -1,15 +1,20 @@
 package me.aleksilassila.islands.commands.subcommands;
 
+import me.aleksilassila.islands.Entry;
 import me.aleksilassila.islands.Islands;
-import me.aleksilassila.islands.IslandsConfig;
+import me.aleksilassila.islands.Plugin;
 import me.aleksilassila.islands.commands.AbstractIslandsWorldSubcommand;
 import me.aleksilassila.islands.utils.Messages;
 import me.aleksilassila.islands.utils.Permissions;
 import org.bukkit.entity.Player;
 
 public class InfoSubcommand extends AbstractIslandsWorldSubcommand {
+    public InfoSubcommand(Islands islands) {
+        super(islands);
+    }
+
     @Override
-    protected void runCommand(Player player, String[] args, boolean confirmed, IslandsConfig.Entry island) {
+    protected void runCommand(Player player, String[] args, boolean confirmed, Entry island) {
         boolean extensiveInfo = player.hasPermission(Permissions.bypass.info);
 
         if (!extensiveInfo && !island.isPublic) {
@@ -23,7 +28,7 @@ public class InfoSubcommand extends AbstractIslandsWorldSubcommand {
         if (island.uuid == null) {
             Messages.send(player, "info.ISLAND_INFO_OWNER", "Server");
         } else {
-            String displayName = Islands.instance.getServer().getOfflinePlayer(island.uuid).getName();
+            String displayName = Plugin.instance.getServer().getOfflinePlayer(island.uuid).getName();
             if (displayName != null) {
                 if (extensiveInfo) {
                     Messages.send(player, "info.ISLAND_INFO_OWNER_WITH_UUID", displayName, island.uuid.toString());
@@ -34,7 +39,7 @@ public class InfoSubcommand extends AbstractIslandsWorldSubcommand {
         }
 
         Messages.send(player, "info.ISLAND_INFO_SPAWNPOINT", island.spawnPosition[0], island.spawnPosition[1]);
-        Messages.send(player, "info.ISLAND_INFO_SIZE", island.size, Islands.instance.parseIslandSize(island.size));
+        Messages.send(player, "info.ISLAND_INFO_SIZE", island.size, Plugin.instance.parseIslandSize(island.size));
         Messages.send(player, "info.ISLAND_INFO_BIOME", island.biome);
 
         if (extensiveInfo) {

@@ -1,8 +1,7 @@
 package me.aleksilassila.islands.commands;
 
 import me.aleksilassila.islands.Islands;
-import me.aleksilassila.islands.IslandsConfig;
-import me.aleksilassila.islands.generation.Biomes;
+import me.aleksilassila.islands.Plugin;
 import me.aleksilassila.islands.utils.Messages;
 import me.aleksilassila.islands.utils.Permissions;
 import org.bukkit.Location;
@@ -15,11 +14,16 @@ import java.util.HashMap;
 import java.util.List;
 
 public abstract class AbstractCreateSubcommands extends Subcommand {
+    public AbstractCreateSubcommands(Islands islands) {
+        super(islands);
+    }
+
     protected abstract void openGui(Player player);
+
     abstract protected void runCommand(Player player, String[] args, boolean confirmed, int islandSize);
 
     protected boolean isRandomBiomeDisabled() {
-        return Islands.instance.getConfig().getBoolean("disableRandomBiome");
+        return Plugin.instance.getConfig().getBoolean("disableRandomBiome");
     }
 
     @Override
@@ -29,14 +33,14 @@ public abstract class AbstractCreateSubcommands extends Subcommand {
             return;
         }
 
-        int islandSize = args.length == 2 ? Islands.instance.parseIslandSize(args[1]) : Islands.instance.parseIslandSize("");
+        int islandSize = args.length == 2 ? Plugin.instance.parseIslandSize(args[1]) : Plugin.instance.parseIslandSize("");
 
-        if (!player.hasPermission(Islands.instance.getCreatePermission(islandSize)) && !player.hasPermission(Permissions.command.createAny)) {
+        if (!player.hasPermission(Plugin.instance.getCreatePermission(islandSize)) && !player.hasPermission(Permissions.command.createAny)) {
             player.sendMessage(Messages.get("error.NO_PERMISSION"));
             return;
         }
 
-        if (islandSize < Islands.instance.getSmallestIslandSize() || islandSize + 4 >= IslandsConfig.INSTANCE.islandSpacing) {
+        if (islandSize < Plugin.instance.getSmallestIslandSize() || islandSize + 4 >= islands.config.islandSpacing) {
             player.sendMessage(Messages.get("error.INVALID_ISLAND_SIZE"));
             return;
         }
@@ -44,27 +48,12 @@ public abstract class AbstractCreateSubcommands extends Subcommand {
         runCommand(player, args, confirmed, islandSize);
     }
 
-    protected boolean hasFunds(Player player, double cost) {
-        if (Islands.instance.econ == null || player.hasPermission(Permissions.bypass.economy)) return true;
-
-        return Islands.instance.econ.has(player, cost);
-    }
-
-    protected void pay(Player player, double cost) {
-        if (Islands.instance.econ == null || player.hasPermission(Permissions.bypass.economy)) return;
-
-        if (cost > 0) {
-            Islands.instance.econ.withdrawPlayer(player, cost);
-            player.sendMessage(Messages.get("success.ISLAND_PURCHASED", cost));
-        }
-    }
-
     @Override
     public List<String> onTabComplete(Player player, String[] args) {
         List<String> availableArgs = new ArrayList<>();
 
         if (args.length == 1) {
-            HashMap<Biome, List<Location>> availableLocations = Biomes.INSTANCE.availableLocations;
+            HashMap<Biome, List<Location>> availableLocations = islands.sourceWorld.getAvailableLocations();
 
             if (!isRandomBiomeDisabled())
                 availableArgs.add("RANDOM");
@@ -74,13 +63,13 @@ public abstract class AbstractCreateSubcommands extends Subcommand {
             }
 
         } else if (args.length == 2) {
-            for (String size : Islands.instance.definedIslandSizes.keySet()) {
-                if (player.hasPermission(Islands.instance.getCreatePermission(Islands.instance.definedIslandSizes.get(size))) || player.hasPermission(Permissions.command.createAny))
+            for (String size : Plugin.instance.definedIslandSizes.keySet()) {
+                if (player.hasPermission(Plugin.instance.getCreatePermission(Plugin.instance.definedIslandSizes.get(size))) || player.hasPermission(Permissions.command.createAny))
                     availableArgs.add(size);
             }
 
             availableArgs.sort(
-                    Comparator.comparingInt(key -> Islands.instance.definedIslandSizes.get(key))
+                    Comparator.comparingInt(key -> Plugin.instance.definedIslandSizes.get(key))
             );
         }
 

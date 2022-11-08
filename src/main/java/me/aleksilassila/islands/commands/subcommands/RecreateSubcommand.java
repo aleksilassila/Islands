@@ -1,10 +1,10 @@
 package me.aleksilassila.islands.commands.subcommands;
 
+import me.aleksilassila.islands.Entry;
 import me.aleksilassila.islands.GUIs.CreateGUI;
 import me.aleksilassila.islands.Islands;
-import me.aleksilassila.islands.IslandsConfig;
 import me.aleksilassila.islands.commands.AbstractCreateSubcommands;
-import me.aleksilassila.islands.generation.Biomes;
+import me.aleksilassila.islands.plugins.Economy;
 import me.aleksilassila.islands.utils.Messages;
 import me.aleksilassila.islands.utils.Permissions;
 import me.aleksilassila.islands.utils.Utils;
@@ -12,14 +12,20 @@ import org.bukkit.block.Biome;
 import org.bukkit.entity.Player;
 
 public class RecreateSubcommand extends AbstractCreateSubcommands {
-    private final Islands plugin = Islands.instance;
+    private final Economy economy;
+
+    public RecreateSubcommand(Islands islands) {
+        super(islands);
+
+        this.economy = islands.economy;
+    }
 
     @Override
     protected void openGui(Player player) {
-        IslandsConfig.Entry island = getIsland(player);
+        Entry island = getIsland(player);
         if (island == null) return;
 
-        CreateGUI gui = new CreateGUI(plugin, player, "recreate");
+        CreateGUI gui = new CreateGUI(islands, player, "recreate");
 
         if (plugin.econ != null && plugin.getConfig().getBoolean("economy.recreateSum")) {
             double oldCost = plugin.islandPrices.getOrDefault(island.size, 0.0);
@@ -29,13 +35,13 @@ public class RecreateSubcommand extends AbstractCreateSubcommands {
         gui.open();
     }
 
-    private IslandsConfig.Entry getIsland(Player player) {
-        if (!player.getWorld().equals(Islands.islandsWorld)) {
+    private Entry getIsland(Player player) {
+        if (!player.getWorld().equals(islandsWorld)) {
             player.sendMessage(Messages.get("error.WRONG_WORLD"));
             return null;
         }
 
-        IslandsConfig.Entry island = IslandsConfig.getEntry(player.getLocation().getBlockX(), player.getLocation().getBlockZ(), true);
+        Entry island = islands.islandsConfig.getEntry(player.getLocation().getBlockX(), player.getLocation().getBlockZ(), true);
 
         if (island == null) {
             player.sendMessage(Messages.get("error.NOT_ON_ISLAND"));
@@ -56,12 +62,12 @@ public class RecreateSubcommand extends AbstractCreateSubcommands {
             return;
         }
 
-        IslandsConfig.Entry island = getIsland(player);
+        Entry island = getIsland(player);
         if (island == null) return;
 
         double cost = 0.0;
 
-        if (plugin.econ != null) {
+        if (economy.isEnabled()) {
             cost = plugin.islandPrices.getOrDefault(islandSize, 0.0);
             cost += plugin.getConfig().getDouble("economy.recreateCost");
 
@@ -71,7 +77,7 @@ public class RecreateSubcommand extends AbstractCreateSubcommands {
                 cost = Math.max(cost - oldCost, 0);
             }
 
-            if (!hasFunds(player, cost)) {
+            if (!economy.hasFunds(player, cost)) {
                 player.sendMessage(Messages.get("error.INSUFFICIENT_FUNDS"));
                 return;
             }
@@ -90,7 +96,7 @@ public class RecreateSubcommand extends AbstractCreateSubcommands {
             }
 
 
-            if (!Biomes.INSTANCE.availableLocations.containsKey(targetBiome)) {
+            if (!islands.sourceWorld.getAvailableLocations().containsKey(targetBiome)) {
                 player.sendMessage(Messages.get("error.NO_LOCATIONS_FOR_BIOME"));
                 return;
             }
@@ -102,14 +108,14 @@ public class RecreateSubcommand extends AbstractCreateSubcommands {
         }
 
         try {
-            boolean success = plugin.recreateIsland(island, targetBiome, islandSize, player);
+            boolean success = islands.islandsWorld.recreateIsland(island, targetBiome, islandSize, player);
 
             if (!success) {
                 player.sendMessage(Messages.get("error.ONGOING_QUEUE_EVENT"));
                 return;
             }
 
-            if (plugin.econ != null) pay(player, cost);
+            economy.pay(player, cost);
 
             player.sendTitle(Messages.get("success.ISLAND_GEN_TITLE"), Messages.get("success.ISLAND_GEN_SUBTITLE"), 10, 20 * 7, 10);
         } catch (IllegalArgumentException e) {

@@ -3,6 +3,7 @@ package me.aleksilassila.islands.GUIs;
 import com.github.stefvanschie.inventoryframework.gui.GuiItem;
 import com.github.stefvanschie.inventoryframework.gui.type.ChestGui;
 import com.github.stefvanschie.inventoryframework.pane.StaticPane;
+import me.aleksilassila.islands.Islands;
 import me.aleksilassila.islands.IslandsConfig;
 import me.aleksilassila.islands.utils.BiomeMaterials;
 import me.aleksilassila.islands.utils.Messages;
@@ -19,7 +20,8 @@ public class VisitGUI extends PageGUI {
 
     private final int PAGE_HEIGHT = 4; // < 1
 
-    public VisitGUI(Player player) {
+    public VisitGUI(Islands islands, Player player) {
+        super(islands);
         this.player = player;
     }
 
@@ -48,7 +50,7 @@ public class VisitGUI extends PageGUI {
     private List<StaticPane> getPanes() {
         List<StaticPane> panes = new ArrayList<>();
 
-        Map<String, Map<String, String>> publicIslands = IslandsConfig.getIslandsInfo(true);
+        Map<String, Map<String, String>> publicIslands = islands.islandsConfig.getIslandsInfo(true);
 
         List<String> sortedSet = new ArrayList<>(publicIslands.keySet());
 
@@ -77,14 +79,15 @@ public class VisitGUI extends PageGUI {
 
 
             pane.addItem(new GuiItem(createGuiItem(BiomeMaterials.valueOf(publicIslands.get(islandId).get("material")).getMaterial(),
-                        Messages.get("gui.visit.ISLAND_NAME", publicIslands.get(islandId).get("name")),
-                        "Server".equals(displayName),
-                        Messages.get("gui.visit.ISLAND_OWNER", displayName)),
-                        event -> {
-                            if (!(event.getWhoClicked() instanceof Player)) return; // Dunno if this is necessary in practice, cows don't click inventories
+                    Messages.get("gui.visit.ISLAND_NAME", publicIslands.get(islandId).get("name")),
+                    "Server".equals(displayName),
+                    Messages.get("gui.visit.ISLAND_OWNER", displayName)),
+                    event -> {
+                        if (!(event.getWhoClicked() instanceof Player))
+                            return; // Dunno if this is necessary in practice, cows don't click inventories
 
-                            ((Player) event.getWhoClicked()).performCommand("visit " + publicIslands.get(islandId).get("name"));
-                        }), (itemCount % (9 * (PAGE_HEIGHT - 1))) % 9, (itemCount % (9 * (PAGE_HEIGHT - 1))) / 9);
+                        ((Player) event.getWhoClicked()).performCommand("visit " + publicIslands.get(islandId).get("name"));
+                    }), (itemCount % (9 * (PAGE_HEIGHT - 1))) % 9, (itemCount % (9 * (PAGE_HEIGHT - 1))) / 9);
             itemCount++;
         }
 

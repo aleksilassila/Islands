@@ -6,6 +6,7 @@ import org.bukkit.World;
 import org.bukkit.block.Biome;
 import org.jetbrains.annotations.Nullable;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Random;
 
@@ -67,5 +68,17 @@ public class Utils {
         }
 
         return arr;
+    }
+
+    public static boolean worldExists(String name) {
+        try {
+            for (File f : Bukkit.getWorldContainer().listFiles()) {
+                if (f.getName().equals(name)) return true;
+            }
+        } catch (NullPointerException e) {
+            return false;
+        }
+
+        return false;
     }
 }

@@ -1,7 +1,8 @@
 package me.aleksilassila.islands.commands.subcommands;
 
+import me.aleksilassila.islands.Entry;
 import me.aleksilassila.islands.Islands;
-import me.aleksilassila.islands.IslandsConfig;
+import me.aleksilassila.islands.Plugin;
 import me.aleksilassila.islands.commands.AbstractIslandsWorldSubcommand;
 import me.aleksilassila.islands.utils.Messages;
 import me.aleksilassila.islands.utils.Permissions;
@@ -12,20 +13,24 @@ import java.util.Collections;
 import java.util.List;
 
 public class NameSubcommand extends AbstractIslandsWorldSubcommand {
+    public NameSubcommand(Islands islands) {
+        super(islands);
+    }
+
     @Override
-    protected void runCommand(Player player, String[] args, boolean confirmed, IslandsConfig.Entry island) {
+    protected void runCommand(Player player, String[] args, boolean confirmed, Entry island) {
         if (args.length != 1) {
             Messages.send(player, "usage.NAME");
             return;
         }
 
         if (player.getUniqueId().equals(island.uuid) || player.hasPermission(Permissions.bypass.name)) {
-            if (IslandsConfig.getIslandByName(args[0]) != null) {
+            if (islands.islandsConfig.getIslandByName(args[0]) != null) {
                 player.sendMessage(Messages.get("error.NAME_TAKEN"));
                 return;
             }
 
-            if (Islands.instance.getConfig().getStringList("illegalIslandNames").contains(args[0])) {
+            if (Plugin.instance.getConfig().getStringList("illegalIslandNames").contains(args[0])) {
                 player.sendMessage(Messages.get("error.NAME_BLOCKED"));
                 return;
             }

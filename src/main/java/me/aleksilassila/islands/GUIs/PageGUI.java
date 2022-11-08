@@ -6,6 +6,7 @@ import com.github.stefvanschie.inventoryframework.pane.OutlinePane;
 import com.github.stefvanschie.inventoryframework.pane.PaginatedPane;
 import com.github.stefvanschie.inventoryframework.pane.Pane;
 import com.github.stefvanschie.inventoryframework.pane.StaticPane;
+import me.aleksilassila.islands.Islands;
 import me.aleksilassila.islands.utils.Messages;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -14,6 +15,10 @@ import org.bukkit.entity.Player;
 import java.util.List;
 
 public abstract class PageGUI extends GUI {
+    public PageGUI(Islands islands) {
+        super(islands);
+    }
+
     protected ChestGui createPaginatedGUI(int pageHeight, String title, List<StaticPane> pages) {
         ChestGui gui = new ChestGui(pageHeight, title);
         gui.setOnTopClick(event -> event.setCancelled(true));
@@ -54,14 +59,14 @@ public abstract class PageGUI extends GUI {
 
         forward.addItem(new GuiItem(createGuiItem(Material.ARROW, Messages.get("gui.NEXT_PAGE"), false), event -> {
 
-        pane.setPage(pane.getPage() + 1);
+            pane.setPage(pane.getPage() + 1);
 
-        if (pane.getPage() == pane.getPages() - 1) {
-            forward.setVisible(false);
-        }
+            if (pane.getPage() == pane.getPages() - 1) {
+                forward.setVisible(false);
+            }
 
-        back.setVisible(true);
-        gui.update();
+            back.setVisible(true);
+            gui.update();
         }), 0, 0);
 
         if (pane.getPages() <= 1) forward.setVisible(false);
@@ -79,7 +84,8 @@ public abstract class PageGUI extends GUI {
                 Messages.get("gui.BACK"),
                 false),
                 event -> {
-                    if (!(event.getWhoClicked() instanceof Player)) return; // Dunno if this is necessary in practice, cows don't click inventories
+                    if (!(event.getWhoClicked() instanceof Player))
+                        return; // Dunno if this is necessary in practice, cows don't click inventories
 
                     open();
                 }), 0, 0);

@@ -1,96 +1,79 @@
 package me.aleksilassila.islands.generation;
 
+import me.aleksilassila.islands.Config;
+import me.aleksilassila.islands.Entry;
 import me.aleksilassila.islands.Islands;
-import me.aleksilassila.islands.IslandsConfig;
+import me.aleksilassila.islands.Plugin;
 import me.aleksilassila.islands.utils.FastNoiseLite;
 import me.aleksilassila.islands.utils.Messages;
 import me.aleksilassila.islands.utils.Permissions;
 import me.aleksilassila.islands.utils.Utils;
+import me.aleksilassila.islands.world.IslandsWorld;
+import me.aleksilassila.islands.world.SourceWorld;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Biome;
 import org.bukkit.block.Block;
 import org.bukkit.block.data.BlockData;
-import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
-import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Random;
 
-// Eh sorry about this one, its a mess
-public enum IslandGeneration {
-    INSTANCE;
+// Eh sorry about this one, it's a mess
+public class IslandGeneration {
+    private final Islands islands;
+    private final Plugin plugin;
+    private final Config config;
 
-    private final Islands plugin;
+    private final SourceWorld sourceWorld;
+    private final IslandsWorld islandsWorld;
 
     public List<Task> queue = new ArrayList<>();
     private final int buildDelay;
     private int rowsBuiltPerDelay = 1;
     private final int rowsClearedPerDelay;
     public boolean proceduralShapes;
-    private final double stalactiteSpacing;
-    private final int stalactiteHeight;
 
     static FastNoiseLite generalShape;
     static FastNoiseLite stalactite;
 
-    private final Map<Material, Material> replacementMap = new HashMap<>();
+    public IslandGeneration(Islands islands) {
+        this.plugin = islands.plugin;
+        this.islands = islands;
+        this.config = islands.config;
 
-    IslandGeneration() {
-        this.plugin = Islands.instance;
+        this.sourceWorld = islands.sourceWorld;
+        this.islandsWorld = islands.islandsWorld;
 
-        double delay = plugin.getConfig().getDouble("generation.generationDelayInTicks");
-        proceduralShapes = plugin.getConfig().getBoolean("useProceduralShapes", false);
-        stalactiteHeight = plugin.getConfig().getInt("generation.stalactiteLength", 8);
-        stalactiteSpacing = plugin.getConfig().getDouble("generation.stalactiteSpacing", 2);
-
-        if (delay < 1.0) {
+        if (config.generationDelay < 1.0) {
             this.buildDelay = 1;
-            this.rowsBuiltPerDelay = (int) Math.round(1 / delay);
+            this.rowsBuiltPerDelay = (int) Math.round(1 / config.generationDelay);
         } else {
-            this.buildDelay = (int) delay;
+            this.buildDelay = (int) config.generationDelay;
         }
 
         this.rowsClearedPerDelay = rowsBuiltPerDelay * plugin.getConfig().getInt("generation.clearSpeedMultiplier", 1);
 
-        ConfigurationSection section = plugin.getConfig().getConfigurationSection("replaceOnGeneration");
-
-        // Initialize block replacement according to config.yml
-        if (section != null) {
-            for (String material : section.getKeys(false)) {
-                Material materialToReplace = Material.getMaterial(material.toUpperCase());
-                Material newMaterial = plugin.getConfig().getString("replaceOnGeneration." + material) != null
-                        ? Material.getMaterial(section.getString(material).toUpperCase())
-                        : null;
-
-                if (materialToReplace != null && newMaterial != null) {
-                    replacementMap.put(materialToReplace, newMaterial);
-                    plugin.getLogger().info("Replacing " + materialToReplace.name() + " with " + newMaterial.name());
-                } else {
-                    if (materialToReplace == null) {
-                        plugin.getLogger().warning("Material not found: " + material);
-                    }
-
-                    if (newMaterial == null) {
-                        plugin.getLogger().warning("Material not found: " + plugin.getConfig().getString("replaceOnGeneration." + material));
-                    }
-                }
-            }
-        }
     }
 
-    public boolean copyIsland(Player player, IslandsConfig.Entry updatedIsland, boolean shouldClearArea, boolean noShape, int oldSize) {
-        if (Biomes.INSTANCE.availableLocations.getOrDefault(updatedIsland.biome, new ArrayList<>()).size() == 0)
+
+    public boolean copyIsland(Player player, Entry updatedIsland, boolean shouldClearArea, boolean noShape, int oldSize) {
+        HashMap<Biome, List<Location>> availableLocations = sourceWorld.getAvailableLocations();
+
+        if (availableLocations.getOrDefault(updatedIsland.biome, new ArrayList<>()).size() == 0)
             throw new IllegalArgumentException();
 
         if (!canAddQueueItem(player))
             return false;
 
-        Location sourceLocation = Biomes.INSTANCE.availableLocations.get(updatedIsland.biome).
-                get(new Random().nextInt(Biomes.INSTANCE.availableLocations.get(updatedIsland.biome).size()));
+        Location sourceLocation = availableLocations.get(updatedIsland.biome).
+                get(new Random().nextInt(availableLocations.get(updatedIsland.biome).size()));
 
         // Get island center y. Center block will be in the middle the first block
         // that is not burnable
@@ -99,7 +82,7 @@ public enum IslandGeneration {
             int centerX = (int) (sourceLocation.getBlockX() + ((double) updatedIsland.size) / 2.0);
             int centerZ = (int) (sourceLocation.getBlockZ() + ((double) updatedIsland.size) / 2.0);
 
-            Material material = Islands.islandsSourceWorld.getBlockAt(centerX, centerY, centerZ).getBlockData().getMaterial();
+            Material material = sourceWorld.getWorld().getBlockAt(centerX, centerY, centerZ).getBlockData().getMaterial();
             if (!material.isAir() && !material.isBurnable())
                 if (material != Material.MUSHROOM_STEM
                         && material != Material.BROWN_MUSHROOM_BLOCK
@@ -123,7 +106,7 @@ public enum IslandGeneration {
         return true;
     }
 
-    public boolean clearIsland(Player player, IslandsConfig.Entry island) {
+    public boolean clearIsland(Player player, Entry island) {
         if (!canAddQueueItem(player))
             return false;
 
@@ -195,10 +178,11 @@ public enum IslandGeneration {
 
     public abstract static class Task extends BukkitRunnable {
         public abstract Player getPlayer();
+
         public abstract String getIslandId();
 
         @Override
-        public synchronized BukkitTask runTaskTimer(Plugin plugin, long delay, long period) throws IllegalArgumentException, IllegalStateException {
+        public synchronized BukkitTask runTaskTimer(org.bukkit.plugin.Plugin plugin, long delay, long period) throws IllegalArgumentException, IllegalStateException {
             Messages.send(getPlayer(), "info.GENERATION_STARTED");
 
             return super.runTaskTimer(plugin, delay, period);
@@ -207,7 +191,7 @@ public enum IslandGeneration {
 
     class CopyTask extends Task {
         private final Player player;
-        private final IslandsConfig.Entry island;
+        private final Entry island;
 
         CopyLocation copyLocation;
         CopyLocation clearLocation;
@@ -227,9 +211,9 @@ public enum IslandGeneration {
         private int o1;
         private int o2;
 
-        public CopyTask(Player player, Location sourceLocation, IslandsConfig.Entry island, boolean paste, boolean clear, boolean useShapes, int clearSize) {
-            int[][] corners = IslandsConfig.getIslandCorner(island.xIndex, island.zIndex, island.size);
-            int[][] clearCorners = IslandsConfig.getIslandCorner(island.xIndex, island.zIndex, clearSize);
+        public CopyTask(Player player, Location sourceLocation, Entry island, boolean paste, boolean clear, boolean useShapes, int clearSize) {
+            int[][] corners = islands.islandsConfig.getIslandCorner(island.xIndex, island.zIndex, island.size);
+            int[][] clearCorners = islands.islandsConfig.getIslandCorner(island.xIndex, island.zIndex, clearSize);
 
             this.copyLocation = new CopyLocation(corners[0][0],
                     island.y,
@@ -258,10 +242,10 @@ public enum IslandGeneration {
             this.useShapes = proceduralShapes && useShapes;
 
             // Stalactite positions + one in the middle
-            int[][] items = Utils.randomStalactitePositions(island.size, stalactiteSpacing);
+            int[][] items = Utils.randomStalactitePositions(island.size, config.stalactiteSpacing);
             this.randomPositions = new int[items.length + 1][2];
             System.arraycopy(items, 0, randomPositions, 0, items.length);
-            randomPositions[randomPositions.length - 1] = new int[] {radius, radius};
+            randomPositions[randomPositions.length - 1] = new int[]{radius, radius};
 
             Random r = new Random();
             o1 = r.nextInt(50000);
@@ -269,8 +253,8 @@ public enum IslandGeneration {
         }
 
         // For clear command only
-        public CopyTask(Player player, IslandsConfig.Entry island) {
-            int[][] corners = IslandsConfig.getIslandCorner(island.xIndex, island.zIndex, island.size);
+        public CopyTask(Player player, Entry island) {
+            int[][] corners = islands.islandsConfig.getIslandCorner(island.xIndex, island.zIndex, island.size);
             this.clearLocation = new CopyLocation(corners[0][0],
                     island.y,
                     corners[0][1],
@@ -297,8 +281,8 @@ public enum IslandGeneration {
 
         @Override
         public void run() {
-            int maxYAdd = (int) (island.size / 2d + 4 * 0.7 + stalactiteHeight);
-            int maxYAddClear = (int) (clearSize / 2d + 4 * 0.7 + stalactiteHeight);
+            int maxYAdd = (int) (island.size / 2d + 4 * 0.7 + config.stalactiteHeight);
+            int maxYAddClear = (int) (clearSize / 2d + 4 * 0.7 + config.stalactiteHeight);
 
             if (clear) { // Clear the area first if necessary
                 for (int count = 0; count < rowsClearedPerDelay; count++) {
@@ -308,14 +292,14 @@ public enum IslandGeneration {
                     boolean skipDelay = true;
                     for (int y = -maxYAddClear; y <= clearSize; y++) {
                         CopyLocation l = clearLocation.add(x, y, z);
-                        Block ib = l.getIslandBlock();
+                        Block ib = l.getTargetBlock();
 
                         if (!ib.getType().isAir()) { // If there's block there, clear it
                             ib.setType(Material.AIR);
                             skipDelay = false; // Don't skip the delay between iterations, normally true
                         }
                     }
-                    clearBiome(clearLocation.add(x, 0, z).getIslandBlock(), Biome.PLAINS);
+                    clearBiome(clearLocation.add(x, 0, z).getTargetBlock(), Biome.PLAINS);
 
                     if (skipDelay) count--;
 
@@ -326,11 +310,11 @@ public enum IslandGeneration {
                         clear = false;
 
                         break;
-                    } else if (index == IslandsConfig.INSTANCE.islandSpacing * IslandsConfig.INSTANCE.islandSpacing / 4) {
+                    } else if (index == config.islandSpacing * config.islandSpacing / 4) {
                         Messages.send(player, "info.CLEARING_STATUS", 25);
-                    } else if (index == IslandsConfig.INSTANCE.islandSpacing * IslandsConfig.INSTANCE.islandSpacing / 2) {
+                    } else if (index == config.islandSpacing * config.islandSpacing / 2) {
                         Messages.send(player, "info.CLEARING_STATUS", 50);
-                    } else if (index == IslandsConfig.INSTANCE.islandSpacing * IslandsConfig.INSTANCE.islandSpacing / 4 * 3) {
+                    } else if (index == config.islandSpacing * config.islandSpacing / 4 * 3) {
                         Messages.send(player, "info.CLEARING_STATUS", 75);
                     }
 
@@ -359,17 +343,17 @@ public enum IslandGeneration {
 
                 for (int y = island.size; y >= -maxYAdd; y--) {
                     CopyLocation l = copyLocation.add(x, y, z);
-                    Block ib = l.getIslandBlock();
+                    Block ib = l.getTargetBlock();
                     Block sb = l.getSourceBlock();
 
                     BlockData data = sb.getBlockData();
 
                     // Check if block should be replaced according to config.yml
-                    if (replacementMap.containsKey(sb.getType())) {
-                        data = replacementMap.get(sb.getType()).createBlockData();
+                    if (config.blockReplacements.containsKey(sb.getType())) {
+                        data = config.blockReplacements.get(sb.getType()).createBlockData();
                     }
 
-                    double yAdd = getShapeNoise(Islands.islandsWorld, x, z, randomPositions, island.size);
+                    double yAdd = getShapeNoise(islandsWorld.getWorld(), x, z, randomPositions, island.size);
 
                     if (!useShapes || (y > radius)) {
                         if (isBlockInIslandShape(x, y, z, island.size))
@@ -387,18 +371,17 @@ public enum IslandGeneration {
                 // Extend biomes up and down
                 Biome upBiome = copyLocation.add(x, island.size, z).getSourceBlock().getBiome();
                 Biome downBiome = copyLocation.add(x, -maxYAdd, z).getSourceBlock().getBiome();
-                Block ib = copyLocation.add(x, 0, z).getIslandBlock();
+                Block ib = copyLocation.add(x, 0, z).getTargetBlock();
                 for (int y = ib.getY() + island.size; y < 256; y++)
-                    Islands.islandsWorld.setBiome(ib.getX(), y, ib.getZ(), upBiome);
+                    islandsWorld.getWorld().setBiome(ib.getX(), y, ib.getZ(), upBiome);
                 for (int y = ib.getY() - maxYAdd; y > 0; y--)
-                    Islands.islandsWorld.setBiome(ib.getX(), y, ib.getZ(), downBiome);
-
+                    islandsWorld.getWorld().setBiome(ib.getX(), y, ib.getZ(), downBiome);
 
 
                 // If done
                 if (index >= island.size * island.size) {
                     // Update lighting
-                    Islands.islandsWorld.getChunkAt(copyLocation.getBlockX() + radius, copyLocation.getBlockZ() + radius);
+                    islandsWorld.getWorld().getChunkAt(copyLocation.getBlockX() + radius, copyLocation.getBlockZ() + radius);
 
                     player.sendMessage(Messages.get("success.GENERATION_DONE"));
 
@@ -424,7 +407,7 @@ public enum IslandGeneration {
 
         private static final double curvature = 5;
 
-        double getShapeNoise(World world, int x, int z, int[][] positions, int size)  {
+        double getShapeNoise(World world, int x, int z, int[][] positions, int size) {
             double factor = Math.max(0, 1 - Math.sqrt((Math.pow(x - size / 2d, 2) + Math.pow(z - size / 2d, 2)) / (Math.pow(size, 2) / 4d)));
             if (factor <= 0) return 0;
 
@@ -446,13 +429,13 @@ public enum IslandGeneration {
             double base = size / 2d * (0.5 * Math.pow(factor, 2.5 / curvature) + 0.5 * Math.pow(factor, curvature / 1.4));
             double generalDetails = generalShape.GetNoise(x + o1, z + o2) * 4;
 
-            double dist = stalactiteSpacing;
+            double dist = config.stalactiteSpacing;
             for (int[] pos : positions) {
                 double d = Math.sqrt(Math.pow(x - pos[0], 2) + Math.pow(z - pos[1], 2));
-                dist = Math.min(d / stalactiteSpacing, dist);
+                dist = Math.min(d / config.stalactiteSpacing, dist);
             }
 
-            double fineDetails = stalactiteHeight * (1 / Math.pow(dist + 1, 2)) * (1 + stalactite.GetNoise(x + o1, z + o2));
+            double fineDetails = config.stalactiteHeight * (1 / Math.pow(dist + 1, 2)) * (1 + stalactite.GetNoise(x + o1, z + o2));
 
             return base + Math.pow(factor, 0.2) * generalDetails + Math.pow(factor, 0.1) * fineDetails;
         }
@@ -463,9 +446,9 @@ public enum IslandGeneration {
      * Check if the block is inside the egg-shape (not sphere!!) of the island,
      * the blocks should be in range is 0<=x<=islandSize
      *
-     * @param x x coordinate relative to the position of the island.
-     * @param y y coordinate relative to the position of the island.
-     * @param z z coordinate relative to the position of the island.
+     * @param x          x coordinate relative to the position of the island.
+     * @param y          y coordinate relative to the position of the island.
+     * @param z          z coordinate relative to the position of the island.
      * @param islandSize Size of the island (diameter of the sphere)
      * @return true if the block is inside
      */
@@ -478,9 +461,9 @@ public enum IslandGeneration {
      * Check if the block is inside sphere with diameter of islandSize,
      * the blocks should be in range is 0<=x<=islandSize
      *
-     * @param x x coordinate relative to the position of the island.
-     * @param y y coordinate relative to the position of the island.
-     * @param z z coordinate relative to the position of the island.
+     * @param x          x coordinate relative to the position of the island.
+     * @param y          y coordinate relative to the position of the island.
+     * @param z          z coordinate relative to the position of the island.
      * @param islandSize Size of the island (diameter of the sphere)
      * @return true if the block is inside
      */
@@ -495,8 +478,8 @@ public enum IslandGeneration {
      * Check if the block is inside cylinder with diameter of islandSize,
      * ignoring height (y), the blocks should be in range is 0<=x<=islandSize
      *
-     * @param relativeX x coordinate relative to the position of the island.
-     * @param relativeZ z coordinate relative to the position of the island.
+     * @param relativeX  x coordinate relative to the position of the island.
+     * @param relativeZ  z coordinate relative to the position of the island.
      * @param islandSize Size of the island (diameter of the cylinder)
      * @return true if the block is inside
      */
@@ -505,7 +488,9 @@ public enum IslandGeneration {
                 <= Math.pow(islandSize / 2.0, 2);
     }
 
-    static class CopyLocation extends Location {
+    class CopyLocation extends Location {
+        private final World source = sourceWorld.getWorld();
+        private final World target = islandsWorld.getWorld();
         double sx, sy, sz;
 
         /**
@@ -513,7 +498,7 @@ public enum IslandGeneration {
          * @param sx islandsSourceWorld x
          */
         public CopyLocation(double ix, double iy, double iz, double sx, double sy, double sz) {
-            super(Islands.islandsWorld, ix, iy, iz);
+            super(islandsWorld.getWorld(), ix, iy, iz);
             this.sx = sx;
             this.sy = sy;
             this.sz = sz;
@@ -524,12 +509,12 @@ public enum IslandGeneration {
             return new CopyLocation(getX() + x, getY() + y, getZ() + z, sx + x, sy + y, sz + z);
         }
 
-        public Block getIslandBlock() {
-            return Islands.islandsWorld.getBlockAt(this);
+        public Block getTargetBlock() {
+            return target.getBlockAt(this);
         }
 
         public Block getSourceBlock() {
-            return Islands.islandsSourceWorld.getBlockAt((int) Math.round(sx), (int) Math.round(sy), (int) Math.round(sz));
+            return source.getBlockAt((int) Math.round(sx), (int) Math.round(sy), (int) Math.round(sz));
         }
     }
 }

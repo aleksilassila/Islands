@@ -4,7 +4,7 @@ import com.github.stefvanschie.inventoryframework.gui.GuiItem;
 import com.github.stefvanschie.inventoryframework.gui.type.ChestGui;
 import com.github.stefvanschie.inventoryframework.pane.StaticPane;
 import me.aleksilassila.islands.Islands;
-import me.aleksilassila.islands.generation.Biomes;
+import me.aleksilassila.islands.Plugin;
 import me.aleksilassila.islands.utils.BiomeMaterials;
 import me.aleksilassila.islands.utils.Messages;
 import me.aleksilassila.islands.utils.Permissions;
@@ -19,7 +19,7 @@ import java.util.HashMap;
 import java.util.List;
 
 public class CreateGUI extends PageGUI {
-    private final Islands plugin;
+    private final Plugin plugin;
     private final Player player;
 
     private final String subcommand;
@@ -28,8 +28,9 @@ public class CreateGUI extends PageGUI {
 
     private final int PAGE_HEIGHT = 4; // < 1
 
-    public CreateGUI(Islands plugin, Player player, String subcommand) {
-        this.plugin = plugin;
+    public CreateGUI(Islands islands, Player player, String subcommand) {
+        super(islands);
+        this.plugin = islands.plugin;
         this.player = player;
         this.subcommand = subcommand;
 
@@ -55,7 +56,7 @@ public class CreateGUI extends PageGUI {
     private List<StaticPane> availableIslandPanes() {
         List<StaticPane> panes = new ArrayList<>();
 
-        HashMap<Biome, List<Location>> availableLocations = Biomes.INSTANCE.availableLocations;
+        HashMap<Biome, List<Location>> availableLocations = islands.sourceWorld.getAvailableLocations();
 
         List<Biome> sortedSet = new ArrayList<>(availableLocations.keySet());
 
@@ -136,7 +137,8 @@ public class CreateGUI extends PageGUI {
             }
 
             int islandSize = plugin.definedIslandSizes.get(key);
-            if (!player.hasPermission(plugin.getCreatePermission(islandSize)) && !player.hasPermission(Permissions.command.createAny)) continue;
+            if (!player.hasPermission(plugin.getCreatePermission(islandSize)) && !player.hasPermission(Permissions.command.createAny))
+                continue;
 
             double cost = 0.0;
 
@@ -146,23 +148,23 @@ public class CreateGUI extends PageGUI {
                 if (oldCost != null) {
                     cost = Math.max(cost - oldCost, 0);
                 }
-                
+
                 if (player.hasPermission(Permissions.bypass.economy)) cost = 0;
             }
 
 
             pane.addItem(
-                new GuiItem(
-                    createGuiItem(
-                        Material.BOOK,
-                        Messages.get("gui.create.SIZE_NAME", key), false,
-                        Messages.get("gui.create.SIZE_LORE", islandSize, cost)
-                    ),
-                    event -> {
-                        event.getWhoClicked().closeInventory();
-                        ((Player) event.getWhoClicked()).performCommand(createCommand + " " + key);
-                    }
-                ), itemCount % 9, itemCount / 9);
+                    new GuiItem(
+                            createGuiItem(
+                                    Material.BOOK,
+                                    Messages.get("gui.create.SIZE_NAME", key), false,
+                                    Messages.get("gui.create.SIZE_LORE", islandSize, cost)
+                            ),
+                            event -> {
+                                event.getWhoClicked().closeInventory();
+                                ((Player) event.getWhoClicked()).performCommand(createCommand + " " + key);
+                            }
+                    ), itemCount % 9, itemCount / 9);
 
             itemCount++;
         }

@@ -1,5 +1,8 @@
+import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
+
 plugins {
     java
+    id("com.github.johnrengelman.shadow") version "7.0.0"
 }
 
 group "me.aleksilassila.islands"
@@ -29,5 +32,13 @@ tasks.register<Copy>("copyJar") {
 }
 
 tasks.named("build") {
+    dependsOn("copyJar")
+}
+
+tasks.withType<ShadowJar> {
+    include("com.github.MilkBowl:VaultAPI:1.7")
+}
+
+tasks.named("shadowJar") {
     dependsOn("copyJar")
 }

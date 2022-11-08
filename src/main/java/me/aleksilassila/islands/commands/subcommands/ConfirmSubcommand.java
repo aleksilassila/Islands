@@ -1,5 +1,6 @@
 package me.aleksilassila.islands.commands.subcommands;
 
+import me.aleksilassila.islands.Islands;
 import me.aleksilassila.islands.commands.Subcommand;
 import me.aleksilassila.islands.utils.Permissions;
 import org.bukkit.entity.Player;
@@ -7,6 +8,10 @@ import org.bukkit.entity.Player;
 import java.util.List;
 
 public class ConfirmSubcommand extends Subcommand {
+    public ConfirmSubcommand(Islands islands) {
+        super(islands);
+    }
+
     @Override
     public void onCommand(Player player, String[] args, boolean confirmed) {
 

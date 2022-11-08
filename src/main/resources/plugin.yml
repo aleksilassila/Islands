@@ -1,18 +1,18 @@
 name: Islands
 version: 5.0.9
 author: Aleksi Lassila
-main: me.aleksilassila.islands.Islands
+main: me.aleksilassila.islands.Plugin
 api-version: 1.15
-softdepend: [Vault, WorldEdit, GriefPrevention]
+softdepend: [ Vault, WorldEdit, GriefPrevention ]
 commands:
   island:
     description: Island managment
     usage: /<command>
-    aliases: [is]
+    aliases: [ is ]
   visit:
     description: Visit islands
     usage: /<command> name
-    aliases: [vi]
+    aliases: [ vi ]
   home:
     description: Teleport to your home island
     usage: /<command> ([home id])

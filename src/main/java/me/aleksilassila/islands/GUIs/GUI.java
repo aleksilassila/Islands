@@ -4,6 +4,7 @@ import com.github.stefvanschie.inventoryframework.gui.GuiItem;
 import com.github.stefvanschie.inventoryframework.gui.type.ChestGui;
 import com.github.stefvanschie.inventoryframework.pane.OutlinePane;
 import com.github.stefvanschie.inventoryframework.pane.Pane;
+import me.aleksilassila.islands.Islands;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
@@ -17,7 +18,14 @@ import java.util.Arrays;
 import java.util.List;
 
 public abstract class GUI {
+    protected final Islands islands;
+
+    public GUI(Islands islands) {
+        this.islands = islands;
+    }
+
     public abstract ChestGui getMainGui();
+
     public abstract Player getPlayer();
 
     public void open() {

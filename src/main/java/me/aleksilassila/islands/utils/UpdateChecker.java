@@ -1,6 +1,6 @@
 package me.aleksilassila.islands.utils;
 
-import me.aleksilassila.islands.Islands;
+import me.aleksilassila.islands.Plugin;
 import org.bukkit.Bukkit;
 
 import java.io.IOException;
@@ -10,12 +10,27 @@ import java.util.Scanner;
 import java.util.function.Consumer;
 
 public class UpdateChecker {
-    private final Islands plugin;
+    private final Plugin plugin;
     private final int resourceId;
 
-    public UpdateChecker(Islands plugin, int resourceId) {
+    public UpdateChecker(Plugin plugin, int resourceId) {
         this.plugin = plugin;
         this.resourceId = resourceId;
+    }
+
+    public void checkForUpdates() {
+        getVersion(version -> {
+            String majorVersion = version.substring(0, version.lastIndexOf("."));
+            String thisMajorVersion = plugin.getDescription().getVersion().substring(0, plugin.getDescription().getVersion().lastIndexOf("."));
+
+            if (plugin.getDescription().getVersion().equalsIgnoreCase(version)) {
+                plugin.getLogger().info("You are up to date.");
+            } else if (!majorVersion.equalsIgnoreCase(thisMajorVersion)) {
+                plugin.getLogger().warning("There's a new major update available!");
+            } else {
+                plugin.getLogger().info("There's a new minor update available!");
+            }
+        });
     }
 
     public void getVersion(final Consumer<String> consumer) {

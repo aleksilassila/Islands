@@ -1,9 +1,9 @@
 package me.aleksilassila.islands.commands;
 
+import me.aleksilassila.islands.Entry;
 import me.aleksilassila.islands.GUIs.VisitGUI;
 import me.aleksilassila.islands.Islands;
-import me.aleksilassila.islands.IslandsConfig;
-import me.aleksilassila.islands.generation.IslandGeneration;
+import me.aleksilassila.islands.Plugin;
 import me.aleksilassila.islands.utils.Messages;
 import me.aleksilassila.islands.utils.Permissions;
 import me.aleksilassila.islands.utils.Utils;
@@ -21,11 +21,13 @@ import org.bukkit.entity.Villager;
 import java.util.*;
 
 public class TeleportCommands {
-    private final Islands plugin;
+    private final Islands islands;
+    private final Plugin plugin;
     private final boolean allowHomeOnlyFromOverworld;
 
-    public TeleportCommands() {
-        this.plugin = Islands.instance;
+    public TeleportCommands(Islands islands) {
+        this.islands = islands;
+        this.plugin = islands.plugin;
         this.allowHomeOnlyFromOverworld = plugin.getConfig().getBoolean("allowHomeOnlyFromOverworld");
 
         new VisitCommand();
@@ -46,7 +48,7 @@ public class TeleportCommands {
 
             Player player = (Player) sender;
 
-            plugin.confirmations.remove(player.getUniqueId().toString());
+            islands.confirmations.remove(player.getUniqueId().toString());
 
             if (!player.hasPermission(Permissions.command.visit)) {
                 player.sendMessage(Messages.get("error.NO_PERMISSION"));
@@ -64,7 +66,7 @@ public class TeleportCommands {
             }
 
             if (args.length != 1) {
-                new VisitGUI(player).open();
+                new VisitGUI(islands, player).open();
                 return true;
             }
 
@@ -73,7 +75,7 @@ public class TeleportCommands {
                 return true;
             }
 
-            IslandsConfig.Entry e = IslandsConfig.getIslandByName(args[0]);
+            Entry e = islands.islandsConfig.getIslandByName(args[0]);
 
             if (e != null) {
                 e.teleport(player);
@@ -87,7 +89,8 @@ public class TeleportCommands {
     }
 
     public class HomesCommand extends Subcommand implements CommandExecutor {
-        public HomesCommand(boolean subcommand) {
+        public HomesCommand(Islands islands, boolean subcommand) {
+            super(islands);
             if (!subcommand) {
                 plugin.getCommand("homes").setExecutor(this);
             }
@@ -127,24 +130,24 @@ public class TeleportCommands {
 
             Player player = (Player) sender;
 
-            plugin.confirmations.remove(player.getUniqueId().toString());
+            islands.confirmations.remove(player.getUniqueId().toString());
 
             if (!player.hasPermission(Permissions.command.listHomes)) {
                 player.sendMessage(Messages.get("error.NO_PERMISSION"));
                 return true;
             }
 
-            List<IslandsConfig.Entry> islands = IslandsConfig.getOwnedIslands(player.getUniqueId());
+            List<Entry> islands = this.islands.islandsConfig.getOwnedIslands(player.getUniqueId());
             Map<String, Integer> idMap = new HashMap<>();
 
-             for (IslandsConfig.Entry e : islands) {
-                 idMap.put(e.islandId, e.homeId);
-             }
+            for (Entry e : islands) {
+                idMap.put(e.islandId, e.homeId);
+            }
 
             islands.sort(Comparator.comparingInt(e -> e.homeId));
 
             player.sendMessage(Messages.get("success.HOMES_FOUND", islands.size()));
-            for (IslandsConfig.Entry e : islands) {
+            for (Entry e : islands) {
                 Messages.send(player, "success.HOME_ITEM", e.name, idMap.get(e.islandId));
             }
 
@@ -158,11 +161,13 @@ public class TeleportCommands {
         private final int neutralTeleportRange;
         private final boolean unfinishedIslandTeleports;
 
-        public HomeCommand(boolean subcommand) {
+        public HomeCommand(Islands islands, boolean subcommand) {
+            super(islands);
             if (!subcommand) {
                 plugin.getCommand("home").setExecutor(this);
             }
 
+            // Fixme use Config
             this.disableNeutralTeleports = plugin.getConfig().getBoolean("disableNeutralTeleports");
             this.enableAllTaggedTeleports = plugin.getConfig().getBoolean("teleportAllNameTagged");
             this.neutralTeleportRange = plugin.getConfig().getInt("neutralTeleportRange");
@@ -178,7 +183,7 @@ public class TeleportCommands {
 
             Player player = (Player) sender;
 
-            plugin.confirmations.remove(player.getUniqueId().toString());
+            islands.confirmations.remove(player.getUniqueId().toString());
 
             if (!player.hasPermission(Permissions.command.home)) {
                 player.sendMessage(Messages.get("error.NO_PERMISSION"));
@@ -212,20 +217,20 @@ public class TeleportCommands {
             int homeId;
 
             try {
-                homeId = args.length == 0 ? IslandsConfig.getLowestHome(player.getUniqueId()) : Integer.parseInt(args[0]);
+                homeId = args.length == 0 ? islands.islandsConfig.getLowestHome(player.getUniqueId()) : Integer.parseInt(args[0]);
             } catch (NumberFormatException e) {
-                homeId = IslandsConfig.getLowestHome(player.getUniqueId());
+                homeId = islands.islandsConfig.getLowestHome(player.getUniqueId());
             }
 
-            IslandsConfig.Entry island = IslandsConfig.getHomeIsland(player.getUniqueId(), homeId);
+            Entry island = islands.islandsConfig.getHomeIsland(player.getUniqueId(), homeId);
 
             if (island == null) {
                 player.sendMessage(Messages.get("error.HOME_NOT_FOUND"));
                 return true;
             }
 
-            if (IslandGeneration.INSTANCE.queue.size() > 0
-                    && IslandGeneration.INSTANCE.queue.get(0).getIslandId().equals(island.islandId)
+            if (islands.generator.queue.size() > 0
+                    && islands.generator.queue.get(0).getIslandId().equals(island.islandId)
                     && !unfinishedIslandTeleports) {
                 Messages.send(player, "error.ISLAND_UNFINISHED");
                 return true;
@@ -263,7 +268,7 @@ public class TeleportCommands {
         }
 
         private void teleportNeutrals(Player player, Location location) {
-            if (!disableNeutralTeleports && player.hasPermission(Permissions.bypass.neutralTeleport) && player.getWorld().equals(Islands.wildernessWorld)) {
+            if (!disableNeutralTeleports && player.hasPermission(Permissions.bypass.neutralTeleport) && player.getWorld().equals(islands.wildernessWorld.getWorld())) {
                 List<Entity> entities = player.getNearbyEntities(neutralTeleportRange, neutralTeleportRange, neutralTeleportRange);
                 List<Entity> notAnimals = new ArrayList<>();
                 entities.removeIf(entity -> {
@@ -283,7 +288,7 @@ public class TeleportCommands {
                 }
 
                 Location animalLocation = location.clone();
-                animalLocation.setY(Utils.getHighestYAt(Islands.islandsWorld, location.getBlockX(), location.getBlockZ()) + 2);
+                animalLocation.setY(Utils.getHighestYAt(islands.islandsWorld.getWorld(), location.getBlockX(), location.getBlockZ()) + 2);
 
                 for (Entity entity : entities) {
                     entity.teleport(animalLocation);
@@ -293,9 +298,9 @@ public class TeleportCommands {
     }
 
     private boolean canTeleport(Player player) {
-        if (plugin.teleportCooldowns.containsKey(player.getUniqueId().toString())) {
-            long cooldownTime  = plugin.getConfig().getInt("tpCooldownTime") * 1000L;
-            long timePassed = new Date().getTime() - plugin.teleportCooldowns.get(player.getUniqueId().toString());
+        if (islands.teleportCooldowns.containsKey(player.getUniqueId().toString())) {
+            long cooldownTime = plugin.getConfig().getInt("tpCooldownTime") * 1000L;
+            long timePassed = new Date().getTime() - islands.teleportCooldowns.get(player.getUniqueId().toString());
 
             return timePassed >= cooldownTime;
         }
@@ -327,13 +332,13 @@ public class TeleportCommands {
     }
 
     private int teleportCooldown(Player player) {
-        if (plugin.teleportCooldowns.containsKey(player.getUniqueId().toString())) {
-            long cooldownTime  = plugin.getConfig().getInt("tpCooldownTime") * 1000L;
-            long timePassed = new Date().getTime() - plugin.teleportCooldowns.get(player.getUniqueId().toString());
+        if (islands.teleportCooldowns.containsKey(player.getUniqueId().toString())) {
+            long cooldownTime = plugin.getConfig().getInt("tpCooldownTime") * 1000L;
+            long timePassed = new Date().getTime() - islands.teleportCooldowns.get(player.getUniqueId().toString());
 
             long remaining = cooldownTime - timePassed;
 
-            return remaining < 0 ? 0 : (int)(remaining / 1000);
+            return remaining < 0 ? 0 : (int) (remaining / 1000);
         }
 
         return 0;
